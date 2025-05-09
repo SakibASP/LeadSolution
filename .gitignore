@@ -1,0 +1,22 @@
+﻿################################################################################
+# This .gitignore file was automatically created by Microsoft(R) Visual Studio.
+################################################################################
+
+/.vs/LeadSolution/CopilotIndices/17.13.444.19527
+/.vs/LeadSolution/FileContentIndex
+/DbContext/obj
+/Interfaces/bin/Debug/net9.0
+/Interfaces/obj
+/LeadApi/bin/Debug/net9.0
+/LeadApi/obj/Debug/net9.0
+/LeadApi/obj
+/Models/bin/Debug/net9.0
+/Models/obj
+/Repositories/bin/Debug/net9.0
+/Repositories/obj
+/Services/bin/Debug/net9.0
+/Services/obj
+/Utils/bin/Debug/net9.0
+/Utils/obj
+/ViewModels/bin/Debug/net9.0
+/ViewModels/obj
