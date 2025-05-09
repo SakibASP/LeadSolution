@@ -90,7 +90,7 @@ namespace LeadApi.Controllers.Auth.v1
             });
         }
 
-        //[Authorize]
+        [Authorize]
         [HttpPost]
         [Route("revoke/{username}")]
         public async Task<IActionResult> Revoke(string username)
