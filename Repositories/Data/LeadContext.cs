@@ -3,11 +3,12 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using Models.Auth;
 using Models.Common;
 using Repositories.AuditFactory;
 namespace Repositories.Data
 {
-    public class LeadContext : IdentityDbContext<IdentityUser>
+    public class LeadContext : IdentityDbContext<ApplicationUser>
     {
         public LeadContext() { }
         public LeadContext(DbContextOptions<LeadContext> options)
