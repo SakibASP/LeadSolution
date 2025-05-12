@@ -5,6 +5,7 @@ using ViewModels.Auth;
 
 namespace LeadApi.Controllers.Auth.v1
 {
+    [Authorize]
     [ApiController]
     [Route("api/[controller]")]
     public class RoleController(UserManager<IdentityUser> userManager, RoleManager<IdentityRole> roleManager) : Controller
