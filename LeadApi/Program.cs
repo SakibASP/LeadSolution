@@ -105,16 +105,28 @@ builder.Services.AddSwaggerGen(c =>
 builder.Services.AddAuthorization();
 
 // Add CORS policy
+//builder.Services.AddCors(options =>
+//{
+//    options.AddPolicy("AllowAll", policy =>
+//    {
+//        policy
+//            .AllowAnyOrigin()
+//            .AllowAnyHeader()
+//            .AllowAnyMethod();
+//    });
+//});
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowAll", policy =>
+    options.AddPolicy("AllowSpecificOrigins", policy =>
     {
         policy
-            .AllowAnyOrigin()  // Or .WithOrigins("http://localhost:3000") for specific origins
+            .WithOrigins("http://localhost:3000")  // React app origin
             .AllowAnyHeader()
-            .AllowAnyMethod();
+            .AllowAnyMethod()
+            .AllowCredentials(); // enable sending cookies or credentials
     });
 });
+
 
 builder.Services.AddControllers();
 
@@ -146,7 +158,8 @@ if (app.Environment.IsDevelopment())
 }
 
 // Use the CORS policy
-app.UseCors("AllowAll");
+//app.UseCors("AllowAll");
+app.UseCors("AllowSpecificOrigins");
 
 app.UseHttpsRedirection();
 app.UseAuthentication();
