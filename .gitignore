@@ -23,3 +23,5 @@
 /.vs/LeadSolution
 /.vs/ProjectEvaluation
 /.vs
+/LeadUI/bin/Debug/net9.0
+/LeadUI/obj
