@@ -9,7 +9,7 @@ using ViewModels.Auth;
 namespace LeadApi.Controllers.Auth.v1
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api/v1/[controller]")]
     public class AuthController(UserManager<ApplicationUser> userManager, IConfiguration config, ITokenService tokenService) : ControllerBase
     {
         private readonly UserManager<ApplicationUser> _userManager = userManager;

@@ -11,6 +11,7 @@ using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
+
 // Add services to the container.
 builder.Services.AddDbContext<LeadContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"),
@@ -115,16 +116,14 @@ builder.Services.AddAuthorization();
 //            .AllowAnyMethod();
 //    });
 //});
+var allowedOrigins = new[] { "https://localhost:7131", "http://localhost:5186" };
+
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowSpecificOrigins", policy =>
-    {
-        policy
-            .WithOrigins("http://localhost:3000")  // React app origin
-            .AllowAnyHeader()
-            .AllowAnyMethod()
-            .AllowCredentials(); // enable sending cookies or credentials
-    });
+        policy.WithOrigins(allowedOrigins) // Allow multiple origins
+              .AllowAnyMethod()            // Allow all HTTP methods (GET, POST, etc.)
+              .AllowAnyHeader());          // Allow all headers
 });
 
 
