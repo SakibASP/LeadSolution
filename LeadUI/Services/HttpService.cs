@@ -18,8 +18,9 @@ namespace LeadUI.Services
                 new AuthenticationHeaderValue("Bearer", token);
         }
 
-        public async Task<T?> PostAsync<T>(string url, object data)
+        public async Task<T?> PostAsync<T>(string version, string endpoint, object data)
         {
+            var url = $"{version}/{endpoint}";
             var response = await _httpClient.PostAsJsonAsync(url, data); // Handles JSON + headers
 
             if (!response.IsSuccessStatusCode)
@@ -34,8 +35,9 @@ namespace LeadUI.Services
         }
 
 
-        public async Task<T?> GetAsync<T>(string url)
+        public async Task<T?> GetAsync<T>(string version, string endpoint)
         {
+            var url = $"{version}/{endpoint}";
             var response = await _httpClient.GetAsync(url);
 
             if (!response.IsSuccessStatusCode)

@@ -31,8 +31,7 @@ namespace LeadUI.Controllers
                 Password = "Sakib@123"
             };
 
-            var _url = _apiSettings.Versions.Auth + _apiSettings.Endpoints.Auth.Login;
-            var response = await _httpService.PostAsync<AuthResponseDto>(_url, loginData);
+            var response = await _httpService.PostAsync<AuthResponseDto>(_apiSettings.Versions.Auth, _apiSettings.Endpoints.Auth.Login, loginData);
             return View(response);
         }
 
