@@ -1,16 +1,15 @@
-﻿using Interfaces.Auth;
+﻿using Application.Interfaces.Auth;
+using Core.Models.Auth;
+using Core.ViewModels.Dto.Auth;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
-using Models.Auth;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
-using ViewModels.Auth;
 
-namespace Services.Auth
+namespace Application.Services.Auth
 {
     public class TokenService(UserManager<ApplicationUser> userManager, IOptions<JwtOptions> jwtOptions) : ITokenService
     {

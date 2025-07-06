@@ -1,12 +1,11 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Identity;
+﻿using Core.Models.Auth;
+using Core.Models.Common;
+using Infrustructure.Repositories.AuditFactory;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
-using Models.Auth;
-using Models.Common;
-using Repositories.AuditFactory;
-namespace Repositories.Data
+namespace Infrustructure.Repositories.Data
 {
     public class LeadContext : IdentityDbContext<ApplicationUser>
     {
@@ -33,6 +32,7 @@ namespace Repositories.Data
             base.OnModelCreating(modelBuilder);
         }
 
+        public virtual DbSet<AspNetServiceTypes> AspNetServiceTypes { get; set; } = default!;
         //For storing users actions in Audit Table
         public virtual DbSet<Audit> Audit { get; set; } = default!;
         private AuditTrailFactory? auditFactory = null;

@@ -1,14 +1,13 @@
-using LeadUI.Interfaces;
-using LeadUI.Models;
-using LeadUI.Settings;
-using Microsoft.AspNetCore.Http;
+using Common.Utils.Helper;
+using Core.ViewModels.Dto.Auth;
+using Lead.UI.Interfaces;
+using Lead.UI.Models;
+using Lead.UI.Settings;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using System.Diagnostics;
-using Utils.Helper;
-using ViewModels.Auth;
 
-namespace LeadUI.Controllers
+namespace Lead.UI.Controllers
 {
     public class HomeController(IHttpService httpService, IOptions<ApiSettings> apiSetting) : BaseController(httpService, apiSetting)
     {
@@ -21,8 +20,8 @@ namespace LeadUI.Controllers
 
         public IActionResult Privacy()
         {
-            var _response = HttpContext.Session.Get<AuthResponseDto>("AuthResponseDto");
-            return View(_response);
+            var response = HttpContext.Session.Get<AuthResponseDto>("AuthResponseDto");
+            return View(response);
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]

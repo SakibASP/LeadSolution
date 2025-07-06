@@ -1,103 +1,132 @@
-﻿using Interfaces.Auth;
+﻿using Application.Interfaces.Auth;
+using Azure;
+using Common.Utils.Helper;
+using Core.Models.Auth;
+using Core.ViewModels.Dto.Auth;
+using Core.ViewModels.Response;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
-using Models.Auth;
 using System.Text.Json;
-using Utils.Helper;
-using ViewModels.Auth;
 
-namespace LeadApi.Controllers.Auth.v1
+namespace Lead.Api.Controllers.Auth.v1
 {
     [ApiController]
     [Route("api/v1/[controller]")]
-    public class AuthController(UserManager<ApplicationUser> userManager, ITokenService tokenService, IOptions<JwtOptions> jwtOptions) : ControllerBase
+    public class AuthController(UserManager<ApplicationUser> userManager, ITokenService tokenService, IOptions<JwtOptions> jwtOptions, IServiceTypeService service) : ControllerBase
     {
         private readonly UserManager<ApplicationUser> _userManager = userManager;
         private readonly ITokenService _tokenService = tokenService;
         private readonly JwtOptions _jwtOptions = jwtOptions.Value;
+        private readonly IServiceTypeService _service = service;
 
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] RegisterDto dto)
         {
-            var user = new ApplicationUser { UserName = dto.Email, Email = dto.Email, PhoneNumber = dto.PhoneNumber };
-            var result = await _userManager.CreateAsync(user, dto.Password);
+            try
+            {
+                var user = new ApplicationUser
+                {
+                    UserName = dto.Email,
+                    Email = dto.Email,
+                    PhoneNumber = dto.PhoneNumber
+                };
 
-            if (!result.Succeeded)
-                return BadRequest(result.Errors);
+                var result = await _userManager.CreateAsync(user, dto.Password);
 
-            return Ok("User created successfully");
+                if (!result.Succeeded)
+                {
+                    var errorMessages = string.Join("; ", result.Errors.Select(e => e.Description));
+                    return BadRequest(ApiResponse<string>.Fail(errorMessages));
+                }
+
+                return Ok(ApiResponse<string>.Success("User created successfully"));
+            }
+            catch (Exception ex)
+            {
+                return Ok(ApiResponse<AuthResponseDto>.Fail("Something went wrong!"));
+            }
+            ;
         }
+
 
         [HttpPost("login")]
         public async Task<IActionResult> Login(LoginDto dto)
         {
-            var user = await _userManager.FindByEmailAsync(dto.Email);
-            if (user == null || !await _userManager.CheckPasswordAsync(user, dto.Password))
-                return Unauthorized();
-
-            var token = await _tokenService.GenerateJwtToken(user);
-            var refreshToken = _tokenService.GenerateRefreshToken();
-
-            // Store refresh token in the database
-            TokenDto tokenDto = new()
+            try
             {
-                RefreshToken = refreshToken,
-                Expires = DateTime.Now.AddDays(_jwtOptions.RefreshTokenValidityInDays)
-            };
-            var jsonRefreshToken = JsonSerializer.Serialize(tokenDto);
-            await _userManager.SetAuthenticationTokenAsync(user, "Default", "RefreshToken", jsonRefreshToken);
+                var user = await _userManager.FindByEmailAsync(dto.Email);
+                if (user == null || !await _userManager.CheckPasswordAsync(user, dto.Password))
+                    return Unauthorized(ApiResponse<string>.Fail("Invalid email or password"));
 
-            return Ok(new AuthResponseDto
+                var token = await _tokenService.GenerateJwtToken(user);
+                var refreshToken = _tokenService.GenerateRefreshToken();
+
+                // Store refresh token with expiration as JSON
+                var tokenDto = new TokenDto
+                {
+                    RefreshToken = refreshToken,
+                    Expires = TimeHelper.GetCurrentBangladeshTime().AddDays(_jwtOptions.RefreshTokenValidityInDays)
+                };
+                var jsonRefreshToken = JsonSerializer.Serialize(tokenDto);
+                await _userManager.SetAuthenticationTokenAsync(user, "Default", "RefreshToken", jsonRefreshToken);
+
+                // Wrap auth response inside ApiResponse<AuthResponseDto>
+                var response = new AuthResponseDto
+                {
+                    Token = token,
+                    RefreshToken = refreshToken,
+                    Expiration = TimeHelper.GetCurrentBangladeshTime().AddMinutes(_jwtOptions.TokenValidityInMinutes)
+                };
+
+                return Ok(ApiResponse<AuthResponseDto>.Success(response, "Login successful!"));
+            }
+            catch (Exception ex)
             {
-                IsSuccess = true,
-                Token = token,
-                RefreshToken = refreshToken,
-                Expiration = DateTime.Now.AddMinutes(_jwtOptions.TokenValidityInMinutes),
-                Message = "Login successful"
-            });
+                return Ok(ApiResponse<AuthResponseDto>.Fail("Something went wrong!"));
+            }
         }
+
 
         [HttpPost]
         [Route("refresh-token")]
         public async Task<IActionResult> RefreshToken([FromBody] TokenDto dto)
         {
-            if (dto is null || string.IsNullOrEmpty(dto.RefreshToken) || string.IsNullOrEmpty(dto.AccessToken)) return BadRequest("Invalid client request");
+            if (dto is null || string.IsNullOrEmpty(dto.RefreshToken) || string.IsNullOrEmpty(dto.AccessToken)) return BadRequest("Invalid client request!");
 
             // 1. Get claims principal from expired access token
             var principal = _tokenService.GetPrincipalFromExpiredToken(dto.AccessToken);
-            if (principal is null) return BadRequest("Invalid access token or refresh token");
+            if (principal is null) return BadRequest("Invalid access token or refresh token!");
 
-            var username = principal.Identity.Name;
-            if (string.IsNullOrEmpty(username)) return BadRequest("Invalid user");
+            var username = principal.Identity!.Name;
+            if (string.IsNullOrEmpty(username)) return BadRequest("Invalid user!");
 
             var user = await _userManager.FindByNameAsync(username);
-            if (user is null) return BadRequest("Invalid user");
+            if (user is null) return BadRequest("Invalid user!");
 
             var storedToken = await _userManager.GetAuthenticationTokenAsync(user, "Default", "RefreshToken");
-            if (storedToken is null) return Unauthorized("No refresh token found for this user");
+            if (storedToken is null) return Unauthorized("No refresh token found for this user!");
 
             var tokenData = JsonSerializer.Deserialize<TokenDto>(storedToken);
-            if (tokenData is null) return Unauthorized("Invalid refresh token data");
+            if (tokenData is null) return Unauthorized("Invalid refresh token data!");
 
-            if (tokenData.AccessToken != dto.RefreshToken) return Unauthorized("Invalid refresh token");
+            if (tokenData.RefreshToken != dto.RefreshToken) return Unauthorized("Invalid refresh token!");
             if (tokenData.Expires >= TimeHelper.GetCurrentBangladeshTime())
             {
                 await _userManager.RemoveAuthenticationTokenAsync(user, loginProvider: "Default", tokenName: "RefreshToken");
-                return Unauthorized("Refresh token expired");
+                return Unauthorized("Refresh token expired!");
             }
 
             var newAccessToken = await _tokenService.GenerateJwtToken(user);
-            return Ok(new AuthResponseDto
+            var response = new AuthResponseDto
             {
-                IsSuccess = true,
                 Token = newAccessToken,
                 RefreshToken = tokenData.RefreshToken,
-                Expiration = DateTime.Now.AddMinutes(_jwtOptions.TokenValidityInMinutes),
-                Message = "Token refreshed successfully"
-            });
+                Expiration = TimeHelper.GetCurrentBangladeshTime().AddMinutes(_jwtOptions.TokenValidityInMinutes)
+            };
+            return Ok(ApiResponse<AuthResponseDto>.Success(response, "Token refreshed successful!"));
         }
 
         [Authorize]
@@ -125,6 +154,21 @@ namespace LeadApi.Controllers.Auth.v1
             }
 
             return Ok(new { Status = "Success", Message = "All tokens revoked" });
+        }
+
+        [HttpGet]
+        [Route("service-type")]
+        public async Task<IActionResult> ServiceType()
+        {
+            try
+            {
+                var types = await _service.GetAspNetServiceTypesAsync();
+                return Ok(ApiResponse<IList<AspNetServiceTypes>>.Success(types, "Token refreshed successful!"));
+            }
+            catch (Exception ex)
+            {
+                return Ok(ApiResponse<AuthResponseDto>.Fail("Something went wrong!"));
+            }
         }
     }
 

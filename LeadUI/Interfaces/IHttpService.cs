@@ -1,4 +1,4 @@
-﻿namespace LeadUI.Interfaces
+﻿namespace Lead.UI.Interfaces
 {
     public interface IHttpService
     {

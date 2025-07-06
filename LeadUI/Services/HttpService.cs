@@ -1,7 +1,7 @@
-﻿using LeadUI.Interfaces;
+﻿using Lead.UI.Interfaces;
 using System.Net.Http.Headers;
 
-namespace LeadUI.Services
+namespace Lead.UI.Services
 {
     public class HttpService(HttpClient httpClient) : IHttpService
     {

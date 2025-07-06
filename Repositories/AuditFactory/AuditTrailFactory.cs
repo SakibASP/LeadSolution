@@ -3,9 +3,9 @@ using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 using System.Text;
-using Models.Common;
+using Core.Models.Common;
 
-namespace Repositories.AuditFactory
+namespace Infrustructure.Repositories.AuditFactory
 {
     public class AuditTrailFactory(IHttpContextAccessor httpContext)
     {

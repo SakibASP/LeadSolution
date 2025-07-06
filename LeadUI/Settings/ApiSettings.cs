@@ -1,4 +1,4 @@
-﻿namespace LeadUI.Settings
+﻿namespace Lead.UI.Settings
 {
     public class ApiSettings
     {
@@ -20,11 +20,13 @@
     public class  Auth
     {
         public required string Login { get; set; }
+        public required string RefreshToken { get; set; }
         public required string Register { get; set; }
         public required string GetUsers { get; set; }
         public required string GetUserById { get; set; }
         public required string GetRoles { get; set; }
         public required string GetRoleByUserId { get; set; }
+        public required string ServiceType { get; set; }
 
     }
 }

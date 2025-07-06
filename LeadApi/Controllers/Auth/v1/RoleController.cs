@@ -1,10 +1,10 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using Core.Models.Auth;
+using Core.ViewModels.Dto.Auth;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Models.Auth;
-using ViewModels.Auth;
 
-namespace LeadApi.Controllers.Auth.v1
+namespace Lead.Api.Controllers.Auth.v1
 {
     [Authorize]
     [ApiController]

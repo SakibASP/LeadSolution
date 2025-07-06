@@ -1,0 +1,26 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Folder Include="Models\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Extentions\Common.Extentions.csproj" />
+    <ProjectReference Include="..\Interfaces\Application.Interfaces.csproj" />
+    <ProjectReference Include="..\Models\Core.Models.csproj" />
+    <ProjectReference Include="..\Services\Application.Services.csproj" />
+    <ProjectReference Include="..\Utils\Common.Utils.csproj" />
+    <ProjectReference Include="..\ViewModels\Core.ViewModels.csproj" />
+  </ItemGroup>
+
+</Project>

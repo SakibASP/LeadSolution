@@ -1,9 +1,10 @@
-using LeadUI.Interfaces;
-using LeadUI.Services;
-using LeadUI.Settings;
-using Microsoft.Extensions.Options;
+using Application.Interfaces.Auth;
+using Application.Services.Auth;
+using Common.Extentions.ScopedServices;
+using Lead.UI.Interfaces;
+using Lead.UI.Services;
+using Lead.UI.Settings;
 using System.Net.Http.Headers;
-using Utils.Constant;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -29,7 +30,6 @@ builder.Services.AddSession(options =>
     options.IdleTimeout = TimeSpan.FromSeconds(10);
     options.Cookie.IsEssential = true;
 });
-
 
 var app = builder.Build();
 

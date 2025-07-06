@@ -1,7 +1,7 @@
-﻿using Models.Auth;
+﻿using Core.Models.Auth;
 using System.Security.Claims;
 
-namespace Interfaces.Auth
+namespace Application.Interfaces.Auth
 {
     public interface ITokenService
     {

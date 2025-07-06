@@ -1,4 +1,4 @@
-﻿namespace ViewModels.Auth
+﻿namespace Core.ViewModels.Dto.Auth
 {
     public class LoginDto
     {

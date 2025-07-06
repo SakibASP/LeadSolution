@@ -1,4 +1,4 @@
-namespace LeadUI.Models
+namespace Lead.UI.Models
 {
     public class ErrorViewModel
     {

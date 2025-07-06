@@ -23,9 +23,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Models\Models.csproj" />
-    <ProjectReference Include="..\Utils\Utils.csproj" />
-    <ProjectReference Include="..\ViewModels\ViewModels.csproj" />
+    <ProjectReference Include="..\Infrustructure.Interfaces\Infrustructure.Interfaces.csproj" />
+    <ProjectReference Include="..\Models\Core.Models.csproj" />
+    <ProjectReference Include="..\Utils\Common.Utils.csproj" />
+    <ProjectReference Include="..\ViewModels\Core.ViewModels.csproj" />
   </ItemGroup>
 
 </Project>

@@ -1,15 +1,11 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
-using System.ComponentModel.DataAnnotations;
 
-namespace Models.Common
+namespace Core.Models.Common
 {
     [Table(nameof(Audit))]
     public class Audit
     {
-        [Key]
-        [Required]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public long AutoId { get; set; }
+        public long Id { get; set; }
         public string? TableName { get; set; }
         public string? UserId { get; set; }
         public string? Actions { get; set; }

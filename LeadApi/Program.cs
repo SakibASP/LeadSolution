@@ -1,14 +1,13 @@
-﻿using Interfaces.Auth;
+﻿using Common.Extentions.ScopedServices;
+using Core.Models.Auth;
+using Core.ViewModels.Dto.Auth;
+using Infrustructure.Repositories.Data;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-using Models.Auth;
-using Repositories.Data;
-using Services.Auth;
 using System.Text;
-using ViewModels.Auth;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -133,9 +132,7 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 //builder.Services.AddOpenApi();
-
-builder.Services.AddScoped<ITokenService, TokenService>();
-
+builder.Services.AddScopedAppServices();
 var app = builder.Build();
 
 // Seed roles on startup

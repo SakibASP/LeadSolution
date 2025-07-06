@@ -1,0 +1,39 @@
+﻿@using Core.ViewModels.Dto.Auth
+@model LoginDto
+
+@{
+    ViewBag.Title = "Login";
+}
+
+<div class="container d-flex justify-content-center align-items-center min-vh-100">
+    <div class="card shadow-lg p-4 rounded-4" style="width: 100%; max-width: 400px;">
+        <h3 class="text-center mb-4 text-primary fw-bold">Sign In</h3>
+
+        @using (Html.BeginForm(null, null, FormMethod.Post, new { @class = "needs-validation", novalidate = "novalidate" }))
+        {
+            @Html.ValidationSummary(true, "", new { @class = "alert alert-danger" })
+
+            <div class="mb-3">
+                @Html.LabelFor(m => m.Email, new { @class = "form-label" })
+                @Html.TextBoxFor(m => m.Email, new { @class = "form-control", placeholder = "Enter email" })
+                @Html.ValidationMessageFor(m => m.Email, "", new { @class = "text-danger small" })
+            </div>
+
+            <div class="mb-3">
+                @Html.LabelFor(m => m.Password, new { @class = "form-label" })
+                @Html.PasswordFor(m => m.Password, new { @class = "form-control", placeholder = "Enter password" })
+                @Html.ValidationMessageFor(m => m.Password, "", new { @class = "text-danger small" })
+            </div>
+
+            <div class="d-grid">
+                <button type="submit" class="btn btn-primary btn-block">Login</button>
+            </div>
+        }
+
+        <div class="text-center mt-3">
+            <span class="text-muted">Don't have an account?</span>
+            @Html.ActionLink("Register here", "Register", "Auth", new { @class = "text-decoration-none fw-semibold" })
+        </div>
+    </div>
+</div>
+

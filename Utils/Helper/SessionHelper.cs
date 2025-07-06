@@ -2,7 +2,7 @@
 using System.Text;
 using System.Text.Json;
 
-namespace Utils.Helper
+namespace Common.Utils.Helper
 {
     public static class SessionHelper
     {
