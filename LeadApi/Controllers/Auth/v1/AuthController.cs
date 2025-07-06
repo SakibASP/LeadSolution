@@ -3,18 +3,21 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using Models.Auth;
+using System.Text.Json;
+using Utils.Helper;
 using ViewModels.Auth;
 
 namespace LeadApi.Controllers.Auth.v1
 {
     [ApiController]
     [Route("api/v1/[controller]")]
-    public class AuthController(UserManager<ApplicationUser> userManager, IConfiguration config, ITokenService tokenService) : ControllerBase
+    public class AuthController(UserManager<ApplicationUser> userManager, ITokenService tokenService, IOptions<JwtOptions> jwtOptions) : ControllerBase
     {
         private readonly UserManager<ApplicationUser> _userManager = userManager;
-        private readonly IConfiguration _config = config;
         private readonly ITokenService _tokenService = tokenService;
+        private readonly JwtOptions _jwtOptions = jwtOptions.Value;
 
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] RegisterDto dto)
@@ -39,16 +42,20 @@ namespace LeadApi.Controllers.Auth.v1
             var refreshToken = _tokenService.GenerateRefreshToken();
 
             // Store refresh token in the database
-            user.RefreshToken = refreshToken;
-            user.RefreshTokenExpiryTime = DateTime.Now.AddDays(int.Parse(_config["JWT:RefreshTokenValidityInDays"]));
-            await _userManager.UpdateAsync(user);
+            TokenDto tokenDto = new()
+            {
+                RefreshToken = refreshToken,
+                Expires = DateTime.Now.AddDays(_jwtOptions.RefreshTokenValidityInDays)
+            };
+            var jsonRefreshToken = JsonSerializer.Serialize(tokenDto);
+            await _userManager.SetAuthenticationTokenAsync(user, "Default", "RefreshToken", jsonRefreshToken);
 
             return Ok(new AuthResponseDto
             {
                 IsSuccess = true,
                 Token = token,
                 RefreshToken = refreshToken,
-                Expiration = DateTime.Now.AddMinutes(int.Parse(_config["JWT:TokenValidityInMinutes"])),
+                Expiration = DateTime.Now.AddMinutes(_jwtOptions.TokenValidityInMinutes),
                 Message = "Login successful"
             });
         }
@@ -57,31 +64,38 @@ namespace LeadApi.Controllers.Auth.v1
         [Route("refresh-token")]
         public async Task<IActionResult> RefreshToken([FromBody] TokenDto dto)
         {
-            if (dto is null || string.IsNullOrEmpty(dto.AccessToken) || string.IsNullOrEmpty(dto.RefreshToken))
-                return BadRequest("Invalid client request");
+            if (dto is null || string.IsNullOrEmpty(dto.RefreshToken) || string.IsNullOrEmpty(dto.AccessToken)) return BadRequest("Invalid client request");
 
+            // 1. Get claims principal from expired access token
             var principal = _tokenService.GetPrincipalFromExpiredToken(dto.AccessToken);
-            if (principal == null)
-                return BadRequest("Invalid access token or refresh token");
+            if (principal is null) return BadRequest("Invalid access token or refresh token");
 
-            string username = principal.Identity.Name;
+            var username = principal.Identity.Name;
+            if (string.IsNullOrEmpty(username)) return BadRequest("Invalid user");
+
             var user = await _userManager.FindByNameAsync(username);
+            if (user is null) return BadRequest("Invalid user");
 
-            if (user == null || user.RefreshToken != dto.RefreshToken || user.RefreshTokenExpiryTime <= DateTime.Now)
-                return BadRequest("Invalid access token or refresh token");
+            var storedToken = await _userManager.GetAuthenticationTokenAsync(user, "Default", "RefreshToken");
+            if (storedToken is null) return Unauthorized("No refresh token found for this user");
+
+            var tokenData = JsonSerializer.Deserialize<TokenDto>(storedToken);
+            if (tokenData is null) return Unauthorized("Invalid refresh token data");
+
+            if (tokenData.AccessToken != dto.RefreshToken) return Unauthorized("Invalid refresh token");
+            if (tokenData.Expires >= TimeHelper.GetCurrentBangladeshTime())
+            {
+                await _userManager.RemoveAuthenticationTokenAsync(user, loginProvider: "Default", tokenName: "RefreshToken");
+                return Unauthorized("Refresh token expired");
+            }
 
             var newAccessToken = await _tokenService.GenerateJwtToken(user);
-            var newRefreshToken = _tokenService.GenerateRefreshToken();
-
-            user.RefreshToken = newRefreshToken;
-            await _userManager.UpdateAsync(user);
-
             return Ok(new AuthResponseDto
             {
                 IsSuccess = true,
                 Token = newAccessToken,
-                RefreshToken = newRefreshToken,
-                Expiration = DateTime.Now.AddMinutes(int.Parse(_config["JWT:TokenValidityInMinutes"])),
+                RefreshToken = tokenData.RefreshToken,
+                Expiration = DateTime.Now.AddMinutes(_jwtOptions.TokenValidityInMinutes),
                 Message = "Token refreshed successfully"
             });
         }
@@ -93,9 +107,7 @@ namespace LeadApi.Controllers.Auth.v1
         {
             var user = await _userManager.FindByNameAsync(username);
             if (user == null) return BadRequest("Invalid user name");
-
-            user.RefreshToken = null;
-            await _userManager.UpdateAsync(user);
+            await _userManager.RemoveAuthenticationTokenAsync(user,loginProvider: "Default",tokenName: "RefreshToken");
 
             return Ok(new { Status = "Success", Message = "Token revoked" });
         }
@@ -108,7 +120,7 @@ namespace LeadApi.Controllers.Auth.v1
             var users = await _userManager.Users.ToListAsync();
             foreach (var user in users)
             {
-                user.RefreshToken = null;
+                await _userManager.RemoveAuthenticationTokenAsync(user, loginProvider: "Default", tokenName: "RefreshToken");
                 await _userManager.UpdateAsync(user);
             }
 

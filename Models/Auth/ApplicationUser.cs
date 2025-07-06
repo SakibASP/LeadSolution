@@ -1,11 +1,14 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Models.Auth
 {
     public class ApplicationUser : IdentityUser
     {
-        // Properties for refresh token
-        public string? RefreshToken { get; set; }
-        public DateTime? RefreshTokenExpiryTime { get; set; }
+        public string? Company { get; set; }
+        public int? ServiceTypeId { get; set; }
+
+        [ForeignKey("ServiceTypeId")]
+        public AspNetServiceTypes? ServiceType { get; set; }
     }
 }

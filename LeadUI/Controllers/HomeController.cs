@@ -1,21 +1,17 @@
 using LeadUI.Interfaces;
 using LeadUI.Models;
 using LeadUI.Settings;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
-using Newtonsoft.Json;
 using System.Diagnostics;
-using System.Text;
-using Utils.Constant;
+using Utils.Helper;
 using ViewModels.Auth;
 
 namespace LeadUI.Controllers
 {
-    public class HomeController(ILogger<HomeController> logger, IHttpService httpService, IOptions<ApiSettings> apiSetting) : Controller
+    public class HomeController(IHttpService httpService, IOptions<ApiSettings> apiSetting) : BaseController(httpService, apiSetting)
     {
-        private readonly ILogger<HomeController> _logger = logger;
-        private readonly IHttpService _httpService = httpService;
-        private readonly ApiSettings _apiSettings = apiSetting.Value;
         public IActionResult Index()
         {
             var name = "Lead";
@@ -23,16 +19,10 @@ namespace LeadUI.Controllers
             return View();
         }
 
-        public async Task<IActionResult> Privacy()
+        public IActionResult Privacy()
         {
-            var loginData = new
-            {
-                Email = "sakibur.rahman.cse@gmail.com",
-                Password = "Sakib@123"
-            };
-
-            var response = await _httpService.PostAsync<AuthResponseDto>(_apiSettings.Versions.Auth, _apiSettings.Endpoints.Auth.Login, loginData);
-            return View(response);
+            var _response = HttpContext.Session.Get<AuthResponseDto>("AuthResponseDto");
+            return View(_response);
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]

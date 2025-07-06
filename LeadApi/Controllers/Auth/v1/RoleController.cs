@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Models.Auth;
 using ViewModels.Auth;
 
 namespace LeadApi.Controllers.Auth.v1
@@ -8,9 +9,9 @@ namespace LeadApi.Controllers.Auth.v1
     [Authorize]
     [ApiController]
     [Route("api/[controller]")]
-    public class RoleController(UserManager<IdentityUser> userManager, RoleManager<IdentityRole> roleManager) : Controller
+    public class RoleController(UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager) : Controller
     {
-        private readonly UserManager<IdentityUser> _userManager = userManager;
+        private readonly UserManager<ApplicationUser> _userManager = userManager;
         private readonly RoleManager<IdentityRole> _roleManager = roleManager;
         [HttpGet("all-roles")]
         public IActionResult GetAllRoles()

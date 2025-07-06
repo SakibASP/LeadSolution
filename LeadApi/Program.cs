@@ -8,11 +8,12 @@ using Models.Auth;
 using Repositories.Data;
 using Services.Auth;
 using System.Text;
+using ViewModels.Auth;
 
 var builder = WebApplication.CreateBuilder(args);
 
-
 // Add services to the container.
+builder.Services.Configure<JwtOptions>(builder.Configuration.GetSection("JWT"));
 builder.Services.AddDbContext<LeadContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"),
         b => b.MigrationsAssembly("Repositories"))); // 👈 Specify where migrations will live

@@ -3,14 +3,9 @@ using System.Net.Http.Headers;
 
 namespace LeadUI.Services
 {
-    public class HttpService : IHttpService
+    public class HttpService(HttpClient httpClient) : IHttpService
     {
-        private readonly HttpClient _httpClient;
-
-        public HttpService(HttpClient httpClient)
-        {
-            _httpClient = httpClient;
-        }
+        private readonly HttpClient _httpClient = httpClient;
 
         public void SetBearerToken(string token)
         {

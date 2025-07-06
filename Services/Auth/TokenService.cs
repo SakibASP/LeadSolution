@@ -1,19 +1,21 @@
 ﻿using Interfaces.Auth;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Models.Auth;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
+using ViewModels.Auth;
 
 namespace Services.Auth
 {
-    public class TokenService(IConfiguration configuration, UserManager<ApplicationUser> userManager) : ITokenService
+    public class TokenService(UserManager<ApplicationUser> userManager, IOptions<JwtOptions> jwtOptions) : ITokenService
     {
-        private readonly IConfiguration _configuration = configuration;
         private readonly UserManager<ApplicationUser> _userManager = userManager;
+        private readonly JwtOptions _jwtOptions = jwtOptions.Value;
 
         public async Task<string> GenerateJwtToken(ApplicationUser user)
         {
@@ -21,9 +23,9 @@ namespace Services.Auth
 
             var authClaims = new List<Claim>
             {
-                new Claim(ClaimTypes.Name, user.UserName),
-                new Claim(ClaimTypes.Email, user.Email),
-                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+                new(ClaimTypes.Name, user.UserName),
+                new(ClaimTypes.Email, user.Email),
+                new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
             };
 
             foreach (var userRole in userRoles)
@@ -31,13 +33,13 @@ namespace Services.Auth
                 authClaims.Add(new Claim(ClaimTypes.Role, userRole));
             }
 
-            var authSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JWT:Secret"]));
+            var authSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtOptions.Secret));
 
-            var tokenValidityInMinutes = int.Parse(_configuration["JWT:TokenValidityInMinutes"]);
+            var tokenValidityInMinutes = _jwtOptions.TokenValidityInMinutes;
 
             var token = new JwtSecurityToken(
-                issuer: _configuration["JWT:ValidIssuer"],
-                audience: _configuration["JWT:ValidAudience"],
+                issuer: _jwtOptions.ValidIssuer,
+                audience: _jwtOptions.ValidAudience,
                 expires: DateTime.Now.AddMinutes(tokenValidityInMinutes),
                 claims: authClaims,
                 signingCredentials: new SigningCredentials(authSigningKey, SecurityAlgorithms.HmacSha256)
@@ -49,11 +51,9 @@ namespace Services.Auth
         public string GenerateRefreshToken()
         {
             var randomNumber = new byte[32];
-            using (var rng = RandomNumberGenerator.Create())
-            {
-                rng.GetBytes(randomNumber);
-                return Convert.ToBase64String(randomNumber);
-            }
+            using var rng = RandomNumberGenerator.Create();
+            rng.GetBytes(randomNumber);
+            return Convert.ToBase64String(randomNumber);
         }
 
         public ClaimsPrincipal GetPrincipalFromExpiredToken(string token)
@@ -64,9 +64,9 @@ namespace Services.Auth
                 ValidateAudience = true,
                 ValidateLifetime = false, // Don't validate lifetime here
                 ValidateIssuerSigningKey = true,
-                ValidIssuer = _configuration["JWT:ValidIssuer"],
-                ValidAudience = _configuration["JWT:ValidAudience"],
-                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JWT:Secret"]))
+                ValidIssuer = _jwtOptions.ValidIssuer,
+                ValidAudience = _jwtOptions.ValidAudience,
+                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtOptions.Secret))
             };
 
             var tokenHandler = new JwtSecurityTokenHandler();
