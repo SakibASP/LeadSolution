@@ -25,3 +25,7 @@
 /.vs
 /LeadUI/bin/Debug/net9.0
 /LeadUI/obj
+/Extentions/bin/Debug/net9.0
+/Extentions/obj
+/Infrustructure.Interfaces/bin/Debug/net9.0
+/Infrustructure.Interfaces/obj
