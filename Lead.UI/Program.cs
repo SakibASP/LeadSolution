@@ -1,6 +1,3 @@
-using Application.Interfaces.Auth;
-using Application.Services.Auth;
-using Common.Extentions.ScopedServices;
 using Lead.UI.Interfaces;
 using Lead.UI.Services;
 using Lead.UI.Settings;

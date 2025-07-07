@@ -1,56 +1,61 @@
-﻿@using Core.ViewModels.Dto.Auth
-@model RegisterDto
+﻿@model Core.ViewModels.Dto.Auth.RegisterDto
+
 @{
-    ViewBag.Title = "Register";
+    ViewData["Title"] = "Register";
 }
 
 <div class="container d-flex justify-content-center align-items-center min-vh-100">
     <div class="card shadow-lg p-4 rounded-4" style="width: 100%; max-width: 500px;">
         <h3 class="text-center mb-4 text-success fw-bold">Create Your Account</h3>
 
-        @using (Html.BeginForm(null, null, FormMethod.Post, new { @class = "needs-validation", novalidate = "novalidate" }))
-        {
-            @Html.ValidationSummary(true, "", new { @class = "alert alert-danger" })
+        <form asp-action="Register" asp-controller="Auth" method="post" class="needs-validation" novalidate>
+            <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
 
             <div class="mb-3">
-                @Html.LabelFor(m => m.Email, new { @class = "form-label" })
-                @Html.TextBoxFor(m => m.Email, new { @class = "form-control", placeholder = "Enter email" })
-                @Html.ValidationMessageFor(m => m.Email, "", new { @class = "text-danger small" })
+                <label asp-for="Email" class="form-label"></label>
+                <input asp-for="Email" class="form-control" placeholder="Enter email" />
+                <span asp-validation-for="Email" class="text-danger small"></span>
             </div>
 
             <div class="mb-3">
-                @Html.LabelFor(m => m.Password, new { @class = "form-label" })
-                @Html.PasswordFor(m => m.Password, new { @class = "form-control", placeholder = "Enter password" })
-                @Html.ValidationMessageFor(m => m.Password, "", new { @class = "text-danger small" })
+                <label asp-for="Password" class="form-label"></label>
+                <input asp-for="Password" class="form-control" placeholder="Enter password" />
+                <span asp-validation-for="Password" class="text-danger small"></span>
             </div>
 
             <div class="mb-3">
-                @Html.LabelFor(m => m.PhoneNumber, new { @class = "form-label" })
-                @Html.TextBoxFor(m => m.PhoneNumber, new { @class = "form-control", placeholder = "Enter phone number" })
-                @Html.ValidationMessageFor(m => m.PhoneNumber, "", new { @class = "text-danger small" })
+                <label asp-for="PhoneNumber" class="form-label"></label>
+                <input asp-for="PhoneNumber" class="form-control" placeholder="Enter phone number" />
+                <span asp-validation-for="PhoneNumber" class="text-danger small"></span>
             </div>
 
             <div class="mb-3">
-                @Html.LabelFor(m => m.Company, new { @class = "form-label" })
-                @Html.TextBoxFor(m => m.Company, new { @class = "form-control", placeholder = "Enter company name" })
-                @Html.ValidationMessageFor(m => m.Company, "", new { @class = "text-danger small" })
+                <label asp-for="Company" class="form-label"></label>
+                <input asp-for="Company" class="form-control" placeholder="Enter company name" />
+                <span asp-validation-for="Company" class="text-danger small"></span>
             </div>
 
             <div class="mb-4">
-                @Html.LabelFor(m => m.ServiceTypeId, new { @class = "form-label" })
-                @Html.DropDownListFor(m => m.ServiceTypeId, ViewBag.ServiceTypes as SelectList, "-- Select Service Type --", new { @class = "form-select" })
-                @Html.ValidationMessageFor(m => m.ServiceTypeId, "", new { @class = "text-danger small" })
+                <label asp-for="ServiceTypeId" class="form-label"></label>
+                <select asp-for="ServiceTypeId" class="form-select"
+                        asp-items="ViewBag.ServiceTypes as SelectList">
+                    <option value="">-- Select Service Type --</option>
+                </select>
+                <span asp-validation-for="ServiceTypeId" class="text-danger small"></span>
             </div>
-
 
             <div class="d-grid">
                 <button type="submit" class="btn btn-success">Register</button>
             </div>
-        }
+        </form>
 
         <div class="text-center mt-3">
             <span class="text-muted">Already have an account?</span>
-            @Html.ActionLink("Login here", "Login", "Auth", new { @class = "text-decoration-none fw-semibold" })
+            <a asp-action="Login" asp-controller="Auth" class="text-decoration-none fw-semibold">Login here</a>
         </div>
     </div>
 </div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

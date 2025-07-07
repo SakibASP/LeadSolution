@@ -39,7 +39,7 @@ namespace Lead.Api.Controllers.Auth.v1
                 if (!result.Succeeded)
                 {
                     var errorMessages = string.Join("; ", result.Errors.Select(e => e.Description));
-                    return BadRequest(ApiResponse<string>.Fail(errorMessages));
+                    return Ok(ApiResponse<string>.Fail(errorMessages));
                 }
 
                 return Ok(ApiResponse<string>.Success("User created successfully"));
@@ -59,7 +59,7 @@ namespace Lead.Api.Controllers.Auth.v1
             {
                 var user = await _userManager.FindByEmailAsync(dto.Email);
                 if (user == null || !await _userManager.CheckPasswordAsync(user, dto.Password))
-                    return Unauthorized(ApiResponse<string>.Fail("Invalid email or password"));
+                    return Ok(ApiResponse<string>.Fail("Invalid email or password"));
 
                 var token = await _tokenService.GenerateJwtToken(user);
                 var refreshToken = _tokenService.GenerateRefreshToken();
@@ -98,25 +98,31 @@ namespace Lead.Api.Controllers.Auth.v1
 
             // 1. Get claims principal from expired access token
             var principal = _tokenService.GetPrincipalFromExpiredToken(dto.AccessToken);
-            if (principal is null) return BadRequest("Invalid access token or refresh token!");
+            if (principal is null) 
+                return Ok(ApiResponse<AuthResponseDto>.Fail("Invalid access token or refresh token!"));
 
             var username = principal.Identity!.Name;
-            if (string.IsNullOrEmpty(username)) return BadRequest("Invalid user!");
+            if (string.IsNullOrEmpty(username)) 
+                return Ok(ApiResponse<AuthResponseDto>.Fail("Invalid user!"));
 
             var user = await _userManager.FindByNameAsync(username);
-            if (user is null) return BadRequest("Invalid user!");
+            if (user is null) 
+                return Ok(ApiResponse<AuthResponseDto>.Fail("Invalid user!"));
 
             var storedToken = await _userManager.GetAuthenticationTokenAsync(user, "Default", "RefreshToken");
-            if (storedToken is null) return Unauthorized("No refresh token found for this user!");
+            if (storedToken is null) 
+                return Ok(ApiResponse<AuthResponseDto>.Fail("No refresh token found for this user!"));
 
             var tokenData = JsonSerializer.Deserialize<TokenDto>(storedToken);
-            if (tokenData is null) return Unauthorized("Invalid refresh token data!");
+            if (tokenData is null) 
+                return Ok(ApiResponse<AuthResponseDto>.Fail("Invalid refresh token data!"));
 
-            if (tokenData.RefreshToken != dto.RefreshToken) return Unauthorized("Invalid refresh token!");
+            if (tokenData.RefreshToken != dto.RefreshToken) 
+                return Ok(ApiResponse<AuthResponseDto>.Fail("Invalid refresh token!"));
             if (tokenData.Expires >= TimeHelper.GetCurrentBangladeshTime())
             {
                 await _userManager.RemoveAuthenticationTokenAsync(user, loginProvider: "Default", tokenName: "RefreshToken");
-                return Unauthorized("Refresh token expired!");
+                return Ok(ApiResponse<AuthResponseDto>.Fail("Refresh token expired!"));
             }
 
             var newAccessToken = await _tokenService.GenerateJwtToken(user);
@@ -135,7 +141,8 @@ namespace Lead.Api.Controllers.Auth.v1
         public async Task<IActionResult> Revoke(string username)
         {
             var user = await _userManager.FindByNameAsync(username);
-            if (user == null) return BadRequest("Invalid user name");
+            if (user == null) return 
+                    Ok(ApiResponse<AuthResponseDto>.Fail("Invalid user name"));
             await _userManager.RemoveAuthenticationTokenAsync(user,loginProvider: "Default",tokenName: "RefreshToken");
 
             return Ok(new { Status = "Success", Message = "Token revoked" });
