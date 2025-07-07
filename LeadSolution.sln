@@ -13,27 +13,27 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Infrustructure", "Infrustru
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "API", "API", "{23E9DC47-882A-49D6-A73E-4C384648D677}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Core.Models", "Models\Core.Models.csproj", "{E7CFFBFD-C0EF-4379-A79C-48FBC6B41DDF}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Core.Models", "Core.Models\Core.Models.csproj", "{E7CFFBFD-C0EF-4379-A79C-48FBC6B41DDF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Core.ViewModels", "ViewModels\Core.ViewModels.csproj", "{351E82EC-2EEA-4B48-B53F-251563C9C16D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Core.ViewModels", "Core.ViewModels\Core.ViewModels.csproj", "{351E82EC-2EEA-4B48-B53F-251563C9C16D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lead.Api", "LeadApi\Lead.Api.csproj", "{4C53F8EE-5E77-4B9C-9F9F-353E1D17E814}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lead.Api", "Lead.Api\Lead.Api.csproj", "{4C53F8EE-5E77-4B9C-9F9F-353E1D17E814}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Infrustructure.Repositories", "Repositories\Infrustructure.Repositories.csproj", "{BF36A5F6-7CE9-42F0-8DB4-D343FF4F20C0}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Infrustructure.Repositories", "Infrustructure.Repositories\Infrustructure.Repositories.csproj", "{BF36A5F6-7CE9-42F0-8DB4-D343FF4F20C0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Application.Interfaces", "Interfaces\Application.Interfaces.csproj", "{B1919B93-0D23-4568-A128-FE56801919BB}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Application.Interfaces", "Application.Interfaces\Application.Interfaces.csproj", "{B1919B93-0D23-4568-A128-FE56801919BB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Application.Services", "Services\Application.Services.csproj", "{87BF6041-621C-4EE9-A04F-EF3BEC71891A}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Application.Services", "Application.Services\Application.Services.csproj", "{87BF6041-621C-4EE9-A04F-EF3BEC71891A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Common.Utils", "Utils\Common.Utils.csproj", "{DDDAFFAD-F6FE-4D70-B392-C95C69B11D2B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Common.Utils", "Common.Utils\Common.Utils.csproj", "{DDDAFFAD-F6FE-4D70-B392-C95C69B11D2B}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Common", "Common", "{E08C1E43-4019-4E17-B347-EEB8047DABBC}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Web", "Web", "{219DE2C9-9CEE-4282-A2EA-E027848B6025}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lead.UI", "LeadUI\Lead.UI.csproj", "{740B75F1-3488-47F0-80DC-D605A23C2C31}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lead.UI", "Lead.UI\Lead.UI.csproj", "{740B75F1-3488-47F0-80DC-D605A23C2C31}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Common.Extentions", "Extentions\Common.Extentions.csproj", "{7B706B6D-C1E6-4986-A51F-777AB00D82C5}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Common.Extentions", "Common.Extentions\Common.Extentions.csproj", "{7B706B6D-C1E6-4986-A51F-777AB00D82C5}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Infrustructure.Interfaces", "Infrustructure.Interfaces\Infrustructure.Interfaces.csproj", "{514DCB17-61D9-43C6-A848-CBFCABEC972D}"
 EndProject

@@ -11,9 +11,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Interfaces\Application.Interfaces.csproj" />
-    <ProjectReference Include="..\Repositories\Infrustructure.Repositories.csproj" />
-    <ProjectReference Include="..\Services\Application.Services.csproj" />
+    <ProjectReference Include="..\Application.Interfaces\Application.Interfaces.csproj" />
+    <ProjectReference Include="..\Infrustructure.Repositories\Infrustructure.Repositories.csproj" />
+    <ProjectReference Include="..\Application.Services\Application.Services.csproj" />
   </ItemGroup>
 
 </Project>

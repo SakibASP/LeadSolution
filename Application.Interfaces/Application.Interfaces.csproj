@@ -11,8 +11,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Models\Core.Models.csproj" />
-    <ProjectReference Include="..\ViewModels\Core.ViewModels.csproj" />
+    <ProjectReference Include="..\Core.Models\Core.Models.csproj" />
+    <ProjectReference Include="..\Core.ViewModels\Core.ViewModels.csproj" />
   </ItemGroup>
 
 </Project>

@@ -15,7 +15,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.Configure<JwtOptions>(builder.Configuration.GetSection("JWT"));
 builder.Services.AddDbContext<LeadContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"),
-        b => b.MigrationsAssembly("Repositories"))); // 👈 Specify where migrations will live
+        b => b.MigrationsAssembly("Infrustructure.Repositories"))); // 👈 Specify where migrations will live
 
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
     .AddEntityFrameworkStores<LeadContext>()
