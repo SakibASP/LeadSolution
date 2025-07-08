@@ -48,7 +48,7 @@ namespace Lead.Api.Controllers.Auth.v1
             {
                 return Ok(ApiResponse<AuthResponseDto>.Fail("Something went wrong!"));
             }
-            ;
+            
         }
 
 
@@ -70,8 +70,9 @@ namespace Lead.Api.Controllers.Auth.v1
                     RefreshToken = refreshToken,
                     Expires = TimeHelper.GetCurrentBangladeshTime().AddDays(_jwtOptions.RefreshTokenValidityInDays)
                 };
-                var jsonRefreshToken = JsonSerializer.Serialize(tokenDto);
-                await _userManager.SetAuthenticationTokenAsync(user, "Default", "RefreshToken", jsonRefreshToken);
+
+                var encryptedToken = EncryptionHelper.Encrypt(JsonSerializer.Serialize(tokenDto));
+                await _userManager.SetAuthenticationTokenAsync(user, "Default", "RefreshToken", encryptedToken);
 
                 // Wrap auth response inside ApiResponse<AuthResponseDto>
                 var response = new AuthResponseDto
@@ -113,7 +114,7 @@ namespace Lead.Api.Controllers.Auth.v1
             if (storedToken is null) 
                 return Ok(ApiResponse<AuthResponseDto>.Fail("No refresh token found for this user!"));
 
-            var tokenData = JsonSerializer.Deserialize<TokenDto>(storedToken);
+            var tokenData = JsonSerializer.Deserialize<TokenDto>(EncryptionHelper.Decrypt(storedToken));
             if (tokenData is null) 
                 return Ok(ApiResponse<AuthResponseDto>.Fail("Invalid refresh token data!"));
 
