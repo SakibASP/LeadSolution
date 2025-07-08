@@ -14,12 +14,12 @@ namespace Lead.UI.Controllers
     {
         protected readonly IHttpService _httpService = httpService;
         protected readonly ApiSettings _apiSettings = apiSetting.Value;
-        protected string? AccessToken { get; set; } = string.Empty;
+        protected string AccessToken { get; set; } = string.Empty;
         public override async Task OnActionExecutionAsync(ActionExecutingContext filterContext, ActionExecutionDelegate next)
         {
             var sessionAuth = HttpContext.Session.Get<AuthResponseDto>(Constants.AuthResponseDto);
             // Check if the user is authenticated
-            if (sessionAuth?.Token is null)
+            if (sessionAuth == null || string.IsNullOrEmpty(sessionAuth.Token))
             {
                 //Redirect to the login page
                 HttpContext.Response.Redirect(Constants.RedirectToLogin);
@@ -43,7 +43,7 @@ namespace Lead.UI.Controllers
                 sessionAuth = response?.Data;
                 HttpContext.Session.Set(Constants.AuthResponseDto, sessionAuth);
             }
-            AccessToken = sessionAuth?.Token;
+            AccessToken = sessionAuth?.Token ?? string.Empty;
             // Proceed with the action execution
             await next();
         }

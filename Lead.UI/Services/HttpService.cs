@@ -30,17 +30,24 @@ namespace Lead.UI.Services
         }
 
 
-        public async Task<T?> GetAsync<T>(string version, string endpoint)
+        public async Task<T?> GetAsync<T>(string version, string endpoint, Dictionary<string, string>? queryParams = null)
         {
-            var url = $"{version}/{endpoint}";
+            var query = queryParams is not null && queryParams.Any()
+                ? "?" + string.Join("&", queryParams.Select(kv => $"{kv.Key}={Uri.EscapeDataString(kv.Value)}"))
+                : string.Empty;
+
+            var url = $"{version}/{endpoint}{query}";
             var response = await _httpClient.GetAsync(url);
 
             if (!response.IsSuccessStatusCode)
             {
+                var err = await response.Content.ReadAsStringAsync();
+                Console.WriteLine($"❌ API Error ({response.StatusCode}): {err}");
                 return default;
             }
 
             return await response.Content.ReadFromJsonAsync<T>();
         }
+
     }
 }

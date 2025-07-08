@@ -1,11 +1,14 @@
 using Common.Utils.Helper;
 using Core.ViewModels.Dto.Auth;
+using Core.ViewModels.Dto.Menu;
+using Core.ViewModels.Response;
 using Lead.UI.Interfaces;
 using Lead.UI.Models;
 using Lead.UI.Settings;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using System.Diagnostics;
+using System.Threading.Tasks;
 
 namespace Lead.UI.Controllers
 {
@@ -18,8 +21,14 @@ namespace Lead.UI.Controllers
             return View();
         }
 
-        public IActionResult Privacy()
+        public async Task<IActionResult> Privacy()
         {
+            var queryParams = new Dictionary<string, string>
+                                {
+                                    { "userId", "abc123" }
+                                };
+            _httpService.SetBearerToken(AccessToken);
+            var data = await _httpService.GetAsync<ApiResponse<IList<DynamicMenuItemDto>>?>(_apiSettings.Versions.Menu, _apiSettings.Endpoints.Menu.GetByUserId, queryParams);
             var response = HttpContext.Session.Get<AuthResponseDto>("AuthResponseDto");
             return View(response);
         }

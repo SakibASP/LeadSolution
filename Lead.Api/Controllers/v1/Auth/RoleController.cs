@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Lead.Api.Controllers.Auth.v1
+namespace Lead.Api.Controllers.v1.Auth
 {
     [Authorize]
     [ApiController]

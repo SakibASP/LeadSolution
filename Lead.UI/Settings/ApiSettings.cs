@@ -10,11 +10,13 @@
     public class Versions
     {
         public required string Auth { get; set; }
+        public required string Menu { get; set; }
     }
 
     public class Endpoints
     {
         public required Auth Auth { get; set; }
+        public required Menu Menu { get; set; }
     }
 
     public class  Auth
@@ -28,5 +30,10 @@
         public required string GetRoleByUserId { get; set; }
         public required string ServiceType { get; set; }
 
+    }
+
+    public class Menu
+    {
+        public required string GetByUserId { get; set; }
     }
 }

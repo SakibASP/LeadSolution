@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using System.Text.Json;
 
-namespace Lead.Api.Controllers.Auth.v1
+namespace Lead.Api.Controllers.v1.Auth
 {
     [ApiController]
     [Route("api/v1/[controller]")]
