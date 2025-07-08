@@ -47,3 +47,4 @@
 /Lead.Api/obj
 /Lead.UI/bin/Debug/net9.0
 /Lead.UI/obj
+/Lead.Api/Logs/ErrorLogs
