@@ -44,6 +44,7 @@ namespace Lead.UI.Controllers
                 HttpContext.Session.Set(Constants.AuthResponseDto, sessionAuth);
             }
             AccessToken = sessionAuth?.Token ?? string.Empty;
+            ViewBag.AuthResponseDto = sessionAuth;
             // Proceed with the action execution
             await next();
         }

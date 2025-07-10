@@ -1,0 +1,65 @@
+﻿@model IEnumerable<Core.ViewModels.Dto.Menu.DynamicMenuItemDto>
+
+@if (Model != null)
+{
+    @foreach (var m in Model)
+    {
+        if (m.MenuParentID == null)
+        {
+            var submenu = Model.Where(n => n.MenuParentID == m.MID).ToList();
+
+            if (submenu != null && submenu.Count > 0)
+            {
+                <li class="nav-item">
+                    <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#@m.MenuName.Replace(" ", "")"
+                           aria-expanded="true" aria-controls="@m.MenuName.Replace(" ","")">
+                        <i class="@m.FaIcon"></i> <span>@m.MenuName</span>
+                    </a>
+                    <div id="@m.MenuName.Replace(" ", "")" class="collapse" aria-labelledby="heading+@m.MenuName.Replace(" ", "")" data-parent="#accordionSidebar">
+                        <div class="bg-white py-2 collapse-inner rounded">
+                            @foreach (var e in submenu)
+                            {
+                                var submenu2 = Model.Where(n => n.MenuParentID == e.MID).ToList();
+                                if (submenu2 != null && submenu2.Count > 0)
+                                {
+                                    <!--For Inner Submenu-->
+                                    @* <ul class="navbar-nav" id="accordionSidebar+@e.MenuName.Replace(" ","")">
+                                    <li class="nav-item">
+                                    <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-target="#@e.MenuName.Replace(" ", "")"
+                                    aria-expanded="true" aria-controls="@e.MenuName.Replace(" ", "")">
+                                    @e.MenuName
+                                    <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
+                                    </a>
+                                    @foreach (var f in submenu2)
+                                    {
+                                    <div id="@e.MenuName.Replace(" ", "")" class="collapse" aria-labelledby="heading+@e.MenuName.Replace(" ", " ")" data-parent="#accordionSidebar+@e.MenuName.Replace(" ", "")">
+                                    <div class="bg-white py-2 collapse-inner rounded">
+                                    <a class="nav-link" href="@f.MenuURL">@f.MenuName</a>
+                                    </div>
+                                    </div>
+                                    }
+                                    </li>
+                                    </ul> *@
+                                }
+                                else
+                                {
+
+                                    <a class="collapse-item" href="@e.MenuURL">@e.MenuName</a>
+
+                                }
+                            }
+                        </div>
+                    </div>
+                </li>
+            }
+            else
+            {
+                <li class="nav-item">
+                    <a class="nav-link" href="@m.MenuURL">
+                        <i class="@m.FaIcon"></i><span>@m.MenuName</span>
+                    </a>
+                </li>
+            }
+        }
+    }
+}

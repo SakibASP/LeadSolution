@@ -1,7 +1,8 @@
 ﻿@model Core.ViewModels.Dto.Auth.RegisterDto
 
 @{
-    ViewData["Title"] = "Register";
+    ViewData["Title"] = "Sign Up";
+    Layout = "~/Views/Shared/_LayoutEmpty.cshtml";
 }
 
 <div class="container d-flex justify-content-center align-items-center min-vh-100">
@@ -15,12 +16,6 @@
                 <label asp-for="Email" class="form-label"></label>
                 <input asp-for="Email" class="form-control" placeholder="Enter email" />
                 <span asp-validation-for="Email" class="text-danger small"></span>
-            </div>
-
-            <div class="mb-3">
-                <label asp-for="Password" class="form-label"></label>
-                <input asp-for="Password" class="form-control" placeholder="Enter password" />
-                <span asp-validation-for="Password" class="text-danger small"></span>
             </div>
 
             <div class="mb-3">
@@ -44,8 +39,14 @@
                 <span asp-validation-for="ServiceTypeId" class="text-danger small"></span>
             </div>
 
+            <div class="mb-3">
+                <label asp-for="Password" class="form-label"></label>
+                <input asp-for="Password" class="form-control" placeholder="Enter password" type="password" required />
+                <span asp-validation-for="Password" class="text-danger small"></span>
+            </div>
+
             <div class="d-grid">
-                <button type="submit" class="btn btn-success">Register</button>
+                <button type="submit" class="btn btn-success">Sign Up</button>
             </div>
         </form>
 

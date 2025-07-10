@@ -29,6 +29,13 @@ namespace Lead.UI.Controllers
             return RedirectToAction("Index", "Home");
         }
 
+        [HttpPost]
+        public IActionResult LogOut()
+        {
+            HttpContext.Session.Clear();
+            return View(nameof(Login));
+        }
+
         private async Task LoginAsync(LoginDto loginDto)
         {
             var response = await _httpService.PostAsync<ApiResponse<AuthResponseDto>?>(_apiSettings.Versions.Auth, _apiSettings.Endpoints.Auth.Login, loginDto);
@@ -52,5 +59,7 @@ namespace Lead.UI.Controllers
             if (response is not null && response.IsSuccess) await LoginAsync(new() { Email = registerDto.Email,Password = registerDto.Password });
             return RedirectToAction("Index", "Home");
         }
+
+
     }
 }
