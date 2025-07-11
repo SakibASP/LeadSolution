@@ -29,4 +29,8 @@
     <ProjectReference Include="..\Core.ViewModels\Core.ViewModels.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Logs\ErrorLogs\" />
+  </ItemGroup>
+
 </Project>

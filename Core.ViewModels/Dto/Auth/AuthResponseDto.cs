@@ -1,10 +1,9 @@
-﻿namespace Core.ViewModels.Dto.Auth
+﻿namespace Core.ViewModels.Dto.Auth;
+
+public class AuthResponseDto
 {
-    public class AuthResponseDto
-    {
-        public string? Token { get; set; }
-        public string? RefreshToken { get; set; }
-        public string? UserName { get; set; }
-        public DateTime Expiration { get; set; }
-    }
+    public string? Token { get; set; }
+    public string? RefreshToken { get; set; }
+    public string? UserName { get; set; }
+    public DateTime Expiration { get; set; }
 }

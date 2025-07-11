@@ -1,5 +1,4 @@
 ﻿using Application.Interfaces.Auth;
-using Azure;
 using Common.Utils.Helper;
 using Core.Models.Auth;
 using Core.ViewModels.Dto.Auth;
@@ -9,18 +8,22 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
+using Serilog;
 using System.Text.Json;
 
 namespace Lead.Api.Controllers.v1.Auth;
 
 [ApiController]
 [Route("api/v1/[controller]")]
-public class AuthController(UserManager<ApplicationUser> userManager, ITokenService tokenService, IOptions<JwtOptions> jwtOptions, IServiceTypeService service) : ControllerBase
+public class AuthController(UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager, ITokenService tokenService, IOptions<JwtOptions> jwtOptions, IServiceTypeService service) : ControllerBase
 {
     private readonly UserManager<ApplicationUser> _userManager = userManager;
+    private readonly RoleManager<IdentityRole> _roleManager = roleManager;
     private readonly ITokenService _tokenService = tokenService;
     private readonly JwtOptions _jwtOptions = jwtOptions.Value;
     private readonly IServiceTypeService _service = service;
+
+    #region Login/Register/RefreshToken and Revoke user
 
     [HttpPost("register")]
     public async Task<IActionResult> Register([FromBody] RegisterDto dto)
@@ -46,6 +49,7 @@ public class AuthController(UserManager<ApplicationUser> userManager, ITokenServ
         }
         catch (Exception ex)
         {
+            Log.Error(ex, MessageHelper<string>.GenerateErrorMsg(HttpContext.Request.Path, null, User.Identity?.Name));
             return Ok(ApiResponse<AuthResponseDto>.Fail("Something went wrong!"));
         }
         
@@ -87,6 +91,7 @@ public class AuthController(UserManager<ApplicationUser> userManager, ITokenServ
         }
         catch (Exception ex)
         {
+            Log.Error(ex, MessageHelper<string>.GenerateErrorMsg(HttpContext.Request.Path, null, User.Identity?.Name));
             return Ok(ApiResponse<AuthResponseDto>.Fail("Something went wrong!"));
         }
     }
@@ -96,45 +101,53 @@ public class AuthController(UserManager<ApplicationUser> userManager, ITokenServ
     [Route("refresh-token")]
     public async Task<IActionResult> RefreshToken([FromBody] TokenDto dto)
     {
-        if (dto is null || string.IsNullOrEmpty(dto.RefreshToken) || string.IsNullOrEmpty(dto.AccessToken)) return BadRequest("Invalid client request!");
-
-        // 1. Get claims principal from expired access token
-        var principal = _tokenService.GetPrincipalFromExpiredToken(dto.AccessToken);
-        if (principal is null) 
-            return Ok(ApiResponse<AuthResponseDto>.Fail("Invalid access token or refresh token!"));
-
-        var username = principal.Identity!.Name;
-        if (string.IsNullOrEmpty(username)) 
-            return Ok(ApiResponse<AuthResponseDto>.Fail("Invalid user!"));
-
-        var user = await _userManager.FindByNameAsync(username);
-        if (user is null) 
-            return Ok(ApiResponse<AuthResponseDto>.Fail("Invalid user!"));
-
-        var storedToken = await _userManager.GetAuthenticationTokenAsync(user, "Default", "RefreshToken");
-        if (storedToken is null) 
-            return Ok(ApiResponse<AuthResponseDto>.Fail("No refresh token found for this user!"));
-
-        var tokenData = JsonSerializer.Deserialize<TokenDto>(EncryptionHelper.Decrypt(storedToken));
-        if (tokenData is null) 
-            return Ok(ApiResponse<AuthResponseDto>.Fail("Invalid refresh token data!"));
-
-        if (tokenData.RefreshToken != dto.RefreshToken) 
-            return Ok(ApiResponse<AuthResponseDto>.Fail("Invalid refresh token!"));
-        if (tokenData.Expires >= TimeHelper.GetCurrentBangladeshTime())
+        try
         {
-            await _userManager.RemoveAuthenticationTokenAsync(user, loginProvider: "Default", tokenName: "RefreshToken");
-            return Ok(ApiResponse<AuthResponseDto>.Fail("Refresh token expired!"));
+            if (dto is null || string.IsNullOrEmpty(dto.RefreshToken) || string.IsNullOrEmpty(dto.AccessToken)) return BadRequest("Invalid client request!");
+
+            // 1. Get claims principal from expired access token
+            var principal = _tokenService.GetPrincipalFromExpiredToken(dto.AccessToken);
+            if (principal is null)
+                return Ok(ApiResponse<AuthResponseDto>.Fail("Invalid access token or refresh token!"));
+
+            var username = principal.Identity!.Name;
+            if (string.IsNullOrEmpty(username))
+                return Ok(ApiResponse<AuthResponseDto>.Fail("Invalid user!"));
+
+            var user = await _userManager.FindByNameAsync(username);
+            if (user is null)
+                return Ok(ApiResponse<AuthResponseDto>.Fail("Invalid user!"));
+
+            var storedToken = await _userManager.GetAuthenticationTokenAsync(user, "Default", "RefreshToken");
+            if (storedToken is null)
+                return Ok(ApiResponse<AuthResponseDto>.Fail("No refresh token found for this user!"));
+
+            var tokenData = JsonSerializer.Deserialize<TokenDto>(EncryptionHelper.Decrypt(storedToken));
+            if (tokenData is null)
+                return Ok(ApiResponse<AuthResponseDto>.Fail("Invalid refresh token data!"));
+
+            if (tokenData.RefreshToken != dto.RefreshToken)
+                return Ok(ApiResponse<AuthResponseDto>.Fail("Invalid refresh token!"));
+            if (tokenData.Expires >= TimeHelper.GetCurrentBangladeshTime())
+            {
+                await _userManager.RemoveAuthenticationTokenAsync(user, loginProvider: "Default", tokenName: "RefreshToken");
+                return Ok(ApiResponse<AuthResponseDto>.Fail("Refresh token expired!"));
+            }
+
+            var newAccessToken = await _tokenService.GenerateJwtToken(user);
+            var response = new AuthResponseDto
+            {
+                Token = newAccessToken,
+                RefreshToken = tokenData.RefreshToken,
+                Expiration = TimeHelper.GetCurrentBangladeshTime().AddMinutes(_jwtOptions.TokenValidityInMinutes)
+            };
+            return Ok(ApiResponse<AuthResponseDto>.Success(response, "Token refreshed successful!"));
         }
-
-        var newAccessToken = await _tokenService.GenerateJwtToken(user);
-        var response = new AuthResponseDto
+        catch (Exception ex)
         {
-            Token = newAccessToken,
-            RefreshToken = tokenData.RefreshToken,
-            Expiration = TimeHelper.GetCurrentBangladeshTime().AddMinutes(_jwtOptions.TokenValidityInMinutes)
-        };
-        return Ok(ApiResponse<AuthResponseDto>.Success(response, "Token refreshed successful!"));
+            Log.Error(ex, MessageHelper<string>.GenerateErrorMsg(HttpContext.Request.Path, null, User.Identity?.Name));
+            return Ok(ApiResponse<AuthResponseDto>.Fail("Something went wrong!"));
+        }
     }
 
     [Authorize]
@@ -165,6 +178,10 @@ public class AuthController(UserManager<ApplicationUser> userManager, ITokenServ
         return Ok(new { Status = "Success", Message = "All tokens revoked" });
     }
 
+    #endregion
+
+    #region Service Type
+
     [HttpGet]
     [Route("service-type")]
     public async Task<IActionResult> ServiceType()
@@ -176,7 +193,68 @@ public class AuthController(UserManager<ApplicationUser> userManager, ITokenServ
         }
         catch (Exception ex)
         {
+            Log.Error(ex, MessageHelper<string>.GenerateErrorMsg(HttpContext.Request.Path, null, User.Identity?.Name));
             return Ok(ApiResponse<AuthResponseDto>.Fail("Something went wrong!"));
         }
     }
+
+    #endregion
+
+    #region Role Management
+
+    [Authorize(Roles = "Admin")]
+    [HttpGet("all-roles")]
+    public async Task<IActionResult> GetAllRoles()
+    {
+        try
+        {
+            var roles = await _roleManager.Roles.ToListAsync();
+            return Ok(ApiResponse<IList<IdentityRole>>.Success(roles, "Refresh token expired!")); // returns JSON list of roles
+        }
+        catch (Exception ex)
+        {
+            Log.Error(ex, MessageHelper<string>.GenerateErrorMsg(HttpContext.Request.Path, null, User.Identity?.Name));
+            return Ok(ApiResponse<IList<IdentityRole>>.Fail("Refresh token expired!"));
+        }
+    }
+
+    [Authorize(Roles = "Admin")]
+    [HttpPost("create-role")]
+    public async Task<IActionResult> CreateRole([FromBody] string roleName)
+    {
+        try
+        {
+            if (string.IsNullOrWhiteSpace(roleName))
+                return Ok(ApiResponse<string>.Fail("Role create failed!"));
+
+            var roleExists = await _roleManager.RoleExistsAsync(roleName);
+            if (roleExists)
+                return Ok(ApiResponse<string>.Fail("Role already exists!"));
+
+            var result = await _roleManager.CreateAsync(new IdentityRole(roleName));
+            return result.Succeeded ? Ok(ApiResponse<string>.Success("Role created successfully!")) : Ok(ApiResponse<string>.Fail("Role already exists!"));
+        }
+        catch (Exception ex)
+        {
+            Log.Error(ex, MessageHelper<string>.GenerateErrorMsg(HttpContext.Request.Path, null, User.Identity?.Name));
+            return Ok(ApiResponse<IList<IdentityRole>>.Fail("Something went wrong!"));
+        }
+    }
+
+    [Authorize(Roles = "Admin")]
+    [HttpPost("assign-role")]
+    public async Task<IActionResult> AssignRole([FromBody] AssignRoleDto request)
+    {
+        var user = await _userManager.FindByEmailAsync(request.Email);
+        if (user == null)
+            return NotFound("User not found.");
+
+        if (!await _roleManager.RoleExistsAsync(request.Role))
+            return NotFound("Role not found.");
+
+        var result = await _userManager.AddToRoleAsync(user, request.Role);
+        return result.Succeeded ? Ok("Role assigned.") : BadRequest(result.Errors);
+    }
+
+    #endregion
 }

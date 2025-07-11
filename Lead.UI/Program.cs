@@ -1,6 +1,8 @@
 using Lead.UI.Interfaces;
 using Lead.UI.Services;
 using Lead.UI.Settings;
+using Microsoft.AspNetCore.Mvc.Razor;
+using Microsoft.Extensions.DependencyInjection;
 using System.Net.Http.Headers;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -26,6 +28,15 @@ builder.Services.AddSession(options =>
     options.Cookie.Name = ".LeadUI.Session";
     options.IdleTimeout = TimeSpan.FromDays(7);
     options.Cookie.IsEssential = true;
+});
+
+builder.Services.Configure<RazorViewEngineOptions>(o =>
+{
+    o.ViewLocationFormats.Clear();
+    o.ViewLocationFormats.Add("~/Views/{1}/{0}" + RazorViewEngine.ViewExtension);
+    o.ViewLocationFormats.Add("~/Views/Shared/{0}" + RazorViewEngine.ViewExtension);
+    o.ViewLocationFormats.Add("~/Views/Common/{1}/{0}" + RazorViewEngine.ViewExtension);
+    o.ViewLocationFormats.Add("~/Views/Auth/{1}/{0}" + RazorViewEngine.ViewExtension);
 });
 
 var app = builder.Build();

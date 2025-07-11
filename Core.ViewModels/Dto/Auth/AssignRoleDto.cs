@@ -1,8 +1,7 @@
-﻿namespace Core.ViewModels.Dto.Auth
+﻿namespace Core.ViewModels.Dto.Auth;
+
+public class AssignRoleDto
 {
-    public class AssignRoleDto
-    {
-        public required string Email { get; set; }
-        public required string Role { get; set; }
-    }
+    public required string Email { get; set; }
+    public required string Role { get; set; }
 }

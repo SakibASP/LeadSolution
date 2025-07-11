@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.Options;
 
-namespace Lead.UI.Controllers
+namespace Lead.UI.Controllers.Common
 {
     public class BaseController(IHttpService httpService, IOptions<ApiSettings> apiSetting) : Controller
     {

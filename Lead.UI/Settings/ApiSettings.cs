@@ -28,6 +28,7 @@
         public required string GetUserById { get; set; }
         public required string GetRoles { get; set; }
         public required string GetRoleByUserId { get; set; }
+        public required string AddRole { get; set; }
         public required string ServiceType { get; set; }
 
     }

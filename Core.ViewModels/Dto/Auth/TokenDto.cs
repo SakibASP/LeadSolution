@@ -1,9 +1,8 @@
-﻿namespace Core.ViewModels.Dto.Auth
+﻿namespace Core.ViewModels.Dto.Auth;
+
+public class TokenDto
 {
-    public class TokenDto
-    {
-        public string? AccessToken { get; set; }
-        public string? RefreshToken { get; set; }
-        public DateTime? Expires { get; set; }
-    }
+    public string? AccessToken { get; set; }
+    public string? RefreshToken { get; set; }
+    public DateTime? Expires { get; set; }
 }
