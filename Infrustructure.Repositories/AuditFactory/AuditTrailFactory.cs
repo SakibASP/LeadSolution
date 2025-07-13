@@ -4,84 +4,91 @@ using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 using System.Text;
 using Core.Models.Common;
+using Common.Utils.Helper;
 
 namespace Infrustructure.Repositories.AuditFactory
 {
+    /// <summary>
+    /// Factory class for creating Audit objects based on entity changes.
+    /// </summary>
     public class AuditTrailFactory(IHttpContextAccessor httpContext)
     {
-        private static readonly TimeZoneInfo bdTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Bangladesh Standard Time");
-        //private readonly DbContext _context = context;
-        private readonly IHttpContextAccessor _httpContext = httpContext; //new HttpContextAccessor();
+        // HTTP context accessor for retrieving user and request information
+        private readonly IHttpContextAccessor _httpContext = httpContext;
 
+        /// <summary>
+        /// Generates an Audit object for the given entity entry if it should be audited.
+        /// </summary>
+        /// <param name="entry">The EntityEntry representing the entity change.</param>
+        /// <returns>An Audit object with relevant audit information, or null if not applicable.</returns>
         public async Task<Audit?> GetAudit(EntityEntry entry)
         {
             Audit? audit = new();
             try
             {
                 string tableName = entry.Entity.GetType().Name;
+                // Determine if the entity should be audited based on its table name
                 bool shouldAudit = !tableName.Contains("AspNet", StringComparison.CurrentCultureIgnoreCase) && !tableName.Contains("RequestCount", StringComparison.CurrentCultureIgnoreCase)
                     && !tableName.Contains("ApplicationUser", StringComparison.CurrentCultureIgnoreCase) && !tableName.Contains("IdentityUser", StringComparison.CurrentCultureIgnoreCase)
                     && !string.IsNullOrEmpty(tableName);
 
                 if (shouldAudit)
                 {
-                    /***
+                    /*
+                    // Example code for retrieving IP address and MAC address (not used in current implementation)
                     string ipAddress = HttpContext.Current.Request.ServerVariables["HTTP_X_FORWARDED_FOR"];
                     if ((String.IsNullOrEmpty(ipAddress)))
                         ipAddress = HttpContext.Current.Request.ServerVariables["REMOTE_ADDR"];
                     if ((String.IsNullOrEmpty(ipAddress)))
                         ipAddress = HttpContext.Current.Request.UserHostAddress;
 
-                    Getting Physical Mac Address of hosted device
+                    // Getting Physical Mac Address of hosted device
                     HashSet<string> macSet = [];
                     NetworkInterface[] networkInterfaces = NetworkInterface.GetAllNetworkInterfaces();
                     foreach (NetworkInterface networkInterface in networkInterfaces)
                     {
                         PhysicalAddress macAddress = networkInterface.GetPhysicalAddress();
-                        //physicalMac = physicalMac + "__" + macAddress.ToString();
                         byte[] bytes = macAddress.GetAddressBytes();
                         string macAddressString = BitConverter.ToString(bytes);
                         macAddressString = macAddressString.Replace("-", ":");
                         macSet.Add(macAddressString);
                     }
                     string physicalMac = string.Join(" || ", macSet);
-                    ***/
+                    */
 
                     if (_httpContext.HttpContext is not null)
                     {
-                        //User's ip address
+                        // User's IP address
                         string? ipAddress = _httpContext.HttpContext.Connection.RemoteIpAddress?.ToString();
-                        //User's id
+                        // User's ID from claims, fallback to default if not found
                         audit.UserId = _httpContext.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier) ?? "TakeSakibsIdAsNullUser";
-                        //model class name based on database table 
+                        // Model class name based on database table
                         audit.TableName = tableName;
-                        //Bangladesh standard current time
-                        audit.UpdateDate = TimeZoneInfo.ConvertTime(DateTime.Now, TimeZoneInfo.Local, bdTimeZone);
-                        //User's operating system
-                        audit.OperatingSystem = GetOperatingSystem(_httpContext.HttpContext!.Request.Headers.UserAgent.ToString()); ;
-                        //re-organizing User's ip address [taking first 256 chars]
+                        // Bangladesh standard current time
+                        audit.UpdateDate = TimeHelper.GetCurrentBangladeshTime();
+                        // User's operating system from User-Agent header
+                        audit.OperatingSystem = GetOperatingSystem(_httpContext.HttpContext!.Request.Headers.UserAgent.ToString());
+                        // Truncate IP address to first 256 characters
                         audit.IPAddress = ipAddress?[..Math.Min(ipAddress.Length, 256)];
-                        //url path [from which menu the request came from]
+                        // URL path from which the request originated
                         audit.AreaAccessed = _httpContext.HttpContext.Request.Path;
-                        //getting primary key value of the table
+                        // Get primary key value of the table
                         PropertyValues? dbValus = await entry.GetDatabaseValuesAsync();
                         audit.KeyValue = GetKeyValue(dbValus);
 
-                        //entry in deleted
+                        // If entity is deleted, populate old data and set action to Delete
                         if (entry.State == EntityState.Deleted)
                         {
                             var oldValues = new StringBuilder();
-                            //populating deleted properties values with column name
                             SetDeletedProperties(dbValus, oldValues);
                             audit.OldData = oldValues.ToString();
                             audit.Actions = AuditActions.Delete.ToString();
                         }
-                        //entry is modified
+                        // If entity is modified, populate old and new data and set action to Update
                         else if (entry.State == EntityState.Modified)
                         {
                             var oldValues = new StringBuilder();
                             var newValues = new StringBuilder();
-                            //populating modified properties values with column name [previous and current data]
                             SetModifiedProperties(entry, dbValus, oldValues, newValues);
                             audit.OldData = oldValues.ToString();
                             audit.NewData = newValues.ToString();
@@ -92,11 +99,16 @@ namespace Infrustructure.Repositories.AuditFactory
             }
             catch
             {
-                //Write codes for exception here
+                // Exception handling can be implemented here (e.g., logging)
             }
             return audit;
         }
 
+        /// <summary>
+        /// Populates oldData with property values for a deleted entity.
+        /// </summary>
+        /// <param name="dbValues">Database property values.</param>
+        /// <param name="oldData">StringBuilder to append old data.</param>
         private static void SetDeletedProperties(PropertyValues? dbValues, StringBuilder oldData)
         {
             if (dbValues is not null)
@@ -111,10 +123,18 @@ namespace Infrustructure.Repositories.AuditFactory
                 }
             }
 
+            // Remove trailing separator if present
             if (oldData.Length > 0)
                 _ = oldData.Remove(oldData.Length - 3, 3);
         }
 
+        /// <summary>
+        /// Populates oldData and newData with property values for a modified entity.
+        /// </summary>
+        /// <param name="entry">EntityEntry representing the entity.</param>
+        /// <param name="dbValues">Database property values.</param>
+        /// <param name="oldData">StringBuilder to append old data.</param>
+        /// <param name="newData">StringBuilder to append new data.</param>
         private static void SetModifiedProperties(EntityEntry entry, PropertyValues? dbValues, StringBuilder oldData, StringBuilder newData)
         {
             if (dbValues is not null)
@@ -125,6 +145,7 @@ namespace Infrustructure.Repositories.AuditFactory
                     var newVal = entry.CurrentValues[propertyName.Name];
                     if (oldVal is not null && newVal is not null)
                     {
+                        // Compare old and new values, append if changed
                         bool unchnaged = oldVal.ToString()!.Equals(newVal.ToString(), StringComparison.CurrentCultureIgnoreCase);
                         if (!unchnaged)
                         {
@@ -135,12 +156,18 @@ namespace Infrustructure.Repositories.AuditFactory
                 }
             }
 
+            // Remove trailing separator if present
             if (oldData.Length > 0)
                 _ = oldData.Remove(oldData.Length - 3, 3);
             if (newData.Length > 0)
                 _ = newData.Remove(newData.Length - 3, 3);
         }
 
+        /// <summary>
+        /// Retrieves the primary key value from the property values.
+        /// </summary>
+        /// <param name="dbValues">Database property values.</param>
+        /// <returns>Primary key value as long, or 0 if not found.</returns>
         public static long? GetKeyValue(PropertyValues? dbValues)
         {
             string _key = dbValues?.EntityType.FindPrimaryKey()?.Properties.FirstOrDefault()?.Name ?? "AutoId";
@@ -150,18 +177,22 @@ namespace Infrustructure.Repositories.AuditFactory
             {
                 id = Convert.ToInt64(keyValue);
             }
-            //var objectStateEntry = ((IObjectContextAdapter)_context).ObjectContext.ObjectStateManager.GetObjectStateEntry(entry.Entity);
-            //if (objectStateEntry.EntityKey.EntityKeyValues != null)
-            //    id = Convert.ToInt64(objectStateEntry.EntityKey.EntityKeyValues[0].Value);
+            // Alternative approach for retrieving key value from ObjectStateEntry (commented out)
+            // var objectStateEntry = ((IObjectContextAdapter)_context).ObjectContext.ObjectStateManager.GetObjectStateEntry(entry.Entity);
+            // if (objectStateEntry.EntityKey.EntityKeyValues != null)
+            //     id = Convert.ToInt64(objectStateEntry.EntityKey.EntityKeyValues[0].Value);
 
             return id;
         }
 
+        /// <summary>
+        /// Extracts the operating system name from the user agent string.
+        /// </summary>
+        /// <param name="userAgent">User agent string from request headers.</param>
+        /// <returns>Operating system name as string.</returns>
         private static string GetOperatingSystem(string userAgent)
         {
-            // Logic to extract operating system from user agent string
-            // You can use a library like UserAgentUtils or implement custom logic
-            // For simplicity, let's assume a basic implementation
+            // Basic logic to extract operating system from user agent string
             if (userAgent.Contains("Android", StringComparison.CurrentCultureIgnoreCase))
             {
                 // If "Android" is found in the User-Agent string, it's likely an Android device
@@ -194,6 +225,9 @@ namespace Infrustructure.Repositories.AuditFactory
         }
     }
 
+    /// <summary>
+    /// Enum representing possible audit actions.
+    /// </summary>
     public enum AuditActions
     {
         Update,

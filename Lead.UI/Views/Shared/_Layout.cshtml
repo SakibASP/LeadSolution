@@ -3,6 +3,7 @@
 @{
     var authData = (AuthResponseDto?)ViewBag.AuthResponseDto;
     var IsAuthenticated = authData is null ? false : !string.IsNullOrEmpty(authData.UserName);
+    ViewData["Version"] = "1.0";
 }
 <!DOCTYPE html>
 <html lang="en">
@@ -13,11 +14,10 @@
     <meta name="description" content="">
     <meta name="author" content="">
 
-    <title>Dailysoftbd - Dashboard</title>
+    <title>Khan Lead - Dashboard</title>
 
 
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="~/Dailysoftbd.Web.styles.css" asp-append-version="true" />
     <link href="~/css/jquery.toast.min.css" rel="stylesheet" />
     <!-- Custom fonts for this template-->
     <link href="~/sb-admin/vendor/fontawesome-free/css/all.min.css" rel="stylesheet" />
@@ -40,7 +40,7 @@
                 <div class="sidebar-brand-icon rotate-n-15">
                     <i class="fas fa-laugh-wink"></i>
                 </div>
-                <div class="sidebar-brand-text mx-3">DAILYSOFTBD</div>
+                <div class="sidebar-brand-text mx-3">Khan Lead</div>
             </a>
 
             <!-- Divider -->
@@ -94,7 +94,7 @@
             <!-- Sidebar Message -->
             @*  <div class="sidebar-card d-none d-lg-flex">
                 <img class="sidebar-card-illustration mb-2" src="~/sb-admin/img/undraw_rocket.svg" alt="...">
-                <p class="text-center mb-2"><strong>Dailysoftbd Pro</strong> is packed with premium features, components, and more!</p>
+                <p class="text-center mb-2"><strong>Lead Pro</strong> is packed with premium features, components, and more!</p>
                 <a class="btn btn-success btn-sm" href="https://startbootstrap.com/theme/sb-admin-pro">Upgrade to Pro!</a>
             </div> *@
 
@@ -275,7 +275,7 @@
                                 <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
                                    data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                     @{
-                                        string _userName = authData.UserName ?? "";
+                                        string _userName = authData?.UserName ?? "";
                                         string userName = _userName.Substring(0, _userName.IndexOf('@'));
                                     }
                                     <span class="mr-2 d-none d-lg-inline text-gray-600 small">@userName</span>
@@ -341,9 +341,9 @@
             <footer class="py-4 bg-light mt-auto">
                 <div class="container-fluid px-4">
                     <div class="d-flex align-items-center justify-content-between small">
-                        <div class="text-muted"> &copy; 2024 - <a id="myAnchor" href="http://dailysoftbd.com/">KhanIT</a></div>
+                        <div class="text-muted"> Version @ViewData["Version"]</div>
                         <div class="text-muted">
-                            Developed by <a id="myAnchor" href="http://sakib.runasp.net/" target="_blank">Md. Sakibur Rahman</a>
+                            Microsoft &nbsp; <a id="myAnchor" href="https://dotnet.microsoft.com/en-us/learn/dotnet/what-is-dotnet" target="_blank"><strong style="background-color: rebeccapurple; color: white; padding: 2px;">.NET</strong></a>
                         </div>
                     </div>
                 </div>

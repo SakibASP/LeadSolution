@@ -10,6 +10,4 @@ public class Constants
 
     public const string Error = "Error";
     public const string Success = "Success";
-
-
 }

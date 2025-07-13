@@ -16,24 +16,33 @@ namespace Application.Services.Auth
         private readonly UserManager<ApplicationUser> _userManager = userManager;
         private readonly JwtOptions _jwtOptions = jwtOptions.Value;
 
+        /// <summary>
+        /// Generates a JWT token for the specified user.
+        /// </summary>
+        /// <param name="user">The application user for whom to generate the token.</param>
+        /// <returns>A JWT token string containing user claims and roles.</returns>
         public async Task<string> GenerateJwtToken(ApplicationUser user)
         {
+            // Get roles assigned to the user
             var userRoles = await _userManager.GetRolesAsync(user);
 
+            // Create claims for the token
             var claims = new List<Claim>
-                        {
-                            new(ClaimTypes.NameIdentifier, user.Id), // ✅ User ID for User.FindFirstValue
-                            new(ClaimTypes.Name, user.UserName ?? string.Empty),
-                            new(ClaimTypes.Email, user.Email ?? string.Empty),
-                            new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
-                        };
+                            {
+                                new(ClaimTypes.NameIdentifier, user.Id), // User ID for User.FindFirstValue
+                                new(ClaimTypes.Name, user.UserName ?? string.Empty),
+                                new(ClaimTypes.Email, user.Email ?? string.Empty),
+                                new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()) // Unique token ID
+                            };
 
             // Add each role as a separate claim
             claims.AddRange(userRoles.Select(role => new Claim(ClaimTypes.Role, role)));
 
+            // Create signing credentials using the secret key
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtOptions.Secret));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
+            // Create the JWT token
             var token = new JwtSecurityToken(
                 issuer: _jwtOptions.ValidIssuer,
                 audience: _jwtOptions.ValidAudience,
@@ -42,10 +51,15 @@ namespace Application.Services.Auth
                 signingCredentials: creds
             );
 
+            // Return the serialized token string
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
 
 
+        /// <summary>
+        /// Generates a secure random refresh token
+        /// </summary>
+        /// <returns></returns>
         public string GenerateRefreshToken()
         {
             var randomNumber = new byte[32];
@@ -54,6 +68,13 @@ namespace Application.Services.Auth
             return Convert.ToBase64String(randomNumber);
         }
 
+
+        /// <summary>
+        /// Extracts ClaimsPrincipal from an expired JWT token
+        /// </summary>
+        /// <param name="token"></param>
+        /// <returns></returns>
+        /// <exception cref="SecurityTokenException"></exception>
         public ClaimsPrincipal GetPrincipalFromExpiredToken(string token)
         {
             var tokenValidationParameters = new TokenValidationParameters
@@ -70,6 +91,7 @@ namespace Application.Services.Auth
             var tokenHandler = new JwtSecurityTokenHandler();
             var principal = tokenHandler.ValidateToken(token, tokenValidationParameters, out SecurityToken securityToken);
 
+            // Ensure the token is a valid JWT and uses the expected algorithm
             if (securityToken is not JwtSecurityToken jwtSecurityToken ||
                 !jwtSecurityToken.Header.Alg.Equals(SecurityAlgorithms.HmacSha256, StringComparison.InvariantCultureIgnoreCase))
                 throw new SecurityTokenException("Invalid token");

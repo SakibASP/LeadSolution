@@ -1,7 +1,5 @@
 using Common.Utils.Helper;
 using Core.ViewModels.Dto.Auth;
-using Core.ViewModels.Dto.Menu;
-using Core.ViewModels.Response;
 using Lead.UI.Interfaces;
 using Lead.UI.Models;
 using Lead.UI.Settings;
@@ -15,7 +13,7 @@ public class HomeController(IHttpService httpService, IOptions<ApiSettings> apiS
 {
     public IActionResult Index()
     {
-        var name = "Lead";
+        var name = "to Khan Lead";
         ViewBag.Name = name;
         return View();
     }

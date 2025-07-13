@@ -16,49 +16,65 @@ public class MenuViewComponent(IHttpService httpService, IOptions<ApiSettings> a
     protected readonly ApiSettings _apiSettings = apiSetting.Value;
     public async Task<IViewComponentResult> InvokeAsync()
     {
+        // Remove any existing menu from session to ensure fresh load
         HttpContext.Session.Remove(Constants.Menu);
+
+        // Retrieve authentication info from session
         var sessionAuth = HttpContext.Session.Get<AuthResponseDto>(Constants.AuthResponseDto);
 
         // Check if the user is authenticated
         if (sessionAuth == null || string.IsNullOrEmpty(sessionAuth.Token))
         {
-            //Redirect to the login page
+            // Redirect to the login page if not authenticated
             HttpContext.Response.Redirect(Constants.RedirectToLogin);
         }
 
+        // Check if the token is expired
         if (sessionAuth?.Expiration <= TimeHelper.GetCurrentBangladeshTime())
         {
+            // Prepare token DTO for refresh
             TokenDto tokenDto = new()
             {
                 AccessToken = sessionAuth.Token,
                 RefreshToken = sessionAuth.RefreshToken
             };
+
+            // Attempt to refresh the token
             var response = await _httpService.PostAsync<ApiResponse<AuthResponseDto>?>(_apiSettings.Versions.Auth, _apiSettings.Endpoints.Auth.RefreshToken, tokenDto);
             if (!(response?.IsSuccess ?? false))
             {
                 // If the refresh token request fails, redirect to the login page
                 HttpContext.Response.Redirect(Constants.RedirectToLogin);
             }
+
+            // Update session with new authentication info
             sessionAuth = response?.Data;
             HttpContext.Session.Set(Constants.AuthResponseDto, sessionAuth);
         }
 
+        // Set the bearer token for subsequent API calls
         _httpService.SetBearerToken(sessionAuth!.Token ?? "");
+
+        // Fetch menu items for the authenticated user
         var data = await _httpService.GetAsync<ApiResponse<IList<DynamicMenuItemDto>>?>(_apiSettings.Versions.Menu, _apiSettings.Endpoints.Menu.GetByUserId);
         var menuList = data?.Data ?? [];
 
         List<DynamicMenuItemDto>? _menuList;
-        var SessionMenu = HttpContext.Session.Get<IList<DynamicMenuItemDto>>(Constants.Menu);
-        if (SessionMenu != null)
+        // Try to get menu from session
+        var sessionMenu = HttpContext.Session.Get<IList<DynamicMenuItemDto>>(Constants.Menu);
+        if (sessionMenu != null)
         {
-            _menuList = (List<DynamicMenuItemDto>?)SessionMenu;
+            // Use menu from session if available
+            _menuList = (List<DynamicMenuItemDto>?)sessionMenu;
         }
         else
         {
+            // Otherwise, use freshly fetched menu and store in session
             _menuList = [.. menuList];
             HttpContext.Session.Set(Constants.Menu, menuList);
         }
 
+        // Render the menu view with the menu list
         return View("_Menu", _menuList);
     }
 }

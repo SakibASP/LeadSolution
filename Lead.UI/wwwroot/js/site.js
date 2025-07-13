@@ -15,12 +15,12 @@ $(function () {
 });
 
 // Write your JavaScript code.
-document.addEventListener("DOMContentLoaded", event => {
+document.addEventListener("DOMContentLoaded", (event) => {
     typeWriting(event);
-})
+});
 
 //Type writing element
-const typeWriting = function (e) {
+const typeWriting = (e) => {
     e.preventDefault();
     const heading = document.getElementById("typewriting");
     if (heading) {
@@ -29,7 +29,7 @@ const typeWriting = function (e) {
         let index = 0;
 
         heading.textContent = "";
-        function typeWriter() {
+        const typeWriter = () => {
             if (index < text.length) {
                 heading.innerHTML += text.charAt(index);
                 index++;
@@ -45,7 +45,7 @@ const typeWriting = function (e) {
 const paymentType = document.getElementById("PaymentId");
 //alert(paymentType);
 if (paymentType != null) {
-    paymentType.addEventListener("change", function (e) {
+    paymentType.addEventListener("change", (e) => {
         $('#SubPaymentId').empty(null);
         $('#SubPaymentId').append(
             '<option disabled selected>' +
@@ -57,7 +57,7 @@ if (paymentType != null) {
     });
 }
 
-const GetSubPaymentTypes = async function (typeId) {
+const GetSubPaymentTypes = async (typeId) => {
     try {
         const reqUrl = `/Home/GetSubPaymentTypes?typeId=${typeId}`;
         const response = await fetch(reqUrl, {
@@ -86,14 +86,14 @@ const GetSubPaymentTypes = async function (typeId) {
 const customerId = document.getElementById("CustomerId");
 //alert(paymentType);
 if (customerId != null) {
-    customerId.addEventListener("change", function (e) {
+    customerId.addEventListener("change", (e) => {
         $('#SubscribeId').empty(null);
         GetSubscriptions(customerId.value);
         e.preventDefault();
     });
 }
 
-const GetSubscriptions = async function (customerId) {
+const GetSubscriptions = async (customerId) => {
     try {
         const reqUrl = `/Home/GetSubscriptions?customerId=${customerId}`;
         const response = await fetch(reqUrl, {
