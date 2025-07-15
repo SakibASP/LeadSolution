@@ -10,6 +10,6 @@ public class ServiceTypeRepo(LeadContext context) : IServiceTypeRepo
     private readonly LeadContext _context = context;
     public async Task<IList<AspNetServiceTypes>> GetAspNetServiceTypesAsync() => await _context.AspNetServiceTypes
         .AsNoTracking()
-        .Where(x=>x.IsActive)
+        .Where(x => x.IsActive)
         .ToListAsync();
 }
