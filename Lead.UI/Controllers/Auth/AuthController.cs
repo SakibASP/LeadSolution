@@ -1,5 +1,4 @@
-﻿using Azure.Core;
-using Common.Utils.Constant;
+﻿using Common.Utils.Constant;
 using Common.Utils.Helper;
 using Core.Models.Auth;
 using Core.ViewModels.Dto.Auth;

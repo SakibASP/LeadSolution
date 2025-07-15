@@ -2,7 +2,6 @@ using Lead.UI.Interfaces;
 using Lead.UI.Services;
 using Lead.UI.Settings;
 using Microsoft.AspNetCore.Mvc.Razor;
-using Microsoft.Extensions.DependencyInjection;
 using System.Net.Http.Headers;
 
 var builder = WebApplication.CreateBuilder(args);

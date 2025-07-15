@@ -1,9 +1,8 @@
 ﻿using Core.Models.Auth;
 
-namespace Infrustructure.Interfaces.Auth
+namespace Infrustructure.Interfaces.Auth;
+
+public interface IServiceTypeRepo
 {
-    public interface IServiceTypeRepo
-    {
-        Task<IList<AspNetServiceTypes>> GetAspNetServiceTypesAsync();
-    }
+    Task<IList<AspNetServiceTypes>> GetAspNetServiceTypesAsync();
 }
