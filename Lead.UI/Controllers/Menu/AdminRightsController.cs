@@ -10,7 +10,6 @@ using Lead.UI.Settings;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.Extensions.Options;
-using Microsoft.IdentityModel.Tokens;
 using System.Text.Json;
 
 namespace Lead.UI.Controllers.Menu;

@@ -1,0 +1,42 @@
+﻿@using Core.ViewModels.Dto.Auth
+@model IList<UserRolesDto>
+@{
+    ViewData["Title"] = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<h1>User Roles</h1>
+<br />
+
+<a asp-action="Register" asp-controller="Auth" class="btn btn-info"><i class="fas fa-plus"></i>Add User</a>
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Email</th>
+            <th>UserName</th>
+            <th>Roles</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @if(Model.Count == 0)
+        {
+            <tr>
+                <td colspan="4">No Data Found</td>
+            </tr>
+        }
+        else
+        {
+            foreach (var user in Model)
+            {
+                <tr>
+                    <td>@user.Email</td>
+                    <td>@user.UserName</td>
+                    <td>@string.Join(" , ", user.Roles.ToList())</td>
+                    <td>
+                        <a class="btn btn-primary btn-sm" asp-controller="Auth" asp-action="ManageUser" asp-route-userId="@user.UserId">Manage</a>
+                    </td>
+                </tr>
+            }
+        }
+    </tbody>
+</table>

@@ -26,13 +26,15 @@ public class Auth
     public required string Register { get; set; }
     public required string GetUsers { get; set; }
     public required string GetUserById { get; set; }
+    public required string AssignRole { get; set; }
+    //Roles
+    public required string GetUserRoles { get; set; }
     public required string GetRoles { get; set; }
     public required string GetRoleById { get; set; }
     public required string GetRolesByUserId { get; set; }
     public required string AddRole { get; set; }
     public required string UpdateRole { get; set; }
     public required string DeleteRole { get; set; }
-    public required string ServiceType { get; set; }
 
 }
 

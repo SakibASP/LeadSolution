@@ -25,18 +25,9 @@
             </div>
 
             <div class="mb-3">
-                <label asp-for="Company" class="form-label"></label>
-                <input asp-for="Company" class="form-control" placeholder="Enter company name" />
-                <span asp-validation-for="Company" class="text-danger small"></span>
-            </div>
-
-            <div class="mb-4">
-                <label asp-for="ServiceTypeId" class="form-label"></label>
-                <select asp-for="ServiceTypeId" class="form-select"
-                        asp-items="ViewBag.ServiceTypes as SelectList">
-                    <option value="">-- Select Service Type --</option>
-                </select>
-                <span asp-validation-for="ServiceTypeId" class="text-danger small"></span>
+                <label asp-for="NID" class="form-label"></label>
+                <input asp-for="NID" class="form-control" placeholder="Enter company name" />
+                <span asp-validation-for="NID" class="text-danger small"></span>
             </div>
 
             <div class="mb-3">

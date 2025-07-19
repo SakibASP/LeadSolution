@@ -4,8 +4,10 @@
         $('input:checkbox').each(function () {
             $(this).prop("checked", false);
         });
-
         let RoleId = $(this).children("option:selected").val();
+        if (RoleId == "") {
+            return;
+        }
         //alert(RoleId);
         $.ajax({
             url: '/AdminRights/GetRoleWiseSelectedPages',
@@ -26,8 +28,8 @@
                 });
             },
             error: function (xhr, ajaxOptions, thrownError) {
-                alert(xhr.status);
-                alert(thrownError);
+                console.log(xhr.status);
+                console.log(thrownError);
             }
         });
     });
@@ -92,8 +94,6 @@ const submit_form = function () {
             });
         },
         error: function (req, status, err) {
-            alert(req.status);
-            alert(err);
             $.toast({
                 heading: 'Failed!',
                 text: 'Something went wrong.',
