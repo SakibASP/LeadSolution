@@ -36,6 +36,7 @@ builder.Services.Configure<RazorViewEngineOptions>(o =>
     o.ViewLocationFormats.Add("~/Views/Shared/{0}" + RazorViewEngine.ViewExtension);
     o.ViewLocationFormats.Add("~/Views/Common/{1}/{0}" + RazorViewEngine.ViewExtension);
     o.ViewLocationFormats.Add("~/Views/Auth/{1}/{0}" + RazorViewEngine.ViewExtension);
+    o.ViewLocationFormats.Add("~/Views/Menu/{1}/{0}" + RazorViewEngine.ViewExtension);
 });
 
 var app = builder.Build();

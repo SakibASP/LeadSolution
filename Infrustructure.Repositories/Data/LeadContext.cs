@@ -1,5 +1,6 @@
 ﻿using Core.Models.Auth;
 using Core.Models.Common;
+using Core.Models.Menu;
 using Infrustructure.Repositories.AuditFactory;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
@@ -34,6 +35,8 @@ public class LeadContext : IdentityDbContext<ApplicationUser>
     }
 
     public virtual DbSet<AspNetServiceTypes> AspNetServiceTypes { get; set; } = default!;
+    public virtual DbSet<MenuItem> MenuItem { get; set; } = default!;
+    public virtual DbSet<MenuToRole> MenuToRole { get; set; } = default!;
     //For storing users actions in Audit Table
     public virtual DbSet<Audit> Audit { get; set; } = default!;
     private AuditTrailFactory? auditFactory = null;

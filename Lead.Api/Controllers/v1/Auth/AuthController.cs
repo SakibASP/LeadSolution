@@ -1,4 +1,6 @@
 ﻿using Application.Interfaces.Auth;
+using Application.Interfaces.Menu;
+using Common.Utils.Constant;
 using Common.Utils.Helper;
 using Core.Models.Auth;
 using Core.ViewModels.Dto.Auth;
@@ -9,19 +11,28 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Serilog;
+using System.Data;
 using System.Text.Json;
 
 namespace Lead.Api.Controllers.v1.Auth;
 
+/// <summary>
+/// Md. Sakibur Rahman
+/// 19 July 2025
+/// </summary>
+
 [ApiController]
 [Route("api/v1/[controller]")]
-public class AuthController(UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager, ITokenService tokenService, IOptions<JwtOptions> jwtOptions, IServiceTypeService service) : ControllerBase
+public class AuthController(UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager, 
+    ITokenService tokenService, IOptions<JwtOptions> jwtOptions, IServiceTypeService serviceType,
+    IAdminRightsService adminRights) : ControllerBase
 {
     private readonly UserManager<ApplicationUser> _userManager = userManager;
     private readonly RoleManager<IdentityRole> _roleManager = roleManager;
-    private readonly ITokenService _tokenService = tokenService;
+    private readonly ITokenService _iTokenService = tokenService;
     private readonly JwtOptions _jwtOptions = jwtOptions.Value;
-    private readonly IServiceTypeService _service = service;
+    private readonly IServiceTypeService _iServiceType = serviceType;
+    private readonly IAdminRightsService _iAdminRights = adminRights;
 
     #region Login/Register/RefreshToken and Revoke user
 
@@ -65,8 +76,8 @@ public class AuthController(UserManager<ApplicationUser> userManager, RoleManage
             if (user == null || !await _userManager.CheckPasswordAsync(user, dto.Password))
                 return Ok(ApiResponse<string>.Fail("Invalid email or password"));
 
-            var token = await _tokenService.GenerateJwtToken(user);
-            var refreshToken = _tokenService.GenerateRefreshToken();
+            var token = await _iTokenService.GenerateJwtToken(user);
+            var refreshToken = _iTokenService.GenerateRefreshToken();
 
             // Store refresh token with expiration as JSON
             var tokenDto = new TokenDto
@@ -106,7 +117,7 @@ public class AuthController(UserManager<ApplicationUser> userManager, RoleManage
             if (dto is null || string.IsNullOrEmpty(dto.RefreshToken) || string.IsNullOrEmpty(dto.AccessToken)) return BadRequest("Invalid client request!");
 
             // 1. Get claims principal from expired access token
-            var principal = _tokenService.GetPrincipalFromExpiredToken(dto.AccessToken);
+            var principal = _iTokenService.GetPrincipalFromExpiredToken(dto.AccessToken);
             if (principal is null)
                 return Ok(ApiResponse<AuthResponseDto>.Fail("Invalid access token or refresh token!"));
 
@@ -134,7 +145,7 @@ public class AuthController(UserManager<ApplicationUser> userManager, RoleManage
                 return Ok(ApiResponse<AuthResponseDto>.Fail("Refresh token expired!"));
             }
 
-            var newAccessToken = await _tokenService.GenerateJwtToken(user);
+            var newAccessToken = await _iTokenService.GenerateJwtToken(user);
             var response = new AuthResponseDto
             {
                 Token = newAccessToken,
@@ -188,7 +199,7 @@ public class AuthController(UserManager<ApplicationUser> userManager, RoleManage
     {
         try
         {
-            var types = await _service.GetAspNetServiceTypesAsync();
+            var types = await _iServiceType.GetAspNetServiceTypesAsync();
             return Ok(ApiResponse<IList<AspNetServiceTypes>>.Success(types, "Token refreshed successful!"));
         }
         catch (Exception ex)
@@ -202,23 +213,46 @@ public class AuthController(UserManager<ApplicationUser> userManager, RoleManage
 
     #region Role Management
 
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = Constants.AdminAuthRoles)]
     [HttpGet("all-roles")]
     public async Task<IActionResult> GetAllRoles()
     {
         try
         {
-            var roles = await _roleManager.Roles.ToListAsync();
-            return Ok(ApiResponse<IList<IdentityRole>>.Success(roles, "Refresh token expired!")); // returns JSON list of roles
+            var isSuperAdmin = User.IsInRole(Constants.SuperAdmin);
+            var roles = await _iAdminRights.GetRoleListAsync(isSuperAdmin);
+            return Ok(ApiResponse<IList<IdentityRole>>.Success(roles.Data, "Roles get successfully!")); // returns JSON list of roles
         }
         catch (Exception ex)
         {
             Log.Error(ex, MessageHelper<string>.GenerateErrorMsg(HttpContext.Request.Path, null, User.Identity?.Name));
-            return Ok(ApiResponse<IList<IdentityRole>>.Fail("Refresh token expired!"));
+            return Ok(ApiResponse<IList<IdentityRole>>.Fail("No role found!"));
         }
     }
 
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = Constants.AdminAuthRoles)]
+    [HttpGet("get-role-by-Id")]
+    public async Task<IActionResult> GetRoleById([FromQuery] string roleId)
+    {
+        try
+        {
+            if (string.IsNullOrWhiteSpace(roleId))
+                return Ok(ApiResponse<string>.Fail("Role not found!"));
+
+            var role = await _roleManager.FindByIdAsync(roleId);
+            if (role is null)
+                return Ok(ApiResponse<string>.Fail("Role not found!"));
+
+            return Ok(ApiResponse<IdentityRole>.Success(role, "Role get successfully!"));
+        }
+        catch (Exception ex)
+        {
+            Log.Error(ex, MessageHelper<string>.GenerateErrorMsg(HttpContext.Request.Path, null, User.Identity?.Name));
+            return Ok(ApiResponse<IdentityRole>.Fail("Something went wrong!"));
+        }
+    }
+
+    [Authorize(Roles = Constants.AdminAuthRoles)]
     [HttpPost("create-role")]
     public async Task<IActionResult> CreateRole([FromBody] string roleName)
     {
@@ -232,7 +266,7 @@ public class AuthController(UserManager<ApplicationUser> userManager, RoleManage
                 return Ok(ApiResponse<string>.Fail("Role already exists!"));
 
             var result = await _roleManager.CreateAsync(new IdentityRole(roleName));
-            return result.Succeeded ? Ok(ApiResponse<string>.Success("Role created successfully!")) : Ok(ApiResponse<string>.Fail("Role already exists!"));
+            return result.Succeeded ? Ok(ApiResponse<string>.Success(null, "Role created successfully!")) : Ok(ApiResponse<string>.Fail("Role already exists!"));
         }
         catch (Exception ex)
         {
@@ -241,7 +275,61 @@ public class AuthController(UserManager<ApplicationUser> userManager, RoleManage
         }
     }
 
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = Constants.AdminAuthRoles)]
+    [HttpPost("update-role")]
+    public async Task<IActionResult> UpdateRole([FromBody] RoleDto role)
+    {
+        try
+        {
+            if (role is null)
+                return Ok(ApiResponse<string>.Fail("Role not found!"));
+
+            var _role = await _roleManager.FindByIdAsync(role.Id);
+            if (_role is null)
+                return Ok(ApiResponse<string>.Fail("Role not found!"));
+
+            var setNameResult = await _roleManager.SetRoleNameAsync(_role, role.Name);
+            if (!setNameResult.Succeeded)
+                return Ok(ApiResponse<string>.Fail("Failed to set role name."));
+
+            var updateResult = await _roleManager.UpdateAsync(_role);
+            if (!updateResult.Succeeded)
+                return Ok(ApiResponse<string>.Fail("Failed to update role."));
+
+            return Ok(ApiResponse<string>.Success(null, "Role updated successfully!"));
+        }
+        catch (Exception ex)
+        {
+            Log.Error(ex, MessageHelper<string>.GenerateErrorMsg(HttpContext.Request.Path, null, User.Identity?.Name));
+            return Ok(ApiResponse<string>.Fail("Something went wrong!"));
+        }
+    }
+
+    [Authorize(Roles = Constants.AdminAuthRoles)]
+    [HttpPost("delete-role")]
+    public async Task<IActionResult> DeleteRole([FromBody] string roleId)
+    {
+        try
+        {
+            if (string.IsNullOrEmpty(roleId))
+                return Ok(ApiResponse<string>.Fail("Role not found!"));
+
+            var role = await _roleManager.FindByIdAsync(roleId);
+            if (role is null)
+                return Ok(ApiResponse<string>.Fail("Role not found!"));
+
+            await _roleManager.DeleteAsync(role);
+            return Ok(ApiResponse<string>.Success(null, "Role removed successfully!"));
+        }
+        catch (Exception ex)
+        {
+            Log.Error(ex, MessageHelper<string>.GenerateErrorMsg(HttpContext.Request.Path, null, User.Identity?.Name));
+            return Ok(ApiResponse<string>.Fail("Something went wrong!"));
+        }
+    }
+    #endregion
+
+    [Authorize(Roles = Constants.AdminAuthRoles)]
     [HttpPost("assign-role")]
     public async Task<IActionResult> AssignRole([FromBody] AssignRoleDto request)
     {
@@ -256,5 +344,4 @@ public class AuthController(UserManager<ApplicationUser> userManager, RoleManage
         return result.Succeeded ? Ok("Role assigned.") : BadRequest(result.Errors);
     }
 
-    #endregion
 }

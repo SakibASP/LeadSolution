@@ -4,12 +4,12 @@ using Infrustructure.Repositories.Data;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 
-namespace Infrustructure.Repositories.Menu;
+namespace Infrustructure.Repositories.BusinessDomains.Menu;
 
 /// <summary>
 /// Repository for menu-related data access operations.
 /// </summary>
-public class MenuRepo(LeadContext context) : IMenuRepo
+public class MenuRepo(LeadContext context) : IMenuRepo, IAsyncDisposable
 {
     private readonly LeadContext _context = context;
 
@@ -28,5 +28,11 @@ public class MenuRepo(LeadContext context) : IMenuRepo
         )
         .AsNoTracking()
         .ToListAsync();
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        await _context.DisposeAsync();
+        GC.SuppressFinalize(this);
     }
 }

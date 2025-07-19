@@ -24,6 +24,9 @@
     <link href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i"
           rel="stylesheet">
 
+    <!-- SweetAlert2 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet" />
+
     <!-- Custom styles for this template-->
     <link href="~/sb-admin/css/sb-admin-2.css" rel="stylesheet" />
     @* <link href="~/css/tables.css" rel="stylesheet" /> *@
@@ -317,17 +320,21 @@
                 <!-- Begin Page Content -->
                 <div class="container-fluid">
                     <div class="row">
-                        <div class="text-center">
-                            @if (@TempData[Constants.Error] != null)
-                            {
-                                <span class="text-center" style="font-size:medium;color:red;"><strong style="font:bold;"> 😢 Error:</strong> @TempData[Constants.Error]</span>
-                            }
-                            @if (@TempData[Constants.Success] != null)
-                            {
-                                <span class="text-center" style="font-size:medium;color:green;"><strong style="font:bold;"> 😊 Success:</strong> @TempData[Constants.Success]</span>
-                            }
+                        @if (TempData[Constants.Error] != null)
+                        {
+                            <div class="toast-bar toast-error">
+                                <i class="fa fa-exclamation-circle"></i>
+                                <strong>Error: &nbsp;</strong> @TempData[Constants.Error]
+                            </div>
+                        }
 
-                        </div>
+                        @if (TempData[Constants.Success] != null)
+                        {
+                            <div class="toast-bar toast-success">
+                                <i class="fa fa-check-circle"></i>
+                                <strong>Success: &nbsp;</strong> @TempData[Constants.Success]
+                            </div>
+                        }
                     </div>
                     <main role="main" class="pb-3">
                         @RenderBody()
@@ -371,7 +378,8 @@
     <script src="~/sb-admin/js/sb-admin-2.min.js"></script>
 
     <script src="~/js/jquery.toast.min.js"></script>
-
+    <!-- SweetAlert2 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

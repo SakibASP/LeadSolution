@@ -11,11 +11,17 @@ using Microsoft.Extensions.Options;
 
 namespace Lead.UI.Controllers.Auth;
 
+/// <summary>
+/// Md. Sakibur Rahman
+/// 19 July 2025
+/// </summary>
+
 public class AuthController(IHttpService httpService, IOptions<ApiSettings> apiSetting) : Controller
 {
     private readonly IHttpService _httpService = httpService;
     private readonly ApiSettings _apiSettings = apiSetting.Value;
 
+    #region Login & register , No bearer needed
     [HttpGet]
     public IActionResult Login()
     {
@@ -66,27 +72,92 @@ public class AuthController(IHttpService httpService, IOptions<ApiSettings> apiS
         if (response is not null && response.IsSuccess) await LoginAsync(new() { Email = registerDto.Email,Password = registerDto.Password });
         return RedirectToAction("Index", "Home");
     }
+    #endregion
 
-    [HttpGet]
+
     public async Task<IActionResult> RoleList()
     {
         var sessionAuth = HttpContext.Session.Get<AuthResponseDto>(Constants.AuthResponseDto);
         if (sessionAuth is null) return RedirectToAction(nameof(Login));
         _httpService.SetBearerToken(sessionAuth.Token ?? "");
+
         var response = await _httpService.GetAsync<ApiResponse<IList<RoleDto>>?>(_apiSettings.Versions.Auth, _apiSettings.Endpoints.Auth.GetRoles);
         if (response is null) return RedirectToAction(nameof(Login));
         ViewBag.AuthResponseDto = sessionAuth;
         return View(response.Data);
     }
 
-    [HttpPost]
+
     public async Task<IActionResult> AddRole(string roleName)
     {
         var sessionAuth = HttpContext.Session.Get<AuthResponseDto>(Constants.AuthResponseDto);
         if (sessionAuth is null) return RedirectToAction(nameof(Login));
         _httpService.SetBearerToken(sessionAuth.Token ?? "");
+
         var response = await _httpService.PostAsync<ApiResponse<string>>(_apiSettings.Versions.Auth, _apiSettings.Endpoints.Auth.AddRole, roleName);
         if (response is null) return RedirectToAction(nameof(Login));
+
+        if (response.IsSuccess)
+            TempData[Constants.Success] = response.Message;
+        else
+            TempData[Constants.Error] = response.Message;
+
+        ViewBag.AuthResponseDto = sessionAuth;
+        return RedirectToAction(nameof(RoleList));
+    }
+
+
+    public async Task<IActionResult> EditRole(string roleId)
+    {
+        var sessionAuth = HttpContext.Session.Get<AuthResponseDto>(Constants.AuthResponseDto);
+        if (sessionAuth is null) return RedirectToAction(nameof(Login));
+        _httpService.SetBearerToken(sessionAuth.Token ?? "");
+
+        var queryParams = new Dictionary<string, string>
+        {
+            { "roleId", roleId } // or just roleId if it's already string
+        };
+
+        var response = await _httpService.GetAsync<ApiResponse<RoleDto>>(_apiSettings.Versions.Auth, _apiSettings.Endpoints.Auth.GetRoleById, queryParams);
+        if (response is null) return RedirectToAction(nameof(Login));
+        ViewBag.AuthResponseDto = sessionAuth;
+        return View(response.Data);
+    }
+
+
+    public async Task<IActionResult> UpdateRole(RoleDto role)
+    {
+        var sessionAuth = HttpContext.Session.Get<AuthResponseDto>(Constants.AuthResponseDto);
+        if (sessionAuth is null) return RedirectToAction(nameof(Login));
+        _httpService.SetBearerToken(sessionAuth.Token ?? "");
+
+        var response = await _httpService.PostAsync<ApiResponse<string>>(_apiSettings.Versions.Auth, _apiSettings.Endpoints.Auth.UpdateRole, role);
+        if (response is null) return RedirectToAction(nameof(Login));
+
+        if (response.IsSuccess)
+            TempData[Constants.Success] = response.Message;
+        else
+            TempData[Constants.Error] = response.Message;
+
+        ViewBag.AuthResponseDto = sessionAuth;
+        return RedirectToAction(nameof(RoleList));
+    }
+
+
+    public async Task<IActionResult> DeleteRole(string roleId)
+    {
+        var sessionAuth = HttpContext.Session.Get<AuthResponseDto>(Constants.AuthResponseDto);
+        if (sessionAuth is null) return RedirectToAction(nameof(Login));
+        _httpService.SetBearerToken(sessionAuth.Token ?? "");
+
+        var response = await _httpService.PostAsync<ApiResponse<string>>(_apiSettings.Versions.Auth, _apiSettings.Endpoints.Auth.DeleteRole, roleId);
+        if (response is null) return RedirectToAction(nameof(Login));
+
+        if (response.IsSuccess)
+            TempData[Constants.Success] = response.Message;
+        else
+            TempData[Constants.Error] = response.Message;
+
         ViewBag.AuthResponseDto = sessionAuth;
         return RedirectToAction(nameof(RoleList));
     }

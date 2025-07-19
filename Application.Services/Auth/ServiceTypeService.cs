@@ -4,9 +4,9 @@ using Infrustructure.Interfaces.Auth;
 
 namespace Application.Services.Auth;
 
-public class ServiceTypeService(IServiceTypeRepo repo): IServiceTypeService
+public class ServiceTypeService(IServiceTypeRepo serviceType) : IServiceTypeService
 {
-    private readonly IServiceTypeRepo _iRepo = repo;
-    public async Task<IList<AspNetServiceTypes>> GetAspNetServiceTypesAsync() => await _iRepo.GetAspNetServiceTypesAsync();
+    private readonly IServiceTypeRepo _iServiceType = serviceType;
+    public async Task<IList<AspNetServiceTypes>> GetAspNetServiceTypesAsync() => await _iServiceType.GetAspNetServiceTypesAsync();
     
 }

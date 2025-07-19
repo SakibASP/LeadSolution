@@ -6,6 +6,9 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+	<ItemGroup>
+		<PackageReference Include="Serilog.AspNetCore" Version="9.0.0" />
+	</ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Application.Interfaces\Application.Interfaces.csproj" />
     <ProjectReference Include="..\Core.Models\Core.Models.csproj" />

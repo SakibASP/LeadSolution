@@ -17,7 +17,31 @@ $(function () {
 // Write your JavaScript code.
 document.addEventListener("DOMContentLoaded", (event) => {
     typeWriting(event);
+    hideTempMessage();
 });
+
+// Hiding the success or error message after 2 seconds
+const hideTempMessage = () => {
+    const alerts = document.querySelectorAll(".toast-alert");
+    alerts.forEach(alert => {
+        setTimeout(() => {
+            alert.style.transition = "opacity 0.5s ease";
+            alert.style.opacity = "0";
+            setTimeout(() => alert.remove(), 500); // Remove after fade
+        }, 2000); // Show for 2 seconds
+    });
+}
+
+// Hiding the success or error message after 2 seconds
+const showTempMessage = (id) => {
+    const alert = document.getElementById(id);
+    if (alert) {
+        alert.style.opacity = "1";
+        setTimeout(() => {
+            alert.style.opacity = "0";
+        }, 2000);
+    }
+}
 
 //Type writing element
 const typeWriting = (e) => {

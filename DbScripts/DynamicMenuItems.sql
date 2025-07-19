@@ -10,5 +10,6 @@ INSERT INTO MenuItem([MenuId],[MenuName],[MenuUrl],[MenuParentId],[Active],[FaIc
 SET IDENTITY_INSERT [MenuItem] OFF
 
 SET IDENTITY_INSERT [MenuItem] ON
+INSERT INTO MenuItem([MenuId],[MenuName],[MenuUrl],[MenuParentId],[Active],[FaIcon]) VALUES (101,N'User Rights',N'/AdminRights/Index',1,1,null)
 INSERT INTO MenuItem([MenuId],[MenuName],[MenuUrl],[MenuParentId],[Active],[FaIcon]) VALUES (103,N'Maintain Roles',N'/Auth/RoleList',1,1,null)
 SET IDENTITY_INSERT [MenuItem] OFF

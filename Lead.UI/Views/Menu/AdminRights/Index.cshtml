@@ -1,0 +1,65 @@
+﻿@using Core.Models.Menu
+@using Core.ViewModels.Dto.Menu
+@using Microsoft.AspNetCore.Html
+@model IEnumerable<MenuItemViewModel>
+
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+<div class="card bg-transparent">
+    <div class="card-heading bg-primary text-white">
+        <h4>Add Pages to a Role</h4>
+    </div>
+    <div class="card-body">
+        @using (Html.BeginForm("Create", "AdminRights", FormMethod.Post))
+        {
+            @Html.AntiForgeryToken()
+            @Html.ValidationSummary(true)
+
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="wrapper">
+                        <p>
+                            <b>Select a Role</b>
+                            @Html.DropDownList("RoleId", (IEnumerable<SelectListItem>)ViewBag.Roles, "Please Select...", htmlAttributes: new { @class = "form-control" })
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            {
+                void ShowTree(List<MenuItem>? menusList)
+                {
+                    if (menusList != null)
+                    {
+                        foreach (var item in menusList)
+                        {
+                            <ul>
+                                <li>
+                                    @Html.CheckBoxFor(itm => item.IsSelected, htmlAttributes: new { @id = item.MenuId, @class = "form-check-input" }) @item.MenuName
+                                    @if (item.Children.Count() > 0)
+                                    {
+                                        ShowTree(item.Children);
+                                    }
+                                </li>
+                            </ul>
+                        }
+                    }
+                }
+                var menuList = ViewBag.menusList as List<MenuItem>;
+                ShowTree(menuList);
+            }
+
+        }
+        <p><input type="submit" value="Save" class="btn btn-primary" onclick="submit_form();" /></p>
+    </div>
+</div>
+
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script src="~/manager/menu/adminrights/index.js"></script>
+}

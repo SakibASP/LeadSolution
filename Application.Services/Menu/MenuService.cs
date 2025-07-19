@@ -5,12 +5,12 @@ using Infrustructure.Interfaces.Menu;
 
 namespace Application.Services.Menu;
 
-public class MenuService(IMenuRepo repo) : IMenuService
+public class MenuService(IMenuRepo menu) : IMenuService
 {
-    private readonly IMenuRepo _iRepo = repo;
+    private readonly IMenuRepo _iMenu = menu;
     public async Task<ApiResponse<IList<DynamicMenuItemDto>>> GetAllMenuAsync(string? userId)
     {
-        var data = await _iRepo.GetAllMenuAsync(userId);
+        var data = await _iMenu.GetAllMenuAsync(userId);
         if (data == null || !data.Any()) return ApiResponse<IList<DynamicMenuItemDto>>.Fail("No menu items found.");
         return ApiResponse<IList<DynamicMenuItemDto>>.Success(data);
     }
