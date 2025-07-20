@@ -21,13 +21,15 @@ public class Endpoints
 
 public class Auth
 {
+    //Authentication and User management
     public required string Login { get; set; }
     public required string RefreshToken { get; set; }
     public required string Register { get; set; }
     public required string GetUsers { get; set; }
     public required string GetUserById { get; set; }
     public required string AssignRole { get; set; }
-    //Roles
+
+    //Roles management
     public required string GetUserRoles { get; set; }
     public required string GetRoles { get; set; }
     public required string GetRoleById { get; set; }
@@ -40,7 +42,10 @@ public class Auth
 
 public class Menu
 {
+    //Menu management
     public required string GetByUserId { get; set; }
+
+    //User rights management
     public required string GetAllMenu { get; set; }
     public required string GetRoleWiseMenu { get; set; }
     public required string CreateRoleWiseMenu { get; set; }
