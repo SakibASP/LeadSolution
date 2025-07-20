@@ -1,5 +1,6 @@
 ﻿using Core.Models.Auth;
 using Core.Models.Common;
+using Core.Models.Lead;
 using Core.Models.Menu;
 using Infrustructure.Repositories.AuditFactory;
 using Microsoft.AspNetCore.Http;
@@ -32,15 +33,34 @@ public class LeadContext : IdentityDbContext<ApplicationUser>
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
+        RegisterAutoIncludes(modelBuilder);
     }
 
+    #region User, Menu and Roles
     public virtual DbSet<AspNetServiceTypes> AspNetServiceTypes { get; set; } = default!;
     public virtual DbSet<MenuItem> MenuItem { get; set; } = default!;
     public virtual DbSet<MenuToRole> MenuToRole { get; set; } = default!;
-    //For storing users actions in Audit Table
+    #endregion
+
+    #region Lead
+    public virtual DbSet<DataTypes> DataTypes { get; set; } = default!;
+    public virtual DbSet<FormDetails> FormDetails { get; set; } = default!;
+    public virtual DbSet<FormValues> FormValues { get; set; } = default!;
+    #endregion
+
+    #region Audit
     public virtual DbSet<Audit> Audit { get; set; } = default!;
     private AuditTrailFactory? auditFactory = null;
     private readonly List<Audit> auditList = [];
+    #endregion
+
+    /// <summary>
+    /// Author      : Sakibur Rahman
+    /// Date        : 01 Jun 2025
+    /// Description : Tracing modified data
+    /// </summary>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
     public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {
         auditList.Clear();
@@ -80,5 +100,25 @@ public class LeadContext : IdentityDbContext<ApplicationUser>
         }
 
         return retVal;
+    }
+
+
+    /// <summary>
+    /// Md. Sakibur Rahman
+    /// 21 Jun 2035
+    /// </summary>
+    /// <param name="modelBuilder"></param>
+    private static void RegisterAutoIncludes(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<FormDetails>()
+            .Navigation(m => m.CSharpDataType)
+            .AutoInclude();
+        modelBuilder.Entity<FormDetails>()
+            .Navigation(m => m.BootstrapDataType)
+            .AutoInclude();
+
+        modelBuilder.Entity<FormValues>()
+            .Navigation(m => m.FormDetails)
+            .AutoInclude();
     }
 }

@@ -6,7 +6,6 @@ namespace Core.Models.Menu
     [Table(nameof(MenuToRole))]
     public class MenuToRole
     {
-        [Key]
         public int? Id { get; set; }
         public string? RoleId { get; set; }
         public int? MenuId { get; set; }

@@ -1,10 +1,16 @@
+using Infrustructure.Repositories.Data;
 using Lead.UI.Interfaces;
 using Lead.UI.Services;
 using Lead.UI.Settings;
 using Microsoft.AspNetCore.Mvc.Razor;
+using Microsoft.EntityFrameworkCore;
 using System.Net.Http.Headers;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddDbContext<LeadContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
 
 builder.Services.Configure<ApiSettings>(builder.Configuration.GetSection("ApiSettings"));
 var apiSettings = builder.Configuration.GetSection("ApiSettings").Get<ApiSettings>();

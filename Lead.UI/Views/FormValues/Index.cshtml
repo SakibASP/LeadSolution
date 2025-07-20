@@ -1,0 +1,44 @@
+﻿@using Core.Models.Lead
+@model IEnumerable<FormValues>
+@{
+    ViewData["Title"] = "Index";
+    var headers = (List<string?>?)ViewBag.Headers;
+}
+
+
+@if (Model.Any() && headers?.Count > 0)
+{
+    <table class="table table-bordered">
+        <thead class="table-dark">
+            <tr>
+                @foreach (var header in headers)
+                {
+                    <th>@header</th>
+                }
+            </tr>
+        </thead>
+        <tbody>
+            @* Group by a common field — assuming FormValue has a SubmissionId or use CreatedDate if needed *@
+            @{
+                var grouped = Model
+                .GroupBy(v => v.SubmissionId) // simulate group by timestamp
+                .ToList();
+            }
+
+            @foreach (var group in grouped)
+            {
+                <tr>
+                    @foreach (var header in headers)
+                    {
+                        var match = group.FirstOrDefault(v => v.FormDetails?.Name == header);
+                        <td>@match?.FormValue</td>
+                    }
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <p>No data found.</p>
+}

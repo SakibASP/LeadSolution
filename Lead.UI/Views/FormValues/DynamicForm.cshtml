@@ -1,0 +1,41 @@
+﻿@using Core.ViewModels.Dto.Lead
+@model DynamicFormViewModel
+@{
+    ViewData["Title"] = "Create";
+}
+
+
+
+<form asp-action="DynamicForm" method="post">
+    @for (int i = 0; i < Model.Inputs.Count; i++)
+    {
+        <div class="form-group">
+            <label>@Model.Inputs[i].Label</label>
+            
+            @if (Model.Inputs[i].IsSelectInput)
+            {
+                <select asp-for="Inputs[@i].Value" class="form-control">
+                    <option value="">-- Select --</option>
+                    <option>Option 1</option>
+                    <option>Option 2</option>
+                </select>
+            }
+            else
+            {
+                <input asp-for="Inputs[@i].Value" type="@Model.Inputs[i].InputType" class="form-control" />
+            }
+
+            <input type="hidden" asp-for="Inputs[@i].FormDetailId" />
+            <input type="hidden" asp-for="Inputs[@i].Label" />
+            <input type="hidden" asp-for="Inputs[@i].InputType" />
+            <input type="hidden" asp-for="Inputs[@i].IsSelectInput" />
+        </div>
+    }
+
+    <button type="submit" class="btn btn-success">Submit</button>
+</form>
+
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

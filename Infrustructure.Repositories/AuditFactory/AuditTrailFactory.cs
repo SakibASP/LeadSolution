@@ -9,7 +9,8 @@ using Common.Utils.Helper;
 namespace Infrustructure.Repositories.AuditFactory;
 
 /// <summary>
-/// Factory class for creating Audit objects based on entity changes.
+/// Md. Sakibur Rahman
+/// 01 Jun 2025
 /// </summary>
 public class AuditTrailFactory(IHttpContextAccessor httpContext)
 {
