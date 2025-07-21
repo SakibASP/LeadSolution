@@ -18,7 +18,7 @@ var apiSettings = builder.Configuration.GetSection("ApiSettings").Get<ApiSetting
 // Register HttpClient + HttpService
 builder.Services.AddHttpClient<IHttpService, HttpService>(client =>
 {
-    client.BaseAddress = new Uri(apiSettings.BaseUrl);
+    client.BaseAddress = new Uri(apiSettings!.BaseUrl);
     client.DefaultRequestHeaders.Accept.Add(
         new MediaTypeWithQualityHeaderValue("application/json"));
 });
@@ -27,7 +27,6 @@ builder.Services.AddHttpClient<IHttpService, HttpService>(client =>
 builder.Services.AddRazorPages();
 builder.Services.AddControllersWithViews();
 builder.Services.AddDistributedMemoryCache();
-
 builder.Services.AddSession(options =>
 {
     options.Cookie.Name = ".LeadUI.Session";

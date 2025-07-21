@@ -130,7 +130,7 @@ try
     });
 
 
-
+    builder.Services.AddHttpContextAccessor();
     builder.Services.AddAuthorization();
 
     // Add CORS policy

@@ -160,6 +160,7 @@ public class AuthController(IHttpService httpService, IOptions<ApiSettings> apiS
     }
     #endregion
 
+    #region Maintain user
     public async Task<IActionResult> UserList()
     {
         var sessionAuth = HttpContext.Session.Get<AuthResponseDto>(Constants.AuthResponseDto);
@@ -201,4 +202,5 @@ public class AuthController(IHttpService httpService, IOptions<ApiSettings> apiS
         else TempData[Constants.Success] = response?.Data;
         return RedirectToAction(nameof(UserList));
     }
+    #endregion
 }

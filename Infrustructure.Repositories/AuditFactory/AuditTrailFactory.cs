@@ -31,7 +31,7 @@ public class AuditTrailFactory(IHttpContextAccessor httpContext)
             // Determine if the entity should be audited based on its table name
             bool shouldAudit = !tableName.Contains("AspNet", StringComparison.CurrentCultureIgnoreCase) && !tableName.Contains("RequestCount", StringComparison.CurrentCultureIgnoreCase)
                 && !tableName.Contains("ApplicationUser", StringComparison.CurrentCultureIgnoreCase) && !tableName.Contains("IdentityUser", StringComparison.CurrentCultureIgnoreCase)
-                && !string.IsNullOrEmpty(tableName);
+                && !string.IsNullOrEmpty(tableName) && !tableName.Contains("IdentityRole", StringComparison.CurrentCultureIgnoreCase);
 
             if (shouldAudit)
             {
