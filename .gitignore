@@ -48,3 +48,10 @@
 /Lead.UI/bin/Debug/net9.0
 /Lead.UI/obj
 /Lead.Api/Logs/ErrorLogs
+/Common.DI/bin/Debug/net9.0
+/Common.DI/obj
+/Infrastructure.Interfaces/bin/Debug/net9.0
+/Infrastructure.Interfaces/obj
+/Infrastructure.Repositories/bin/Debug/net9.0
+/Infrastructure.Repositories/obj
+/Lead.Api/Logs/FatalLogs
