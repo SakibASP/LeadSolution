@@ -1,15 +1,10 @@
-using Infrustructure.Repositories.Data;
 using Lead.UI.Interfaces;
 using Lead.UI.Services;
 using Lead.UI.Settings;
 using Microsoft.AspNetCore.Mvc.Razor;
-using Microsoft.EntityFrameworkCore;
 using System.Net.Http.Headers;
 
 var builder = WebApplication.CreateBuilder(args);
-
-builder.Services.AddDbContext<LeadContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 
 builder.Services.Configure<ApiSettings>(builder.Configuration.GetSection("ApiSettings"));
@@ -42,6 +37,7 @@ builder.Services.Configure<RazorViewEngineOptions>(o =>
     o.ViewLocationFormats.Add("~/Views/Common/{1}/{0}" + RazorViewEngine.ViewExtension);
     o.ViewLocationFormats.Add("~/Views/Auth/{1}/{0}" + RazorViewEngine.ViewExtension);
     o.ViewLocationFormats.Add("~/Views/Menu/{1}/{0}" + RazorViewEngine.ViewExtension);
+    o.ViewLocationFormats.Add("~/Views/Lead/{1}/{0}" + RazorViewEngine.ViewExtension);
 });
 
 var app = builder.Build();

@@ -1,5 +1,5 @@
-﻿using Common.Utils.Constant;
-using Common.Utils.Helper;
+﻿using Common.Extentions;
+using Common.Utils.Constant;
 using Core.ViewModels.Dto.Auth;
 using Core.ViewModels.Dto.Menu;
 using Core.ViewModels.Response;
@@ -30,7 +30,7 @@ public class MenuViewComponent(IHttpService httpService, IOptions<ApiSettings> a
         }
 
         // Check if the token is expired
-        if (sessionAuth?.Expiration <= TimeHelper.GetCurrentBangladeshTime())
+        if (sessionAuth?.Expiration <= DateTime.Now.ToBangladeshTime())
         {
             // Prepare token DTO for refresh
             TokenDto tokenDto = new()

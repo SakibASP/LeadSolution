@@ -1,77 +1,89 @@
-﻿using Core.Models.Lead;
-using Core.ViewModels.Dto.Lead;
-using Infrustructure.Repositories.Data;
+﻿using Common.Utils.Constant;
+using Core.Models.Lead;
+using Core.ViewModels.Response;
+using Lead.UI.Controllers.Common;
+using Lead.UI.Interfaces;
+using Lead.UI.Settings;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 
 namespace Lead.UI.Controllers.Lead;
 
-public class FormValuesController : Controller
+public class FormValuesController(IHttpService httpService, IOptions<ApiSettings> apiSetting) : BaseController(httpService, apiSetting)
 {
-    private readonly LeadContext _context;
 
-    public FormValuesController(LeadContext context)
+    private string Version => _apiSettings.Versions.DataTypes;
+    private string Controller => _apiSettings.Endpoints.ControllerNames.FormValues;
+
+    //private void SetToken() => _httpService.SetBearerToken(AccessToken);
+
+    public async Task<IActionResult> Index()
     {
-        _context = context;
+        //SetToken();
+        var response = await _httpService.GetAsync<ApiResponse<IList<FormDetails>>>(
+            Version, Controller + _apiSettings.Endpoints.CommonEndPoints.GetAll);
+
+        if (response?.IsSuccess != true)
+            TempData[Constants.Error] = response?.Message;
+
+        return View(response?.Data ?? []);
     }
 
-    // GET: /FormValues/DynamicForm
-    public async Task<IActionResult> DynamicForm()
-    {
-        var formDetails = await _context.FormDetails
-            .Include(f => f.BootstrapDataType)
-            .Where(f => f.IsActive)
-            .ToListAsync();
-
-        var vm = new DynamicFormViewModel
-        {
-            Inputs = [.. formDetails.Select(f => new DynamicFormDto
-            {
-                FormDetailId = f.Id,
-                Label = f.Name,
-                InputType = f.BootstrapDataType?.Name ?? "text",
-                IsSelectInput = f.IsSelectInput
-            })]
-        };
-
-        return View(vm);
-    }
+    public IActionResult Create() => View();
 
     [HttpPost]
-    public async Task<IActionResult> DynamicForm(DynamicFormViewModel model)
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Create(FormDetails formDetails)
     {
-        var submissionId = await _context.FormValues.MaxAsync(x => x.SubmissionId) ?? 1;
-        foreach (var input in model.Inputs)
-        {
-            var entity = new FormValues
-            {
-                FormId = input.FormDetailId,
-                FormValue = input.Value,
-                CreatedDate = DateTime.Now,
-                SubmissionId = (submissionId + 1)
-            };
+        if (!ModelState.IsValid)
+            return View(formDetails);
 
-            _context.FormValues.Add(entity);
-        }
+        //SetToken();
+        var response = await _httpService.PostAsync<ApiResponse<dynamic>>(
+            Version, Controller + _apiSettings.Endpoints.CommonEndPoints.Add, formDetails);
 
-        await _context.SaveChangesAsync();
+        TempData[response?.IsSuccess == true ? Constants.Success : Constants.Error] = response?.Message;
         return RedirectToAction(nameof(Index));
     }
 
-    // List view
-    public async Task<IActionResult> Index()
+    public async Task<IActionResult> Edit(int? id)
     {
-        // 1. Get all FormDetail names
-        ViewBag.Headers = await _context.FormDetails
-            .AsNoTracking()
-            .OrderBy(f => f.Id)
-            .Select(f => f.Name)
-            .ToListAsync();
-        var values = await _context.FormValues
-            .AsNoTracking()
-            .ToListAsync();
+        if (id is null)
+            return NotFound();
 
-        return View(values);
+        //SetToken();
+        var response = await _httpService.GetAsync<ApiResponse<FormDetails>>(
+            Version, Controller + _apiSettings.Endpoints.CommonEndPoints.GetById,
+            new() { ["id"] = id.ToString()! });
+
+        return response?.Data is null ? NotFound() : View(response.Data);
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Edit(int id, FormDetails formdetails)
+    {
+        if (id != formdetails.Id)
+            return NotFound();
+
+        if (!ModelState.IsValid)
+            return View(formdetails);
+
+        //SetToken();
+        var response = await _httpService.PostAsync<ApiResponse<dynamic>>(
+            Version, Controller + _apiSettings.Endpoints.CommonEndPoints.Update, formdetails);
+
+        TempData[response?.IsSuccess == true ? Constants.Success : Constants.Error] = response?.Message;
+        return RedirectToAction(nameof(Index));
+    }
+
+    public async Task<IActionResult> Remove(int id)
+    {
+        //SetToken();
+        var response = await _httpService.PostAsync<ApiResponse<FormDetails>>(
+            Version, Controller + _apiSettings.Endpoints.CommonEndPoints.Remove, id);
+
+        TempData[response?.IsSuccess == true ? Constants.Success : Constants.Error] = response?.Message;
+        return RedirectToAction(nameof(Index));
     }
 }

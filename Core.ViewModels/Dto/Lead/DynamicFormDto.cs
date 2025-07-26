@@ -2,7 +2,7 @@
 
 public class DynamicFormDto
 {
-    public int FormDetailId { get; set; }
+    public int? FormDetailId { get; set; }
     public string? Label { get; set; }
     public string? InputType { get; set; }  // text, email, date, select, etc.
     public string? Value { get; set; }

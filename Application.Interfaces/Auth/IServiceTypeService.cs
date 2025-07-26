@@ -4,5 +4,5 @@ namespace Application.Interfaces.Auth;
 
 public interface IServiceTypeService
 {
-    Task<IList<AspNetServiceTypes>> GetAspNetServiceTypesAsync();
+    Task<IList<AspNetServiceTypes>> GetAspNetServiceTypesAsync(dynamic parameter);
 }

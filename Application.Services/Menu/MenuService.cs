@@ -1,7 +1,7 @@
 ﻿using Application.Interfaces.Menu;
 using Core.ViewModels.Dto.Menu;
 using Core.ViewModels.Response;
-using Infrustructure.Interfaces.Menu;
+using Infrastructure.Interfaces.Menu;
 
 namespace Application.Services.Menu;
 

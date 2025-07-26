@@ -1,5 +1,6 @@
 ﻿using Application.Interfaces.Auth;
 using Application.Interfaces.Menu;
+using Common.Extentions;
 using Common.Utils.Constant;
 using Common.Utils.Helper;
 using Core.Models.Auth;
@@ -34,6 +35,7 @@ public class AuthController(UserManager<ApplicationUser> userManager, RoleManage
     private readonly JwtOptions _jwtOptions = jwtOptions.Value;
     private readonly IServiceTypeService _iServiceType = serviceType;
     private readonly IAdminRightsService _iAdminRights = adminRights;
+    private readonly DateTime _bdTime = DateTime.Now.ToBangladeshTime();
 
     #region Login/Register/RefreshToken and Revoke user
 
@@ -69,7 +71,7 @@ public class AuthController(UserManager<ApplicationUser> userManager, RoleManage
 
 
     [HttpPost("login")]
-    public async Task<IActionResult> Login(LoginDto dto)
+    public async Task<IActionResult> Login([FromBody] LoginDto dto)
     {
         try
         {
@@ -84,7 +86,7 @@ public class AuthController(UserManager<ApplicationUser> userManager, RoleManage
             var tokenDto = new TokenDto
             {
                 RefreshToken = refreshToken,
-                Expires = TimeHelper.GetCurrentBangladeshTime().AddDays(_jwtOptions.RefreshTokenValidityInDays)
+                Expires = _bdTime.AddDays(_jwtOptions.RefreshTokenValidityInDays)
             };
 
             var encryptedToken = EncryptionHelper.Encrypt(JsonSerializer.Serialize(tokenDto));
@@ -96,7 +98,7 @@ public class AuthController(UserManager<ApplicationUser> userManager, RoleManage
                 Token = token,
                 RefreshToken = refreshToken,
                 UserName = user.UserName,
-                Expiration = TimeHelper.GetCurrentBangladeshTime().AddMinutes(_jwtOptions.TokenValidityInMinutes)
+                Expiration = _bdTime.AddMinutes(_jwtOptions.TokenValidityInMinutes)
             };
 
             return Ok(ApiResponse<AuthResponseDto>.Success(response, "Login successful!"));
@@ -140,7 +142,7 @@ public class AuthController(UserManager<ApplicationUser> userManager, RoleManage
 
             if (tokenData.RefreshToken != dto.RefreshToken)
                 return Ok(ApiResponse<AuthResponseDto>.Fail("Invalid refresh token!"));
-            if (tokenData.Expires >= TimeHelper.GetCurrentBangladeshTime())
+            if (tokenData.Expires >= _bdTime)
             {
                 await _userManager.RemoveAuthenticationTokenAsync(user, loginProvider: "Default", tokenName: "RefreshToken");
                 return Ok(ApiResponse<AuthResponseDto>.Fail("Refresh token expired!"));
@@ -151,7 +153,7 @@ public class AuthController(UserManager<ApplicationUser> userManager, RoleManage
             {
                 Token = newAccessToken,
                 RefreshToken = tokenData.RefreshToken,
-                Expiration = TimeHelper.GetCurrentBangladeshTime().AddMinutes(_jwtOptions.TokenValidityInMinutes)
+                Expiration = _bdTime.AddMinutes(_jwtOptions.TokenValidityInMinutes)
             };
             return Ok(ApiResponse<AuthResponseDto>.Success(response, "Token refreshed successful!"));
         }
@@ -165,7 +167,7 @@ public class AuthController(UserManager<ApplicationUser> userManager, RoleManage
     [Authorize]
     [HttpPost]
     [Route("revoke")]
-    public async Task<IActionResult> Revoke(string username)
+    public async Task<IActionResult> Revoke([FromBody] string username)
     {
         var user = await _userManager.FindByNameAsync(username);
         if (user == null) return 
@@ -196,11 +198,11 @@ public class AuthController(UserManager<ApplicationUser> userManager, RoleManage
 
     [HttpGet]
     [Route("service-type")]
-    public async Task<IActionResult> ServiceType()
+    public async Task<IActionResult> ServiceType([FromQuery] dynamic parameter)
     {
         try
         {
-            var types = await _iServiceType.GetAspNetServiceTypesAsync();
+            var types = await _iServiceType.GetAspNetServiceTypesAsync(parameter);
             return Ok(ApiResponse<IList<AspNetServiceTypes>>.Success(types, "Token refreshed successful!"));
         }
         catch (Exception ex)

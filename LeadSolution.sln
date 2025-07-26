@@ -9,7 +9,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Core", "Core", "{8B78C7DA-E
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Application", "Application", "{E429B56C-E377-4EE8-9717-80D68F10B232}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Infrustructure", "Infrustructure", "{E9330585-761E-4AAE-96DF-5B598AA02C74}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Infrastructure", "Infrastructure", "{E9330585-761E-4AAE-96DF-5B598AA02C74}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "API", "API", "{23E9DC47-882A-49D6-A73E-4C384648D677}"
 EndProject
@@ -19,7 +19,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Core.ViewModels", "Core.Vie
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lead.Api", "Lead.Api\Lead.Api.csproj", "{4C53F8EE-5E77-4B9C-9F9F-353E1D17E814}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Infrustructure.Repositories", "Infrustructure.Repositories\Infrustructure.Repositories.csproj", "{BF36A5F6-7CE9-42F0-8DB4-D343FF4F20C0}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Infrastructure.Repositories", "Infrastructure.Repositories\Infrastructure.Repositories.csproj", "{BF36A5F6-7CE9-42F0-8DB4-D343FF4F20C0}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Application.Interfaces", "Application.Interfaces\Application.Interfaces.csproj", "{B1919B93-0D23-4568-A128-FE56801919BB}"
 EndProject
@@ -35,7 +35,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lead.UI", "Lead.UI\Lead.UI.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Common.Extentions", "Common.Extentions\Common.Extentions.csproj", "{7B706B6D-C1E6-4986-A51F-777AB00D82C5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Infrustructure.Interfaces", "Infrustructure.Interfaces\Infrustructure.Interfaces.csproj", "{514DCB17-61D9-43C6-A848-CBFCABEC972D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Infrastructure.Interfaces", "Infrastructure.Interfaces\Infrastructure.Interfaces.csproj", "{514DCB17-61D9-43C6-A848-CBFCABEC972D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Common.DI", "Common.DI\Common.DI.csproj", "{A4E48765-B9EF-462E-BEA6-71CD49CD9710}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -83,6 +85,10 @@ Global
 		{514DCB17-61D9-43C6-A848-CBFCABEC972D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{514DCB17-61D9-43C6-A848-CBFCABEC972D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{514DCB17-61D9-43C6-A848-CBFCABEC972D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A4E48765-B9EF-462E-BEA6-71CD49CD9710}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A4E48765-B9EF-462E-BEA6-71CD49CD9710}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A4E48765-B9EF-462E-BEA6-71CD49CD9710}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A4E48765-B9EF-462E-BEA6-71CD49CD9710}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -104,6 +110,7 @@ Global
 		{740B75F1-3488-47F0-80DC-D605A23C2C31} = {219DE2C9-9CEE-4282-A2EA-E027848B6025}
 		{7B706B6D-C1E6-4986-A51F-777AB00D82C5} = {E08C1E43-4019-4E17-B347-EEB8047DABBC}
 		{514DCB17-61D9-43C6-A848-CBFCABEC972D} = {E9330585-761E-4AAE-96DF-5B598AA02C74}
+		{A4E48765-B9EF-462E-BEA6-71CD49CD9710} = {E08C1E43-4019-4E17-B347-EEB8047DABBC}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {5A2D59CB-8AB0-4FBB-8DCE-C1707D633067}

@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <TargetFramework>net9.0</TargetFramework>
@@ -8,28 +8,18 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.4" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.4">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="9.0.4">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
     <PackageReference Include="Swashbuckle.AspNetCore" Version="8.1.1" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Application.Interfaces\Application.Interfaces.csproj" />
-    <ProjectReference Include="..\Application.Services\Application.Services.csproj" />
-    <ProjectReference Include="..\Common.Extentions\Common.Extentions.csproj" />
+    <ProjectReference Include="..\Common.DI\Common.DI.csproj" />
     <ProjectReference Include="..\Common.Utils\Common.Utils.csproj" />
     <ProjectReference Include="..\Core.Models\Core.Models.csproj" />
     <ProjectReference Include="..\Core.ViewModels\Core.ViewModels.csproj" />
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Controllers\v1\Lead\" />
     <Folder Include="Logs\ErrorLogs\" />
   </ItemGroup>
 

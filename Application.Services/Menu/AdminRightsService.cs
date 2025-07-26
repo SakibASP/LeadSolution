@@ -3,7 +3,7 @@ using Core.Models.Menu;
 using Core.ViewModels.Dto.Menu;
 using Core.ViewModels.Request.Menu;
 using Core.ViewModels.Response;
-using Infrustructure.Interfaces.Menu;
+using Infrastructure.Interfaces.Menu;
 using Microsoft.AspNetCore.Identity;
 
 namespace Application.Services.Menu;

@@ -1,12 +1,12 @@
 ﻿using Application.Interfaces.Auth;
 using Core.Models.Auth;
-using Infrustructure.Interfaces.Auth;
+using Infrastructure.Interfaces.Lead;
 
 namespace Application.Services.Auth;
 
-public class ServiceTypeService(IServiceTypeRepo serviceType) : IServiceTypeService
+public class ServiceTypeService(IGenericRepo<AspNetServiceTypes> serviceType) : IServiceTypeService
 {
-    private readonly IServiceTypeRepo _iServiceType = serviceType;
-    public async Task<IList<AspNetServiceTypes>> GetAspNetServiceTypesAsync() => await _iServiceType.GetAspNetServiceTypesAsync();
+    private readonly IGenericRepo<AspNetServiceTypes> _iServiceType = serviceType;
+    public async Task<IList<AspNetServiceTypes>> GetAspNetServiceTypesAsync(dynamic parameter) => await _iServiceType.GetAllAsync(parameter);
     
 }

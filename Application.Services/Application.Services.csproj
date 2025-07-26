@@ -8,12 +8,13 @@
 
 	<ItemGroup>
 		<PackageReference Include="Serilog.AspNetCore" Version="9.0.0" />
+		<PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.13.0" />
 	</ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Application.Interfaces\Application.Interfaces.csproj" />
     <ProjectReference Include="..\Core.Models\Core.Models.csproj" />
-    <ProjectReference Include="..\Infrustructure.Repositories\Infrustructure.Repositories.csproj" />
     <ProjectReference Include="..\Core.ViewModels\Core.ViewModels.csproj" />
+    <ProjectReference Include="..\Infrastructure.Interfaces\Infrastructure.Interfaces.csproj" />
   </ItemGroup>
 
 </Project>

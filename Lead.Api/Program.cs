@@ -1,7 +1,8 @@
-﻿using Common.Extentions.ScopedServices;
+﻿using Common.DI;
 using Core.Models.Auth;
 using Core.ViewModels.Dto.Auth;
-using Infrustructure.Repositories.Data;
+using Infrastructure.Repositories.Data;
+using Lead.Api.Middlewares;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -42,8 +43,13 @@ try
     // Add services to the container.
     builder.Services.Configure<JwtOptions>(builder.Configuration.GetSection("JWT"));
     builder.Services.AddDbContext<LeadContext>(options =>
-        options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"),
-            b => b.MigrationsAssembly("Infrustructure.Repositories"))); // 👈 Specify where migrations will live
+        options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+    //  For code first approach
+    //  ->Specify where migrations will live
+    //builder.Services.AddDbContext<LeadContext>(options =>
+    //    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"),
+    //        b => b.MigrationsAssembly("Infrastructure.Repositories")));
 
     builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
         .AddEntityFrameworkStores<LeadContext>()
@@ -91,7 +97,7 @@ try
             ValidateIssuerSigningKey = true,
             ValidIssuer = builder.Configuration["JWT:ValidIssuer"],
             ValidAudience = builder.Configuration["JWT:ValidAudience"],
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JWT:Secret"])),
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JWT:Secret"]!)),
             ClockSkew = TimeSpan.Zero
         };
     });
@@ -111,22 +117,22 @@ try
         });
 
         c.AddSecurityRequirement(new OpenApiSecurityRequirement
-    {
         {
-            new OpenApiSecurityScheme
             {
-                Reference = new OpenApiReference
+                new OpenApiSecurityScheme
                 {
-                    Type = ReferenceType.SecurityScheme,
-                    Id = "Bearer"
+                    Reference = new OpenApiReference
+                    {
+                        Type = ReferenceType.SecurityScheme,
+                        Id = "Bearer"
+                    },
+                    Scheme = "oauth2",
+                    Name = "Bearer",
+                    In = ParameterLocation.Header
                 },
-                Scheme = "oauth2",
-                Name = "Bearer",
-                In = ParameterLocation.Header
-            },
-            new List<string>()
-        }
-    });
+                new List<string>()
+            }
+        });
     });
 
 
@@ -185,6 +191,9 @@ try
     // Use the CORS policy
     //app.UseCors("AllowAll");
     app.UseCors("AllowSpecificOrigins");
+
+    // Register your middleware before routing
+    app.UseMiddleware<RequestLoggingMiddleware>();
 
     app.UseHttpsRedirection();
     app.UseAuthentication();

@@ -1,5 +1,5 @@
-﻿using Common.Utils.Constant;
-using Common.Utils.Helper;
+﻿using Common.Extentions;
+using Common.Utils.Constant;
 using Core.ViewModels.Dto.Auth;
 using Core.ViewModels.Response;
 using Lead.UI.Interfaces;
@@ -31,6 +31,11 @@ public class BaseController(IHttpService httpService, IOptions<ApiSettings> apiS
     protected string AccessToken { get; set; } = string.Empty;
 
     /// <summary>
+    /// Current Bangladesh Time
+    /// </summary>
+    protected DateTime CurrentBdTime { get; set; } = DateTime.Now.ToBangladeshTime();
+
+    /// <summary>
     /// Checks authentication and refreshes token if expired before executing an action.
     /// </summary>
     /// <param name="filterContext">The action executing context.</param>
@@ -49,7 +54,7 @@ public class BaseController(IHttpService httpService, IOptions<ApiSettings> apiS
         }
 
         // Check if the token has been expired
-        if (sessionAuth?.Expiration <= TimeHelper.GetCurrentBangladeshTime())
+        if (sessionAuth?.Expiration <= CurrentBdTime)
         {
             // Prepare token DTO for refresh request
             TokenDto tokenDto = new()
