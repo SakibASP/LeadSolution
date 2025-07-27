@@ -30,7 +30,7 @@ public class DataTypesController(IDataTypeService dataTypeService) : Controller
         }
         catch (Exception ex)
         {
-            Log.Error(ex, MessageHelper<string>.GenerateErrorMsg(HttpContext.Request.Path, parameter, User.Identity?.Name));
+            Log.Error(ex, MessageHelper.GenerateErrorMsg(HttpContext.Request.Path, parameter, User.Identity?.Name));
             return Ok(ApiResponse<IList<DataTypes>>.Fail("Something went wrong!"));
         }
     }
@@ -45,7 +45,7 @@ public class DataTypesController(IDataTypeService dataTypeService) : Controller
         }
         catch (Exception ex)
         {
-            Log.Error(ex, MessageHelper<int>.GenerateErrorMsg(HttpContext.Request.Path, id, User.Identity?.Name));
+            Log.Error(ex, MessageHelper.GenerateErrorMsg(HttpContext.Request.Path, id, User.Identity?.Name));
             return Ok(ApiResponse<DataTypes>.Fail("Something went wrong!"));
         }
     }
@@ -60,7 +60,7 @@ public class DataTypesController(IDataTypeService dataTypeService) : Controller
         }
         catch (Exception ex)
         {
-            Log.Error(ex, MessageHelper<DataTypes>.GenerateErrorMsg(HttpContext.Request.Path, dataTypes, User.Identity?.Name));
+            Log.Error(ex, MessageHelper.GenerateErrorMsg(HttpContext.Request.Path, dataTypes, User.Identity?.Name));
             return Ok(ApiResponse<dynamic>.Fail("Something went wrong!"));
         }
     }
@@ -75,7 +75,7 @@ public class DataTypesController(IDataTypeService dataTypeService) : Controller
         }
         catch (Exception ex)
         {
-            Log.Error(ex, MessageHelper<DataTypes>.GenerateErrorMsg(HttpContext.Request.Path, dataTypes, User.Identity?.Name));
+            Log.Error(ex, MessageHelper.GenerateErrorMsg(HttpContext.Request.Path, dataTypes, User.Identity?.Name));
             return Ok(ApiResponse<dynamic>.Fail("Something went wrong!"));
         }
     }
@@ -90,7 +90,7 @@ public class DataTypesController(IDataTypeService dataTypeService) : Controller
         }
         catch (Exception ex)
         {
-            Log.Error(ex, MessageHelper<int>.GenerateErrorMsg(HttpContext.Request.Path, id, User.Identity?.Name));
+            Log.Error(ex, MessageHelper.GenerateErrorMsg(HttpContext.Request.Path, id, User.Identity?.Name));
             return Ok(ApiResponse<dynamic>.Fail("Something went wrong!"));
         }
     }

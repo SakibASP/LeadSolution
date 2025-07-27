@@ -21,9 +21,19 @@ public class ControllerNames
 
 public class Endpoints
 {
+    public required CommonEndPoints CommonEndPoints { get; set; }
     public required Auth Auth { get; set; }
     public required Menu Menu { get; set; }
-    public required CommonEndPoints CommonEndPoints { get; set; }
+    public required FormValues FormValues { get; set; }
+}
+
+public class CommonEndPoints
+{
+    public required string GetAll { get; set; }
+    public required string GetById { get; set; }
+    public required string Add { get; set; }
+    public required string Update { get; set; }
+    public required string Remove { get; set; }
 }
 
 public class Auth
@@ -59,11 +69,7 @@ public class Menu
     public required string UpdateRoleWiseMenu { get; set; }
 }
 
-public class CommonEndPoints
+public class FormValues
 {
-    public required string GetAll { get; set; }
-    public required string GetById { get; set; }
-    public required string Add { get; set; }
-    public required string Update { get; set; }
-    public required string Remove { get; set; }
+    public required string GetDynamicForm { get; set; }
 }

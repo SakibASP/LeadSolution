@@ -1,52 +1,68 @@
 ﻿@model Core.Models.Lead.FormDetails
 
 @{
-    ViewData["Title"] = "Create";
+    ViewData["Title"] = "Create Form Field";
 }
 
-<h1>Create</h1>
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow rounded-3">
+                <div class="card-header bg-primary text-white text-center">
+                    <h4 class="mb-0">Create Form Field</h4>
+                </div>
+                <div class="card-body">
+                    <form asp-action="Create">
+                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
 
-<h4>FormDetails</h4>
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Create">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-group">
-                <label asp-for="Name" class="control-label"></label>
-                <input asp-for="Name" class="form-control" />
-                <span asp-validation-for="Name" class="text-danger"></span>
+                        <div class="form-group mb-3">
+                            <label asp-for="Name" class="form-label fw-bold"></label>
+                            <input asp-for="Name" class="form-control" placeholder="Enter field name" />
+                            <span asp-validation-for="Name" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label asp-for="TypeId" class="form-label fw-bold"></label>
+                            <select asp-for="TypeId" class="form-select" asp-items="ViewBag.TypeId">
+                                <option disabled selected>-- Select Type --</option>
+                            </select>
+                        </div>
+
+                        <div class="form-check form-switch mb-2">
+                            <input class="form-check-input" asp-for="IsNullSupported" type="checkbox" />
+                            <label class="form-check-label fw-semibold" asp-for="IsNullSupported"></label>
+                        </div>
+
+                        <div class="form-check form-switch mb-2">
+                            <input class="form-check-input" asp-for="IsSelectInput" type="checkbox" />
+                            <label class="form-check-label fw-semibold" asp-for="IsSelectInput"></label>
+                        </div>
+
+                        <div class="form-check form-switch mb-4">
+                            <input class="form-check-input" asp-for="IsActive" type="checkbox" />
+                            <label class="form-check-label fw-semibold" asp-for="IsActive"></label>
+                        </div>
+
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-success btn-lg">
+                                <i class="bi bi-plus-circle"></i> Create
+                            </button>
+                        </div>
+                    </form>
+                </div>
             </div>
-            <div class="form-group">
-                <label asp-for="TypeId" class="control-label"></label>
-                <select asp-for="TypeId" class="form-control" asp-items="ViewBag.TypeId"></select>
+
+            <div class="text-center mt-3">
+                <a asp-action="Index" class="text-decoration-none">
+                    ← Back to List
+                </a>
             </div>
-            <div class="form-group form-check">
-                <label class="form-check-label">
-                    <input class="form-check-input" asp-for="IsNullSupported" /> @Html.DisplayNameFor(model => model.IsNullSupported)
-                </label>
-            </div>
-            <div class="form-group form-check">
-                <label class="form-check-label">
-                    <input class="form-check-input" asp-for="IsSelectInput" /> @Html.DisplayNameFor(model => model.IsSelectInput)
-                </label>
-            </div>
-            <div class="form-group form-check">
-                <label class="form-check-label">
-                    <input class="form-check-input" asp-for="IsActive" /> @Html.DisplayNameFor(model => model.IsActive)
-                </label>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-primary" />
-            </div>
-        </form>
+        </div>
     </div>
 </div>
 
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
-
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
 }

@@ -63,7 +63,7 @@ public class AuthController(UserManager<ApplicationUser> userManager, RoleManage
         }
         catch (Exception ex)
         {
-            Log.Error(ex, MessageHelper<string>.GenerateErrorMsg(HttpContext.Request.Path, null, User.Identity?.Name));
+            Log.Error(ex, MessageHelper.GenerateErrorMsg(HttpContext.Request.Path, null, User.Identity?.Name));
             return Ok(ApiResponse<AuthResponseDto>.Fail("Something went wrong!"));
         }
         
@@ -105,7 +105,7 @@ public class AuthController(UserManager<ApplicationUser> userManager, RoleManage
         }
         catch (Exception ex)
         {
-            Log.Error(ex, MessageHelper<string>.GenerateErrorMsg(HttpContext.Request.Path, null, User.Identity?.Name));
+            Log.Error(ex, MessageHelper.GenerateErrorMsg(HttpContext.Request.Path, null, User.Identity?.Name));
             return Ok(ApiResponse<AuthResponseDto>.Fail("Something went wrong!"));
         }
     }
@@ -158,7 +158,7 @@ public class AuthController(UserManager<ApplicationUser> userManager, RoleManage
         }
         catch (Exception ex)
         {
-            Log.Error(ex, MessageHelper<string>.GenerateErrorMsg(HttpContext.Request.Path, null, User.Identity?.Name));
+            Log.Error(ex, MessageHelper.GenerateErrorMsg(HttpContext.Request.Path, null, User.Identity?.Name));
             return Ok(ApiResponse<AuthResponseDto>.Fail("Something went wrong!"));
         }
     }
@@ -205,7 +205,7 @@ public class AuthController(UserManager<ApplicationUser> userManager, RoleManage
         }
         catch (Exception ex)
         {
-            Log.Error(ex, MessageHelper<string>.GenerateErrorMsg(HttpContext.Request.Path, null, User.Identity?.Name));
+            Log.Error(ex, MessageHelper.GenerateErrorMsg(HttpContext.Request.Path, null, User.Identity?.Name));
             return Ok(ApiResponse<IList<IdentityRole>>.Fail("No role found!"));
         }
     }
@@ -227,7 +227,7 @@ public class AuthController(UserManager<ApplicationUser> userManager, RoleManage
         }
         catch (Exception ex)
         {
-            Log.Error(ex, MessageHelper<string>.GenerateErrorMsg(HttpContext.Request.Path, null, User.Identity?.Name));
+            Log.Error(ex, MessageHelper.GenerateErrorMsg(HttpContext.Request.Path, null, User.Identity?.Name));
             return Ok(ApiResponse<IdentityRole>.Fail("Something went wrong!"));
         }
     }
@@ -250,7 +250,7 @@ public class AuthController(UserManager<ApplicationUser> userManager, RoleManage
         }
         catch (Exception ex)
         {
-            Log.Error(ex, MessageHelper<string>.GenerateErrorMsg(HttpContext.Request.Path, null, User.Identity?.Name));
+            Log.Error(ex, MessageHelper.GenerateErrorMsg(HttpContext.Request.Path, null, User.Identity?.Name));
             return Ok(ApiResponse<IList<IdentityRole>>.Fail("Something went wrong!"));
         }
     }
@@ -280,7 +280,7 @@ public class AuthController(UserManager<ApplicationUser> userManager, RoleManage
         }
         catch (Exception ex)
         {
-            Log.Error(ex, MessageHelper<string>.GenerateErrorMsg(HttpContext.Request.Path, null, User.Identity?.Name));
+            Log.Error(ex, MessageHelper.GenerateErrorMsg(HttpContext.Request.Path, null, User.Identity?.Name));
             return Ok(ApiResponse<string>.Fail("Something went wrong!"));
         }
     }
@@ -303,7 +303,7 @@ public class AuthController(UserManager<ApplicationUser> userManager, RoleManage
         }
         catch (Exception ex)
         {
-            Log.Error(ex, MessageHelper<string>.GenerateErrorMsg(HttpContext.Request.Path, null, User.Identity?.Name));
+            Log.Error(ex, MessageHelper.GenerateErrorMsg(HttpContext.Request.Path, null, User.Identity?.Name));
             return Ok(ApiResponse<string>.Fail("Something went wrong!"));
         }
     }

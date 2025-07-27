@@ -23,4 +23,8 @@
     <ProjectReference Include="..\Core.ViewModels\Core.ViewModels.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Views\Lead\BusinessInfo\" />
+  </ItemGroup>
+
 </Project>

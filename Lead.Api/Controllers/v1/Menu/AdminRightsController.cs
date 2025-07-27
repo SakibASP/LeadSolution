@@ -29,7 +29,7 @@ public class AdminRightsController(IAdminRightsService adminRights) : Controller
         }
         catch (Exception ex)
         {
-            Log.Error(ex, MessageHelper<string>.GenerateErrorMsg(HttpContext.Request.Path, null, User.Identity?.Name));
+            Log.Error(ex, MessageHelper.GenerateErrorMsg(HttpContext.Request.Path, null, User.Identity?.Name));
             return Ok(ApiResponse<IList<MenuItem>>.Fail("Something went wrong!"));
         }
     }
@@ -45,7 +45,7 @@ public class AdminRightsController(IAdminRightsService adminRights) : Controller
         }
         catch (Exception ex)
         {
-            Log.Error(ex, MessageHelper<string>.GenerateErrorMsg(HttpContext.Request.Path, null, User.Identity?.Name));
+            Log.Error(ex, MessageHelper.GenerateErrorMsg(HttpContext.Request.Path, null, User.Identity?.Name));
             return Ok(ApiResponse<IList<MenuItemViewModel>>.Fail("Something went wrong!"));
         }
     }
@@ -61,7 +61,7 @@ public class AdminRightsController(IAdminRightsService adminRights) : Controller
         }
         catch (Exception ex)
         {
-            Log.Error(ex, MessageHelper<MenuItemViewModel>.GenerateErrorMsg(HttpContext.Request.Path, menuItem, User.Identity?.Name));
+            Log.Error(ex, MessageHelper.GenerateErrorMsg(HttpContext.Request.Path, menuItem, User.Identity?.Name));
             return Ok(ApiResponse<string>.Fail("Something went wrong!"));
         }
     }
@@ -77,7 +77,7 @@ public class AdminRightsController(IAdminRightsService adminRights) : Controller
         }
         catch (Exception ex)
         {
-            Log.Error(ex, MessageHelper<UpdateAdminRightsRequest>.GenerateErrorMsg(HttpContext.Request.Path, updateRequest, User.Identity?.Name));
+            Log.Error(ex, MessageHelper.GenerateErrorMsg(HttpContext.Request.Path, updateRequest, User.Identity?.Name));
             return Ok(ApiResponse<string>.Fail("Something went wrong!"));
         }
     }

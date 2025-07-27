@@ -29,7 +29,7 @@ public class MenuController(IMenuService menu) : Controller
         }
         catch (Exception ex)
         {
-            Log.Error(ex, MessageHelper<string>.GenerateErrorMsg(HttpContext.Request.Path, null, User.Identity?.Name));
+            Log.Error(ex, MessageHelper.GenerateErrorMsg(HttpContext.Request.Path, null, User.Identity?.Name));
             return Ok(ApiResponse<AuthResponseDto>.Fail("Something went wrong!"));
         }
     }

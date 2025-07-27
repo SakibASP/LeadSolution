@@ -1,41 +1,84 @@
 ﻿@using Core.ViewModels.Dto.Lead
 @model DynamicFormViewModel
+
 @{
     ViewData["Title"] = "Create";
 }
 
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="card shadow rounded-3">
+                <div class="card-header bg-success text-white text-center">
+                    <h4 class="mb-0">Dynamic Form</h4>
+                </div>
+                <div class="card-body">
+                    <form asp-action="DynamicForm" method="post" novalidate>
+                        @if (Model.Inputs?.Count > 0)
+                        {
+                            <div class="row">
+                                @for (int i = 0; i < Model.Inputs.Count; i++)
+                                {
+                                    @if (Model.Inputs[i].IsSelectInput)
+                                    {
+                                        <div class="col-md-12 mb-2">
+                                            <label asp-for="Inputs[@i].Value" class="form-label fw-semibold">
+                                                @Model.Inputs[i].Label
+                                            </label>
+                                            <select asp-for="Inputs[@i].Value" class="form-select" aria-label="@Model.Inputs[i].Label">
+                                                <option value="">-- Select --</option>
+                                                <option>Option 1</option>
+                                                <option>Option 2</option>
+                                            </select>
+                                            <span asp-validation-for="Inputs[@i].Value" class="text-danger small"></span>
+                                        </div>
+                                    }
+                                    else if (Model.Inputs[i].InputType!.Equals("textarea", StringComparison.CurrentCultureIgnoreCase))
+                                    {
+                                        <div class="col-md-12 mb-2">
+                                            <label asp-for="Inputs[@i].Value" class="form-label fw-semibold">
+                                                @Model.Inputs[i].Label
+                                            </label>
+                                            <textarea asp-for="Inputs[@i].Value" rows="5" cols="5" class="form-control" placeholder="@Model.Inputs[i].Label"></textarea>
+                                            <span asp-validation-for="Inputs[@i].Value" class="text-danger small"></span>
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <div class="col-md-12 mb-2">
+                                            <label asp-for="Inputs[@i].Value" class="form-label fw-semibold">
+                                                @Model.Inputs[i].Label
+                                            </label>
+                                            <input asp-for="Inputs[@i].Value" type="@Model.Inputs[i].InputType" class="form-control" placeholder="@Model.Inputs[i].Label" />
+                                            <span asp-validation-for="Inputs[@i].Value" class="text-danger small"></span>
+                                        </div>
+                                    }
 
 
-<form asp-action="DynamicForm" method="post">
-    @for (int i = 0; i < Model.Inputs.Count; i++)
-    {
-        <div class="form-group">
-            <label>@Model.Inputs[i].Label</label>
-            
-            @if (Model.Inputs[i].IsSelectInput)
-            {
-                <select asp-for="Inputs[@i].Value" class="form-control">
-                    <option value="">-- Select --</option>
-                    <option>Option 1</option>
-                    <option>Option 2</option>
-                </select>
-            }
-            else
-            {
-                <input asp-for="Inputs[@i].Value" type="@Model.Inputs[i].InputType" class="form-control" />
-            }
+                                    @* Hidden fields *@
+                                    <input type="hidden" asp-for="Inputs[@i].FormDetailId" />
+                                    <input type="hidden" asp-for="Inputs[@i].Label" />
+                                    <input type="hidden" asp-for="Inputs[@i].InputType" />
+                                    <input type="hidden" asp-for="Inputs[@i].IsSelectInput" />
 
-            <input type="hidden" asp-for="Inputs[@i].FormDetailId" />
-            <input type="hidden" asp-for="Inputs[@i].Label" />
-            <input type="hidden" asp-for="Inputs[@i].InputType" />
-            <input type="hidden" asp-for="Inputs[@i].IsSelectInput" />
+                                }
+                            </div>
+
+                            <div class="d-grid mt-4">
+                                <button type="submit" class="btn btn-success btn-lg fw-bold">
+                                    <i class="bi bi-check-circle me-2"></i> Submit
+                                </button>
+                            </div>
+                        }
+                    </form>
+                </div>
+            </div>
         </div>
-    }
-
-    <button type="submit" class="btn btn-success">Submit</button>
-</form>
-
+    </div>
+</div>
 
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
 }

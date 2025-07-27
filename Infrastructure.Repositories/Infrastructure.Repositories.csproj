@@ -32,7 +32,6 @@
 
   <ItemGroup>
     <Folder Include="BusinessDomains\Auth\" />
-    <Folder Include="BusinessDomains\Lead\" />
   </ItemGroup>
 
 </Project>

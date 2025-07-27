@@ -69,3 +69,7 @@
 
 
 /*Toast style end*/
+
+.form-check {
+    padding-left: 2.5rem; /* or whatever matches your input padding */
+}

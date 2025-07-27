@@ -6,6 +6,7 @@ using Application.Services.Lead;
 using Application.Services.Menu;
 using Infrastructure.Interfaces.Lead;
 using Infrastructure.Interfaces.Menu;
+using Infrastructure.Repositories.BusinessDomains.Lead;
 using Infrastructure.Repositories.BusinessDomains.Menu;
 using Infrastructure.Repositories.Data;
 using Microsoft.Extensions.DependencyInjection;
@@ -22,11 +23,14 @@ public static class ScopedServices
         services.AddScoped<IMenuService, MenuService>();
         services.AddScoped<IAdminRightsService, AdminRightsService>();
         services.AddScoped<IDataTypeService, DataTypeService>();
+        services.AddScoped<IFormDetailService, FormDetailService>();
+        services.AddScoped<IFormValueService, FormValueService>();
         services.AddScoped<IBusinessInfoService, BusinessInfoService>();
 
         //Repositories
         services.AddScoped<IMenuRepo, MenuRepo>();
         services.AddScoped<IAdminRightsRepo, AdminRightsRepo>();
+        services.AddScoped<IFormValueRepo, FormValueRepo>();
         services.AddScoped(typeof(IGenericRepo<>), typeof(GenericRepo<>));
 
 

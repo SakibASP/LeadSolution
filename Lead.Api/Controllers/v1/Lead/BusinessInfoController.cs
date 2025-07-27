@@ -29,7 +29,7 @@ public class BusinessInfoController(IBusinessInfoService businessInfoService) : 
         }
         catch (Exception ex)
         {
-            Log.Error(ex, MessageHelper<dynamic>.GenerateErrorMsg(HttpContext.Request.Path, parameter, User.Identity?.Name));
+            Log.Error(ex, MessageHelper.GenerateErrorMsg(HttpContext.Request.Path, parameter, User.Identity?.Name));
             return Ok(ApiResponse<IList<AspNetBusinessInfo>>.Fail("Something went wrong!"));
         }
     }
@@ -44,7 +44,7 @@ public class BusinessInfoController(IBusinessInfoService businessInfoService) : 
         }
         catch (Exception ex)
         {
-            Log.Error(ex, MessageHelper<int>.GenerateErrorMsg(HttpContext.Request.Path, id, User.Identity?.Name));
+            Log.Error(ex, MessageHelper.GenerateErrorMsg(HttpContext.Request.Path, id, User.Identity?.Name));
             return Ok(ApiResponse<AspNetBusinessInfo>.Fail("Something went wrong!"));
         }
     }
@@ -59,7 +59,7 @@ public class BusinessInfoController(IBusinessInfoService businessInfoService) : 
         }
         catch (Exception ex)
         {
-            Log.Error(ex, MessageHelper<AspNetBusinessInfo>.GenerateErrorMsg(HttpContext.Request.Path, businessInfo, User.Identity?.Name));
+            Log.Error(ex, MessageHelper.GenerateErrorMsg(HttpContext.Request.Path, businessInfo, User.Identity?.Name));
             return Ok(ApiResponse<dynamic>.Fail("Something went wrong!"));
         }
     }
@@ -75,7 +75,7 @@ public class BusinessInfoController(IBusinessInfoService businessInfoService) : 
         }
         catch (Exception ex)
         {
-            Log.Error(ex, MessageHelper<AspNetBusinessInfo>.GenerateErrorMsg(HttpContext.Request.Path, businessInfo, User.Identity?.Name));
+            Log.Error(ex, MessageHelper.GenerateErrorMsg(HttpContext.Request.Path, businessInfo, User.Identity?.Name));
             return Ok(ApiResponse<dynamic>.Fail("Something went wrong!"));
         }
     }
@@ -91,7 +91,7 @@ public class BusinessInfoController(IBusinessInfoService businessInfoService) : 
         }
         catch (Exception ex)
         {
-            Log.Error(ex, MessageHelper<int>.GenerateErrorMsg(HttpContext.Request.Path, id, User.Identity?.Name));
+            Log.Error(ex, MessageHelper.GenerateErrorMsg(HttpContext.Request.Path, id, User.Identity?.Name));
             return Ok(ApiResponse<dynamic>.Fail("Something went wrong!"));
         }
     }
