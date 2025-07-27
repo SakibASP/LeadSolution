@@ -22,6 +22,7 @@ public static class ScopedServices
         services.AddScoped<IMenuService, MenuService>();
         services.AddScoped<IAdminRightsService, AdminRightsService>();
         services.AddScoped<IDataTypeService, DataTypeService>();
+        services.AddScoped<IBusinessInfoService, BusinessInfoService>();
 
         //Repositories
         services.AddScoped<IMenuRepo, MenuRepo>();

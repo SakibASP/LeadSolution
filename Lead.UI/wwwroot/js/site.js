@@ -145,7 +145,7 @@ const GetSubscriptions = async (customerId) => {
 const confirmDelete = (deleteUrl) => {
     Swal.fire({
         title: 'Are you sure?',
-        text: "Do you want to delete this role?",
+        text: "Do you want to delete this record?",
         icon: 'warning',
         showCancelButton: true,
         confirmButtonColor: '#d33',

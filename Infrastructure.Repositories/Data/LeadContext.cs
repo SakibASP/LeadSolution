@@ -37,6 +37,8 @@ public class LeadContext : IdentityDbContext<ApplicationUser>
 
     #region User, Menu and Roles
     public virtual DbSet<AspNetServiceTypes> AspNetServiceTypes { get; set; } = default!;
+    public virtual DbSet<AspNetBusinessInfo> AspNetBusinessInfo { get; set; } = default!;
+    public virtual DbSet<AspNetUserBusinessInfo> AspNetUserBusinessInfo { get; set; } = default!;
     public virtual DbSet<MenuItem> MenuItem { get; set; } = default!;
     public virtual DbSet<MenuToRole> MenuToRole { get; set; } = default!;
     #endregion
@@ -109,15 +111,26 @@ public class LeadContext : IdentityDbContext<ApplicationUser>
     /// <param name="modelBuilder"></param>
     private static void RegisterAutoIncludes(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<FormDetails>()
-            .Navigation(m => m.CSharpDataType)
+        modelBuilder.Entity<AspNetBusinessInfo>()
+           .Navigation(m => m.AspNetServiceTypes)
+           .AutoInclude();
+
+        modelBuilder.Entity<AspNetUserBusinessInfo>()
+            .Navigation(m => m.AspNetBusinessInfo)
             .AutoInclude();
+        modelBuilder.Entity<AspNetUserBusinessInfo>()
+            .Navigation(m => m.User)
+            .AutoInclude();
+
         modelBuilder.Entity<FormDetails>()
-            .Navigation(m => m.BootstrapDataType)
+            .Navigation(m => m.DataTypes)
             .AutoInclude();
 
         modelBuilder.Entity<FormValues>()
             .Navigation(m => m.FormDetails)
+            .AutoInclude();
+        modelBuilder.Entity<FormValues>()
+            .Navigation(m => m.AspNetBusinessInfo)
             .AutoInclude();
     }
 }

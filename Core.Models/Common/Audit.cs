@@ -2,7 +2,6 @@
 
 namespace Core.Models.Common;
 
-[Table(nameof(Audit))]
 public class Audit
 {
     public long Id { get; set; }

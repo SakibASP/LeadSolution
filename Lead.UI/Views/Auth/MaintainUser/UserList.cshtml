@@ -1,4 +1,4 @@
-﻿@using Core.ViewModels.Dto.Auth
+﻿@using Core.ViewModels.Dto.Auth.Roles
 @model IList<UserRolesDto>
 @{
     ViewData["Title"] = "Index";
@@ -33,7 +33,7 @@
                     <td>@user.UserName</td>
                     <td>@string.Join(" , ", user.Roles.ToList())</td>
                     <td>
-                        <a class="btn btn-primary btn-sm" asp-controller="Auth" asp-action="ManageUser" asp-route-userId="@user.UserId">Manage</a>
+                        <a class="btn btn-primary btn-sm" asp-controller="MaintainUser" asp-action="ManageUser" asp-route-userId="@user.UserId">Manage</a>
                     </td>
                 </tr>
             }

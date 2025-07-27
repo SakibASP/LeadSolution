@@ -1,6 +1,6 @@
 ﻿using Application.Interfaces.Menu;
 using Common.Utils.Helper;
-using Core.ViewModels.Dto.Auth;
+using Core.ViewModels.Dto.Auth.Auth;
 using Core.ViewModels.Response;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;

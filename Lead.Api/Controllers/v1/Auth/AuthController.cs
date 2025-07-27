@@ -4,7 +4,8 @@ using Common.Extentions;
 using Common.Utils.Constant;
 using Common.Utils.Helper;
 using Core.Models.Auth;
-using Core.ViewModels.Dto.Auth;
+using Core.ViewModels.Dto.Auth.Auth;
+using Core.ViewModels.Dto.Auth.Roles;
 using Core.ViewModels.Request.Auth;
 using Core.ViewModels.Response;
 using Microsoft.AspNetCore.Authorization;
@@ -26,14 +27,13 @@ namespace Lead.Api.Controllers.v1.Auth;
 [ApiController]
 [Route("api/v1/[controller]")]
 public class AuthController(UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager, 
-    ITokenService tokenService, IOptions<JwtOptions> jwtOptions, IServiceTypeService serviceType,
+    ITokenService tokenService, IOptions<JwtOptions> jwtOptions,
     IAdminRightsService adminRights) : ControllerBase
 {
     private readonly UserManager<ApplicationUser> _userManager = userManager;
     private readonly RoleManager<IdentityRole> _roleManager = roleManager;
     private readonly ITokenService _iTokenService = tokenService;
     private readonly JwtOptions _jwtOptions = jwtOptions.Value;
-    private readonly IServiceTypeService _iServiceType = serviceType;
     private readonly IAdminRightsService _iAdminRights = adminRights;
     private readonly DateTime _bdTime = DateTime.Now.ToBangladeshTime();
 
@@ -111,8 +111,7 @@ public class AuthController(UserManager<ApplicationUser> userManager, RoleManage
     }
 
 
-    [HttpPost]
-    [Route("refresh-token")]
+    [HttpPost("refresh-token")]
     public async Task<IActionResult> RefreshToken([FromBody] TokenDto dto)
     {
         try
@@ -165,8 +164,7 @@ public class AuthController(UserManager<ApplicationUser> userManager, RoleManage
     }
 
     [Authorize]
-    [HttpPost]
-    [Route("revoke")]
+    [HttpPost("revoke")]
     public async Task<IActionResult> Revoke([FromBody] string username)
     {
         var user = await _userManager.FindByNameAsync(username);
@@ -178,8 +176,7 @@ public class AuthController(UserManager<ApplicationUser> userManager, RoleManage
     }
 
     [Authorize]
-    [HttpPost]
-    [Route("revoke-all")]
+    [HttpPost("revoke-all")]
     public async Task<IActionResult> RevokeAll()
     {
         var users = await _userManager.Users.ToListAsync();
@@ -190,26 +187,6 @@ public class AuthController(UserManager<ApplicationUser> userManager, RoleManage
         }
 
         return Ok(new { Status = "Success", Message = "All tokens revoked" });
-    }
-
-    #endregion
-
-    #region Service Type
-
-    [HttpGet]
-    [Route("service-type")]
-    public async Task<IActionResult> ServiceType([FromQuery] dynamic parameter)
-    {
-        try
-        {
-            var types = await _iServiceType.GetAspNetServiceTypesAsync(parameter);
-            return Ok(ApiResponse<IList<AspNetServiceTypes>>.Success(types, "Token refreshed successful!"));
-        }
-        catch (Exception ex)
-        {
-            Log.Error(ex, MessageHelper<string>.GenerateErrorMsg(HttpContext.Request.Path, null, User.Identity?.Name));
-            return Ok(ApiResponse<AuthResponseDto>.Fail("Something went wrong!"));
-        }
     }
 
     #endregion
@@ -330,6 +307,7 @@ public class AuthController(UserManager<ApplicationUser> userManager, RoleManage
             return Ok(ApiResponse<string>.Fail("Something went wrong!"));
         }
     }
+
     #endregion
 
     #region Maintain User

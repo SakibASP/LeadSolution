@@ -1,6 +1,6 @@
 ﻿using Common.DI;
 using Core.Models.Auth;
-using Core.ViewModels.Dto.Auth;
+using Core.ViewModels.Dto.Auth.Auth;
 using Infrastructure.Repositories.Data;
 using Lead.Api.Middlewares;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -106,16 +106,17 @@ try
     {
         c.SwaggerDoc("v1", new OpenApiInfo { Title = "LeadSolution", Version = "v1" });
 
-        // Add JWT Bearer authentication
+        // JWT Auth Definition
         c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
         {
-            Description = "JWT Authorization header using the Bearer scheme. Example: 'Bearer {token}'",
+            Description = @"Enter 'Bearer' [space] and then your valid token.<br>Example: Bearer eyJhbGciOiJIUzI1NiIsInR...",
             Name = "Authorization",
             In = ParameterLocation.Header,
             Type = SecuritySchemeType.ApiKey,
             Scheme = "Bearer"
         });
 
+        // Attach Security to all operations
         c.AddSecurityRequirement(new OpenApiSecurityRequirement
         {
             {
@@ -126,8 +127,6 @@ try
                         Type = ReferenceType.SecurityScheme,
                         Id = "Bearer"
                     },
-                    Scheme = "oauth2",
-                    Name = "Bearer",
                     In = ParameterLocation.Header
                 },
                 new List<string>()
@@ -187,6 +186,7 @@ try
         app.UseSwagger();
         app.UseSwaggerUI();
     }
+
 
     // Use the CORS policy
     //app.UseCors("AllowAll");

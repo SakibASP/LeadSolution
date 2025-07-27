@@ -1,6 +1,6 @@
 ﻿using Common.Utils.Constant;
 using Core.Models.Menu;
-using Core.ViewModels.Dto.Auth;
+using Core.ViewModels.Dto.Auth.Roles;
 using Core.ViewModels.Dto.Menu;
 using Core.ViewModels.Request.Menu;
 using Core.ViewModels.Response;

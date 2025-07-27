@@ -1,10 +1,10 @@
-﻿@using Core.ViewModels.Dto.Auth
+﻿@using Core.ViewModels.Dto.Auth.Roles
 @model IList<ManageUserRoleDto>
 @{
     ViewData["Title"] = "Manage";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
-<form asp-action="ManageUser" asp-controller="Auth" asp-route-userId="@ViewBag.userId" method="post">
+<form asp-action="ManageUser" asp-controller="MaintainUser" asp-route-userId="@ViewBag.userId" method="post">
     <div class="card">
         <div class="card-header">
             <h2>Manage User Roles</h2>

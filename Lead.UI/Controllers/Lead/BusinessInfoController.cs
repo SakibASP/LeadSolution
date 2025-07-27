@@ -1,5 +1,5 @@
 ﻿using Common.Utils.Constant;
-using Core.Models.Lead;
+using Core.Models.Auth;
 using Core.ViewModels.Response;
 using Lead.UI.Controllers.Common;
 using Lead.UI.Interfaces;
@@ -9,19 +9,19 @@ using Microsoft.Extensions.Options;
 
 namespace Lead.UI.Controllers.Lead;
 
-public class FormValuesController(IHttpService httpService, IOptions<ApiSettings> apiSetting) : BaseController(httpService, apiSetting)
+public class BusinessInfoController(IHttpService httpService, IOptions<ApiSettings> apiSetting) : BaseController(httpService, apiSetting)
 {
+    private string ApiVersion => _apiSettings.Versions.BusinessInfo;
+    private string ApiController => _apiSettings.ControllerNames.BusinessInfo;
+    private string VersionedController => $"{ApiVersion}/{ApiController}";
 
-    private string Version => _apiSettings.Versions.DataTypes;
-    private string Controller => _apiSettings.ControllerNames.FormValues;
-
-    //private void SetToken() => _httpService.SetBearerToken(AccessToken);
+    private void SetToken() => _httpService.SetBearerToken(AccessToken);
 
     public async Task<IActionResult> Index()
     {
-        //SetToken();
-        var response = await _httpService.GetAsync<ApiResponse<IList<FormDetails>>>(
-            Version, Controller + _apiSettings.Endpoints.CommonEndPoints.GetAll);
+        SetToken();
+        var response = await _httpService.GetAsync<ApiResponse<IList<AspNetBusinessInfo>>>(
+            VersionedController, _apiSettings.Endpoints.CommonEndPoints.GetAll);
 
         if (response?.IsSuccess != true)
             TempData[Constants.Error] = response?.Message;
@@ -33,14 +33,14 @@ public class FormValuesController(IHttpService httpService, IOptions<ApiSettings
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Create(FormDetails formDetails)
+    public async Task<IActionResult> Create(AspNetBusinessInfo businessInfo)
     {
         if (!ModelState.IsValid)
-            return View(formDetails);
+            return View(businessInfo);
 
-        //SetToken();
+        SetToken();
         var response = await _httpService.PostAsync<ApiResponse<dynamic>>(
-            Version, Controller + _apiSettings.Endpoints.CommonEndPoints.Add, formDetails);
+            VersionedController, _apiSettings.Endpoints.CommonEndPoints.Add, businessInfo);
 
         TempData[response?.IsSuccess == true ? Constants.Success : Constants.Error] = response?.Message;
         return RedirectToAction(nameof(Index));
@@ -51,9 +51,9 @@ public class FormValuesController(IHttpService httpService, IOptions<ApiSettings
         if (id is null)
             return NotFound();
 
-        //SetToken();
-        var response = await _httpService.GetAsync<ApiResponse<FormDetails>>(
-            Version, Controller + _apiSettings.Endpoints.CommonEndPoints.GetById,
+        SetToken();
+        var response = await _httpService.GetAsync<ApiResponse<AspNetBusinessInfo>>(
+            VersionedController, _apiSettings.Endpoints.CommonEndPoints.GetById,
             new() { ["id"] = id.ToString()! });
 
         return response?.Data is null ? NotFound() : View(response.Data);
@@ -61,17 +61,17 @@ public class FormValuesController(IHttpService httpService, IOptions<ApiSettings
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Edit(int id, FormDetails formdetails)
+    public async Task<IActionResult> Edit(int id, AspNetBusinessInfo businessInfo)
     {
-        if (id != formdetails.Id)
+        if (id != businessInfo.Id)
             return NotFound();
 
         if (!ModelState.IsValid)
-            return View(formdetails);
+            return View(businessInfo);
 
-        //SetToken();
+        SetToken();
         var response = await _httpService.PostAsync<ApiResponse<dynamic>>(
-            Version, Controller + _apiSettings.Endpoints.CommonEndPoints.Update, formdetails);
+            VersionedController, _apiSettings.Endpoints.CommonEndPoints.Update, businessInfo);
 
         TempData[response?.IsSuccess == true ? Constants.Success : Constants.Error] = response?.Message;
         return RedirectToAction(nameof(Index));
@@ -79,11 +79,12 @@ public class FormValuesController(IHttpService httpService, IOptions<ApiSettings
 
     public async Task<IActionResult> Remove(int id)
     {
-        //SetToken();
-        var response = await _httpService.PostAsync<ApiResponse<FormDetails>>(
-            Version, Controller + _apiSettings.Endpoints.CommonEndPoints.Remove, id);
+        SetToken();
+        var response = await _httpService.PostAsync<ApiResponse<dynamic>>(
+            VersionedController, _apiSettings.Endpoints.CommonEndPoints.Remove, id);
 
         TempData[response?.IsSuccess == true ? Constants.Success : Constants.Error] = response?.Message;
         return RedirectToAction(nameof(Index));
     }
 }
+

@@ -1,5 +1,5 @@
 using Common.Extentions;
-using Core.ViewModels.Dto.Auth;
+using Core.ViewModels.Dto.Auth.Auth;
 using Lead.UI.Interfaces;
 using Lead.UI.Models;
 using Lead.UI.Settings;

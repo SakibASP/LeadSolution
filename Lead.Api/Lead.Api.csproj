@@ -21,6 +21,7 @@
 
   <ItemGroup>
     <Folder Include="Logs\ErrorLogs\" />
+    <Folder Include="Logs\FatalLogs\" />
   </ItemGroup>
 
 </Project>

@@ -1,4 +1,4 @@
-﻿using Core.ViewModels.Dto.Auth;
+﻿using Core.ViewModels.Dto.Auth.Roles;
 
 namespace Core.ViewModels.Request.Auth;
 

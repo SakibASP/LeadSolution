@@ -11,9 +11,9 @@ namespace Lead.UI.Controllers.Lead;
 
 public class FormDetailsController(IHttpService httpService, IOptions<ApiSettings> apiSetting) : BaseController(httpService, apiSetting)
 {
-
-    private string Version => _apiSettings.Versions.DataTypes;
-    private string Controller => _apiSettings.Endpoints.ControllerNames.DataTypes;
+    private string ApiVersion => _apiSettings.Versions.DataTypes;
+    private string ApiController => _apiSettings.ControllerNames.DataTypes;
+    private string VersionedController => $"{ApiVersion}/{ApiController}";
 
     private void SetToken() => _httpService.SetBearerToken(AccessToken);
 
@@ -21,7 +21,7 @@ public class FormDetailsController(IHttpService httpService, IOptions<ApiSetting
     {
         SetToken();
         var response = await _httpService.GetAsync<ApiResponse<IList<FormDetails>>>(
-            Version, Controller + _apiSettings.Endpoints.CommonEndPoints.GetAll);
+            VersionedController, _apiSettings.Endpoints.CommonEndPoints.GetAll);
 
         if (response?.IsSuccess != true)
             TempData[Constants.Error] = response?.Message;
@@ -40,7 +40,7 @@ public class FormDetailsController(IHttpService httpService, IOptions<ApiSetting
 
         SetToken();
         var response = await _httpService.PostAsync<ApiResponse<dynamic>>(
-            Version, Controller + _apiSettings.Endpoints.CommonEndPoints.Add, formDetails);
+            VersionedController, _apiSettings.Endpoints.CommonEndPoints.Add, formDetails);
 
         TempData[response?.IsSuccess == true ? Constants.Success : Constants.Error] = response?.Message;
         return RedirectToAction(nameof(Index));
@@ -53,7 +53,7 @@ public class FormDetailsController(IHttpService httpService, IOptions<ApiSetting
 
         SetToken();
         var response = await _httpService.GetAsync<ApiResponse<FormDetails>>(
-            Version, Controller + _apiSettings.Endpoints.CommonEndPoints.GetById,
+            VersionedController, _apiSettings.Endpoints.CommonEndPoints.GetById,
             new() { ["id"] = id.ToString()! });
 
         return response?.Data is null ? NotFound() : View(response.Data);
@@ -71,7 +71,7 @@ public class FormDetailsController(IHttpService httpService, IOptions<ApiSetting
 
         SetToken();
         var response = await _httpService.PostAsync<ApiResponse<dynamic>>(
-            Version, Controller + _apiSettings.Endpoints.CommonEndPoints.Update, formdetails);
+            VersionedController, _apiSettings.Endpoints.CommonEndPoints.Update, formdetails);
 
         TempData[response?.IsSuccess == true ? Constants.Success : Constants.Error] = response?.Message;
         return RedirectToAction(nameof(Index));
@@ -81,7 +81,7 @@ public class FormDetailsController(IHttpService httpService, IOptions<ApiSetting
     {
         SetToken();
         var response = await _httpService.PostAsync<ApiResponse<FormDetails>>(
-            Version, Controller + _apiSettings.Endpoints.CommonEndPoints.Remove, id);
+            VersionedController, _apiSettings.Endpoints.CommonEndPoints.Remove, id);
 
         TempData[response?.IsSuccess == true ? Constants.Success : Constants.Error] = response?.Message;
         return RedirectToAction(nameof(Index));

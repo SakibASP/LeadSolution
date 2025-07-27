@@ -1,6 +1,6 @@
 ﻿using Application.Interfaces.Auth;
 using Core.Models.Auth;
-using Core.ViewModels.Dto.Auth;
+using Core.ViewModels.Dto.Auth.Auth;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;

@@ -1,5 +1,6 @@
 ﻿@using Common.Utils.Constant
 @using Core.ViewModels.Dto.Auth
+@using Core.ViewModels.Dto.Auth.Auth
 @{
     var authData = (AuthResponseDto?)ViewBag.AuthResponseDto;
     var IsAuthenticated = authData is null ? false : !string.IsNullOrEmpty(authData.UserName);

@@ -1,21 +1,25 @@
 ﻿using Core.Models.Common;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Core.Models.Lead;
 
-[Table(nameof(FormDetails))]
 public class FormDetails : BaseModel
 {
     public string? Name { get; set; }
-    public int? CSharpTypeId { get; set; }
-    public int? BootstrapTypeId { get; set; }
+
+    [DisplayName("Type")]
+    public int? TypeId { get; set; }
+
+    [DisplayName("Support Null")]
     public bool IsNullSupported { get; set; } = true;
+
+    [DisplayName("Select Input")]
     public bool IsSelectInput { get; set; } = false;
+
+    [DisplayName("Active")]
     public bool IsActive { get; set; } = true;
 
-    [ForeignKey(nameof(CSharpTypeId))]
-    public DataTypes? CSharpDataType { get; set; }
-
-    [ForeignKey(nameof(BootstrapTypeId))]
-    public DataTypes? BootstrapDataType { get; set; }
+    [ForeignKey(nameof(TypeId))]
+    public DataTypes? DataTypes { get; set; }
 }

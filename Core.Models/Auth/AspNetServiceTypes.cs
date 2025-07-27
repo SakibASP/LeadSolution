@@ -1,8 +1,17 @@
-﻿namespace Core.Models.Auth;
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace Core.Models.Auth;
 
 public class AspNetServiceTypes
 {
-    public required int Id { get; set; }
-    public required string Name { get; set; }
+    [Key]
+    [Required]
+    public int Id { get; set; }
+
+    [Required, StringLength(256)]
+    public string Name { get; set; }
     public bool IsActive { get; set; } = true;
+
+    // Navigation property
+    public virtual ICollection<AspNetBusinessInfo>? AspNetBusinessInfo { get; set; }
 }

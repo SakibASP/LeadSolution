@@ -1,4 +1,4 @@
-﻿namespace Core.ViewModels.Dto.Auth;
+﻿namespace Core.ViewModels.Dto.Auth.Roles;
 
 public class AssignRoleDto
 {

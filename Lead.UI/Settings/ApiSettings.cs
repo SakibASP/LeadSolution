@@ -3,22 +3,26 @@
 public class ApiSettings
 {
     public required string BaseUrl { get; set; }
-    public required Versions Versions { get; set; }
+    public required ControllerNames Versions { get; set; }
+    public required ControllerNames ControllerNames { get; set; }
     public required Endpoints Endpoints { get; set; }
 }
 
-public class Versions
+public class ControllerNames
 {
     public required string Auth { get; set; }
     public required string Menu { get; set; }
     public required string DataTypes { get; set; }
+    public required string FormDetails { get; set; }
+    public required string FormValues { get; set; }
+    public required string BusinessInfo { get; set; }
 }
+
 
 public class Endpoints
 {
     public required Auth Auth { get; set; }
     public required Menu Menu { get; set; }
-    public required ControllerNames ControllerNames { get; set; }
     public required CommonEndPoints CommonEndPoints { get; set; }
 }
 
@@ -53,13 +57,6 @@ public class Menu
     public required string GetRoleWiseMenu { get; set; }
     public required string CreateRoleWiseMenu { get; set; }
     public required string UpdateRoleWiseMenu { get; set; }
-}
-
-public class ControllerNames
-{
-    public required string DataTypes { get; set; }
-    public required string FormDetails { get; set; }
-    public required string FormValues { get; set; }
 }
 
 public class CommonEndPoints
