@@ -1,0 +1,48 @@
+﻿@model IEnumerable<Core.Models.Auth.AspNetBusinessInfo>
+
+@{
+    ViewData["Title"] = "Business Info List";
+}
+
+<h2>Business Info List</h2>
+
+<p>
+    <a asp-action="Create" class="btn btn-success">Create New</a>
+</p>
+
+<table class="table table-bordered table-striped">
+    <thead>
+        <tr>
+            <th>Service</th>
+            <th>Business Name</th>
+            <th>Phone</th>
+            <th>Email</th>
+            <th>WhatsApp</th>
+            <th>Website</th>
+            <th>Is Active</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.AspNetServiceTypes?.Name</td>
+                <td>@item.BusinessName</td>
+                <td>@item.Phone</td>
+                <td>@item.Email</td>
+                <td>@item.WhatsApp</td>
+                <td>@item.Website</td>
+                <td>@(item.IsActive ? "Yes" : "No")</td>
+                <td>
+                    <a asp-action="Edit" class="btn btn-primary btn-sm" asp-route-id="@item.Id">Edit</a>
+                    <a href="javascript:void(0);"
+                       class="btn btn-danger btn-sm"
+                       onclick="confirmDelete('@Url.Action("Remove", "BusinessInfo", new { item.Id })')">
+                        Delete
+                    </a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

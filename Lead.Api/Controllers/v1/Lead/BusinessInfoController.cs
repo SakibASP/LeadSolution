@@ -12,7 +12,7 @@ using Serilog;
 /// </summary>
 namespace Lead.Api.Controllers.v1.Lead;
 
-
+[Authorize]
 [ApiController]
 [Route("api/v1/[controller]")]
 public class BusinessInfoController(IBusinessInfoService businessInfoService) : Controller
@@ -20,80 +20,21 @@ public class BusinessInfoController(IBusinessInfoService businessInfoService) : 
     private readonly IBusinessInfoService _iBusinessInfo = businessInfoService;
 
     [HttpGet("get-all")]
-    public async Task<IActionResult> GetAll([FromQuery] dynamic? parameter)
-    {
-        try
-        {
-            var result = await _iBusinessInfo.GetAllAsync(parameter);
-            return Ok(result);
-        }
-        catch (Exception ex)
-        {
-            Log.Error(ex, MessageHelper.GenerateErrorMsg(HttpContext.Request.Path, parameter, User.Identity?.Name));
-            return Ok(ApiResponse<IList<AspNetBusinessInfo>>.Fail("Something went wrong!"));
-        }
-    }
+    public async Task<IActionResult> GetAll([FromQuery] dynamic? parameter) => Ok(await _iBusinessInfo.GetAllAsync(parameter));
+
+    [HttpGet("get-all-service-types")]
+    public async Task<IActionResult> GetAllService() => Ok(await _iBusinessInfo.GetAllServiceTypesAsync());
 
     [HttpGet("get-by-id")]
-    public async Task<IActionResult> GetById([FromQuery] int id)
-    {
-        try
-        {
-            var result = await _iBusinessInfo.GetByIdAsync(id);
-            return Ok(result);
-        }
-        catch (Exception ex)
-        {
-            Log.Error(ex, MessageHelper.GenerateErrorMsg(HttpContext.Request.Path, id, User.Identity?.Name));
-            return Ok(ApiResponse<AspNetBusinessInfo>.Fail("Something went wrong!"));
-        }
-    }
+    public async Task<IActionResult> GetById([FromQuery] int id) => Ok(await _iBusinessInfo.GetByIdAsync(id));
 
     [HttpPost("add")]
-    public async Task<IActionResult> Add([FromBody] AspNetBusinessInfo businessInfo)
-    {
-        try
-        {
-            var result = await _iBusinessInfo.AddAsync(businessInfo, User.Identity?.Name ?? "");
-            return Ok(result);
-        }
-        catch (Exception ex)
-        {
-            Log.Error(ex, MessageHelper.GenerateErrorMsg(HttpContext.Request.Path, businessInfo, User.Identity?.Name));
-            return Ok(ApiResponse<dynamic>.Fail("Something went wrong!"));
-        }
-    }
+    public async Task<IActionResult> Add([FromBody] AspNetBusinessInfo businessInfo) => Ok(await _iBusinessInfo.AddAsync(businessInfo));
 
-    [Authorize]
     [HttpPost("update")]
-    public async Task<IActionResult> Update([FromBody] AspNetBusinessInfo businessInfo)
-    {
-        try
-        {
-            var result = await _iBusinessInfo.UpdateAsync(businessInfo, User.Identity?.Name ?? "");
-            return Ok(result);
-        }
-        catch (Exception ex)
-        {
-            Log.Error(ex, MessageHelper.GenerateErrorMsg(HttpContext.Request.Path, businessInfo, User.Identity?.Name));
-            return Ok(ApiResponse<dynamic>.Fail("Something went wrong!"));
-        }
-    }
+    public async Task<IActionResult> Update([FromBody] AspNetBusinessInfo businessInfo) => Ok(await _iBusinessInfo.UpdateAsync(businessInfo));
 
-    [Authorize]
     [HttpPost("remove")]
-    public async Task<IActionResult> Remove([FromBody] int id)
-    {
-        try
-        {
-            var result = await _iBusinessInfo.RemoveAsync(id);
-            return Ok(result);
-        }
-        catch (Exception ex)
-        {
-            Log.Error(ex, MessageHelper.GenerateErrorMsg(HttpContext.Request.Path, id, User.Identity?.Name));
-            return Ok(ApiResponse<dynamic>.Fail("Something went wrong!"));
-        }
-    }
+    public async Task<IActionResult> Remove([FromBody] int id) => Ok(await _iBusinessInfo.RemoveAsync(id));
 }
 

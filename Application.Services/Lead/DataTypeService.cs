@@ -1,48 +1,91 @@
 ﻿using Application.Interfaces.Lead;
 using Common.Extentions;
+using Common.Utils.Helper;
 using Core.Models.Lead;
 using Core.ViewModels.Response;
 using Infrastructure.Interfaces.Lead;
+using Microsoft.AspNetCore.Http;
+using Serilog;
 
 namespace Application.Services.Lead;
 
-/// <summary>
-/// Md. Sakibur Rahman
-/// 25 July 2025
-/// </summary>
-public class DataTypeService(IGenericRepo<DataTypes> repo) : IDataTypeService
+public class DataTypeService(IGenericRepo<DataTypes> repo, IHttpContextAccessor httpContext) : IDataTypeService
 {
-    private readonly IGenericRepo<DataTypes> _iRepo = repo;
-    public async Task<ApiResponse<dynamic>> AddAsync(DataTypes dataTypes, string userName)
+    private readonly IGenericRepo<DataTypes> _iDataType = repo;
+    private readonly IHttpContextAccessor _httpContext = httpContext;
+
+    private string? CurrentUser => _httpContext.HttpContext?.User?.Identity?.Name;
+
+    public async Task<ApiResponse<dynamic>> AddAsync(DataTypes dataTypes)
     {
-        dataTypes.CreatedBy = userName;
-        await _iRepo.AddAsync(dataTypes);
-        return ApiResponse<dynamic>.Success(null, "Data type created successfully!");
+        try
+        {
+            dataTypes.CreatedBy = CurrentUser;
+            await _iDataType.AddAsync(dataTypes);
+            return ApiResponse<dynamic>.Success(true, "Data type created successfully!");
+        }
+        catch (Exception ex)
+        {
+            Log.Error(ex, $"Error creating DataType by user {CurrentUser}");
+            return ApiResponse<dynamic>.Fail("Something went wrong!");
+        }
     }
 
     public async Task<ApiResponse<IList<DataTypes>>> GetAllAsync(dynamic? parameter)
     {
-        var result = await _iRepo.GetAllAsync(parameter);
-        return ApiResponse<IList<DataTypes>>.Success(result, "Data type retrieved successfully!");
+        try
+        {
+            var result = await _iDataType.GetAllAsync(parameter);
+            return ApiResponse<IList<DataTypes>>.Success(result, "Data type retrieved successfully!");
+        }
+        catch (Exception ex)
+        {
+            Log.Error(ex, $"Error retrieving DataTypes by user {CurrentUser}");
+            return ApiResponse<IList<DataTypes>>.Fail("Something went wrong!");
+        }
     }
 
     public async Task<ApiResponse<DataTypes>> GetByIdAsync(int id)
     {
-        var result = await _iRepo.GetByIdAsync(id);
-        return ApiResponse<DataTypes>.Success(result, "Data type retrieved successfully!");
+        try
+        {
+            var result = await _iDataType.GetByIdAsync(id);
+            return ApiResponse<DataTypes>.Success(result, "Data type retrieved successfully!");
+        }
+        catch (Exception ex)
+        {
+            Log.Error(ex, $"Error retrieving DataType Id={id} by user {CurrentUser}");
+            return ApiResponse<DataTypes>.Fail("Something went wrong!");
+        }
     }
 
     public async Task<ApiResponse<dynamic>> RemoveAsync(int id)
     {
-        await _iRepo.RemoveAsync(id);
-        return ApiResponse<dynamic>.Success(null, "Data type removed successfully!");
+        try
+        {
+            await _iDataType.RemoveAsync(id);
+            return ApiResponse<dynamic>.Success(true, "Data type removed successfully!");
+        }
+        catch (Exception ex)
+        {
+            Log.Error(ex, $"Error removing DataType Id={id} by user {CurrentUser}");
+            return ApiResponse<dynamic>.Fail("Something went wrong!");
+        }
     }
 
-    public async Task<ApiResponse<dynamic>> UpdateAsync(DataTypes dataTypes, string userName)
+    public async Task<ApiResponse<dynamic>> UpdateAsync(DataTypes dataTypes)
     {
-        dataTypes.ModifiedBy = userName;
-        dataTypes.ModifiedDate = DateTime.Now.ToBangladeshTime();
-        await _iRepo.UpdateAsync(dataTypes);
-        return ApiResponse<dynamic>.Success(null, "Data type updated successfully!");
+        try
+        {
+            dataTypes.ModifiedBy = CurrentUser;
+            dataTypes.ModifiedDate = DateTime.Now.ToBangladeshTime();
+            await _iDataType.UpdateAsync(dataTypes);
+            return ApiResponse<dynamic>.Success(true, "Data type updated successfully!");
+        }
+        catch (Exception ex)
+        {
+            Log.Error(ex, $"Error updating DataType Id={dataTypes.Id} by user {CurrentUser}");
+            return ApiResponse<dynamic>.Fail("Something went wrong!");
+        }
     }
 }

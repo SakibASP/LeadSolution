@@ -11,7 +11,4 @@ public class AspNetServiceTypes
     [Required, StringLength(256)]
     public string Name { get; set; }
     public bool IsActive { get; set; } = true;
-
-    // Navigation property
-    public virtual ICollection<AspNetBusinessInfo>? AspNetBusinessInfo { get; set; }
 }

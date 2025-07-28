@@ -5,6 +5,7 @@ using Lead.UI.Controllers.Common;
 using Lead.UI.Interfaces;
 using Lead.UI.Settings;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.Extensions.Options;
 
 namespace Lead.UI.Controllers.Lead;
@@ -29,7 +30,17 @@ public class BusinessInfoController(IHttpService httpService, IOptions<ApiSettin
         return View(response?.Data ?? []);
     }
 
-    public IActionResult Create() => View();
+    public async Task<IActionResult> Create()
+    {
+        SetToken();
+        var viewBagResponse = await _httpService.GetAsync<ApiResponse<IList<AspNetServiceTypes>>>(
+            VersionedController, _apiSettings.Endpoints.BusinessInfo.GetServiceType);
+
+        if (viewBagResponse?.IsSuccess is not true) TempData[Constants.Error] = viewBagResponse?.Message;
+
+        ViewBag.ServiceId = new SelectList(viewBagResponse?.Data, "Id", "Name");
+        return View();
+    }
 
     [HttpPost]
     [ValidateAntiForgeryToken]
@@ -39,8 +50,18 @@ public class BusinessInfoController(IHttpService httpService, IOptions<ApiSettin
             return View(businessInfo);
 
         SetToken();
-        var response = await _httpService.PostAsync<ApiResponse<dynamic>>(
+        var postTask = _httpService.PostAsync<ApiResponse<dynamic>>(
             VersionedController, _apiSettings.Endpoints.CommonEndPoints.Add, businessInfo);
+
+        var getTask = _httpService.GetAsync<ApiResponse<IList<AspNetServiceTypes>>>(
+            VersionedController, _apiSettings.Endpoints.BusinessInfo.GetServiceType);
+
+        await Task.WhenAll(postTask, getTask);
+
+        var response = await postTask;
+        var viewBagResponse = await getTask;
+
+        ViewBag.ServiceId = new SelectList(viewBagResponse?.Data, "Id", "Name", businessInfo.ServiceId);
 
         TempData[response?.IsSuccess == true ? Constants.Success : Constants.Error] = response?.Message;
         return RedirectToAction(nameof(Index));
@@ -52,10 +73,23 @@ public class BusinessInfoController(IHttpService httpService, IOptions<ApiSettin
             return NotFound();
 
         SetToken();
-        var response = await _httpService.GetAsync<ApiResponse<AspNetBusinessInfo>>(
+
+        var getDetailTask = _httpService.GetAsync<ApiResponse<AspNetBusinessInfo>>(
             VersionedController, _apiSettings.Endpoints.CommonEndPoints.GetById,
             new() { ["id"] = id.ToString()! });
 
+        var getTypeTask = _httpService.GetAsync<ApiResponse<IList<AspNetServiceTypes>>>(
+            VersionedController, _apiSettings.Endpoints.BusinessInfo.GetServiceType);
+
+        await Task.WhenAll(getDetailTask, getTypeTask);
+
+        var response = await getDetailTask;
+        var viewBagResponse = await getTypeTask;
+
+        if (viewBagResponse?.IsSuccess is not true) TempData[Constants.Error] = viewBagResponse?.Message;
+
+        ViewBag.ServiceId = new SelectList(viewBagResponse?.Data, "Id", "Name", response?.Data?.ServiceId);
+        TempData[response?.IsSuccess == true ? Constants.Success : Constants.Error] = response?.Message;
         return response?.Data is null ? NotFound() : View(response.Data);
     }
 
@@ -70,9 +104,18 @@ public class BusinessInfoController(IHttpService httpService, IOptions<ApiSettin
             return View(businessInfo);
 
         SetToken();
-        var response = await _httpService.PostAsync<ApiResponse<dynamic>>(
+        var postTask = _httpService.PostAsync<ApiResponse<dynamic>>(
             VersionedController, _apiSettings.Endpoints.CommonEndPoints.Update, businessInfo);
 
+        var getTask = _httpService.GetAsync<ApiResponse<IList<AspNetServiceTypes>>>(
+            VersionedController, _apiSettings.Endpoints.BusinessInfo.GetServiceType);
+
+        await Task.WhenAll(postTask, getTask);
+
+        var response = await postTask;
+        var viewBagResponse = await getTask;
+
+        ViewBag.ServiceId = new SelectList(viewBagResponse?.Data, "Id", "Name", businessInfo.ServiceId);
         TempData[response?.IsSuccess == true ? Constants.Success : Constants.Error] = response?.Message;
         return RedirectToAction(nameof(Index));
     }

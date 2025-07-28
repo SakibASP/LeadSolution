@@ -20,7 +20,7 @@ public class FormValuesController(IHttpService httpService, IOptions<ApiSettings
     public async Task<IActionResult> Index()
     {
         //SetToken();
-        var response = await _httpService.GetAsync<ApiResponse<IList<FormDetails>>>(
+        var response = await _httpService.GetAsync<ApiResponse<IList<FormValues>>>(
             VersionedController, _apiSettings.Endpoints.CommonEndPoints.GetAll);
 
         if (response?.IsSuccess != true)

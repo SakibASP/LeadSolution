@@ -68,7 +68,7 @@ public class FormDetailsController(IHttpService httpService, IOptions<ApiSetting
 
         ViewBag.TypeId = new SelectList(viewBagResponse?.Data, "Id", "Name", formDetails.TypeId);
         TempData[response?.IsSuccess == true ? Constants.Success : Constants.Error] = response?.Message;
-        return View(formDetails);
+        return RedirectToAction(nameof(Index));
     }
 
 
@@ -82,6 +82,7 @@ public class FormDetailsController(IHttpService httpService, IOptions<ApiSetting
             VersionedController, 
             _apiSettings.Endpoints.CommonEndPoints.GetById,
             new() { ["id"] = id.ToString()! });
+
         var getTypeTask = _httpService.GetAsync<ApiResponse<IList<DataTypes>>>(
             $"{_apiSettings.Versions.DataTypes}/{_apiSettings.ControllerNames.DataTypes}",
             _apiSettings.Endpoints.CommonEndPoints.GetAll);

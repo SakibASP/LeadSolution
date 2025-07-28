@@ -7,7 +7,7 @@ public interface IDataTypeService
 {
     Task<ApiResponse<IList<DataTypes>>> GetAllAsync(dynamic? parameter);
     Task<ApiResponse<DataTypes>> GetByIdAsync(int id);
-    Task<ApiResponse<dynamic>> AddAsync(DataTypes dataTypes, string userName);
-    Task<ApiResponse<dynamic>> UpdateAsync(DataTypes dataTypes, string userName);
+    Task<ApiResponse<dynamic>> AddAsync(DataTypes dataTypes);
+    Task<ApiResponse<dynamic>> UpdateAsync(DataTypes dataTypes);
     Task<ApiResponse<dynamic>> RemoveAsync(int id);
 }

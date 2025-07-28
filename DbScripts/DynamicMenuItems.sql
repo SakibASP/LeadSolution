@@ -18,8 +18,8 @@ SET IDENTITY_INSERT [MenuItem] OFF
 SET IDENTITY_INSERT [MenuItem] ON
 INSERT INTO MenuItem([MenuId],[MenuName],[MenuUrl],[MenuParentId],[Active],[FaIcon]) VALUES (201,N'Data Types Config',N'/DataTypes/Index',2,1,null)
 INSERT INTO MenuItem([MenuId],[MenuName],[MenuUrl],[MenuParentId],[Active],[FaIcon]) VALUES (202,N'Form Config',N'/FormDetails/Index',2,1,null)
-
 INSERT INTO MenuItem([MenuId],[MenuName],[MenuUrl],[MenuParentId],[Active],[FaIcon]) VALUES (203,N'Messages',N'/FormValues/Index',2,1,null)
+INSERT INTO MenuItem([MenuId],[MenuName],[MenuUrl],[MenuParentId],[Active],[FaIcon]) VALUES (204,N'Business Info',N'/BusinessInfo/Index',2,1,null)
 INSERT INTO MenuItem([MenuId],[MenuName],[MenuUrl],[MenuParentId],[Active],[FaIcon]) VALUES (250,N'Data Entry Check',N'/FormValues/DynamicForm',2,1,null)
 SET IDENTITY_INSERT [MenuItem] OFF
 

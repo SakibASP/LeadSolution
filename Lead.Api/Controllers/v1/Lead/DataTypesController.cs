@@ -21,77 +21,19 @@ public class DataTypesController(IDataTypeService dataTypeService) : Controller
     private readonly IDataTypeService _iDataType = dataTypeService;
 
     [HttpGet("get-all")]
-    public async Task<IActionResult> GetAll([FromQuery] dynamic? parameter)
-    {
-        try
-        {
-            var result = await _iDataType.GetAllAsync(parameter);
-            return Ok(result);
-        }
-        catch (Exception ex)
-        {
-            Log.Error(ex, MessageHelper.GenerateErrorMsg(HttpContext.Request.Path, parameter, User.Identity?.Name));
-            return Ok(ApiResponse<IList<DataTypes>>.Fail("Something went wrong!"));
-        }
-    }
+    public async Task<IActionResult> GetAll([FromQuery] dynamic? parameter) => Ok(await _iDataType.GetAllAsync(parameter));
 
     [HttpGet("get-by-id")]
-    public async Task<IActionResult> GetById([FromQuery] int id)
-    {
-        try
-        {
-            var result = await _iDataType.GetByIdAsync(id);
-            return Ok(result);
-        }
-        catch (Exception ex)
-        {
-            Log.Error(ex, MessageHelper.GenerateErrorMsg(HttpContext.Request.Path, id, User.Identity?.Name));
-            return Ok(ApiResponse<DataTypes>.Fail("Something went wrong!"));
-        }
-    }
+    public async Task<IActionResult> GetById([FromQuery] int id) => Ok(await _iDataType.GetByIdAsync(id));
 
     [HttpPost("update")]
-    public async Task<IActionResult> Update([FromBody] DataTypes dataTypes)
-    {
-        try
-        {
-            var result = await _iDataType.UpdateAsync(dataTypes, User.Identity?.Name ?? "");
-            return Ok(result);
-        }
-        catch (Exception ex)
-        {
-            Log.Error(ex, MessageHelper.GenerateErrorMsg(HttpContext.Request.Path, dataTypes, User.Identity?.Name));
-            return Ok(ApiResponse<dynamic>.Fail("Something went wrong!"));
-        }
-    }
+    public async Task<IActionResult> Update([FromBody] DataTypes dataTypes) => Ok(await _iDataType.UpdateAsync(dataTypes));
+
 
     [HttpPost("add")]
-    public async Task<IActionResult> Add([FromBody] DataTypes dataTypes)
-    {
-        try
-        {
-            var result = await _iDataType.AddAsync(dataTypes, User.Identity?.Name ?? "");
-            return Ok(result);
-        }
-        catch (Exception ex)
-        {
-            Log.Error(ex, MessageHelper.GenerateErrorMsg(HttpContext.Request.Path, dataTypes, User.Identity?.Name));
-            return Ok(ApiResponse<dynamic>.Fail("Something went wrong!"));
-        }
-    }
+    public async Task<IActionResult> Add([FromBody] DataTypes dataTypes) => Ok(await _iDataType.AddAsync(dataTypes));
 
     [HttpPost("remove")]
-    public async Task<IActionResult> Remove([FromBody] int id)
-    {
-        try
-        {
-            var result = await _iDataType.RemoveAsync(id);
-            return Ok(result);
-        }
-        catch (Exception ex)
-        {
-            Log.Error(ex, MessageHelper.GenerateErrorMsg(HttpContext.Request.Path, id, User.Identity?.Name));
-            return Ok(ApiResponse<dynamic>.Fail("Something went wrong!"));
-        }
-    }
+    public async Task<IActionResult> Remove([FromBody] int id) => Ok(await _iDataType.RemoveAsync(id));
+
 }

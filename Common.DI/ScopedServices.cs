@@ -31,6 +31,7 @@ public static class ScopedServices
         services.AddScoped<IMenuRepo, MenuRepo>();
         services.AddScoped<IAdminRightsRepo, AdminRightsRepo>();
         services.AddScoped<IFormValueRepo, FormValueRepo>();
+        services.AddScoped<IServiceTypeRepo, ServiceTypeRepo>();
         services.AddScoped(typeof(IGenericRepo<>), typeof(GenericRepo<>));
 
 

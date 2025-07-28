@@ -12,7 +12,7 @@ public class FormValueService(IFormValueRepo repo) : IFormValueService
     public async Task<ApiResponse<dynamic>> AddAsync(DynamicFormViewModel viewModel)
     {
         await _iRepo.AddAsync(viewModel);
-        return ApiResponse<dynamic>.Success(null, "Messages added successfully!");
+        return ApiResponse<dynamic>.Success(true, "Messages added successfully!");
     }
 
     public async Task<ApiResponse<IList<FormValues>>> GetAllAsync(dynamic? param = null)

@@ -34,7 +34,4 @@ public class AspNetBusinessInfo : BaseModel
 
     [ForeignKey(nameof(ServiceId))]
     public virtual AspNetServiceTypes? AspNetServiceTypes { get; set; }
-    // Navigation property
-    public virtual ICollection<AspNetUserBusinessInfo>? UserBusinessInfos { get; set; }
-    public virtual ICollection<FormValues>? FormValues { get; set; }
 }

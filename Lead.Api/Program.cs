@@ -41,7 +41,6 @@ try
     var builder = WebApplication.CreateBuilder(args);
 
     // Add services to the container.
-    builder.Services.Configure<JwtOptions>(builder.Configuration.GetSection("JWT"));
     builder.Services.AddDbContext<LeadContext>(options =>
         options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
@@ -79,6 +78,7 @@ try
 
 
     // Configure JWT Authentication
+    builder.Services.Configure<JwtOptions>(builder.Configuration.GetSection("JWT"));
     builder.Services.AddAuthentication(options =>
     {
         options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -139,16 +139,6 @@ try
     builder.Services.AddAuthorization();
 
     // Add CORS policy
-    //builder.Services.AddCors(options =>
-    //{
-    //    options.AddPolicy("AllowAll", policy =>
-    //    {
-    //        policy
-    //            .AllowAnyOrigin()
-    //            .AllowAnyHeader()
-    //            .AllowAnyMethod();
-    //    });
-    //});
     var allowedOrigins = new[] { "https://localhost:7131", "http://localhost:5186" };
 
     builder.Services.AddCors(options =>

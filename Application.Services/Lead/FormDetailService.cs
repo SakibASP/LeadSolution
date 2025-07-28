@@ -11,19 +11,23 @@ namespace Application.Services.Lead;
 
 public class FormDetailService(IGenericRepo<FormDetails> repo, IHttpContextAccessor httpContext) : IFormDetailService
 {
-    private readonly IGenericRepo<FormDetails> _iRepo = repo;
-    private readonly IHttpContextAccessor _httpContext= httpContext;
+    private readonly IGenericRepo<FormDetails> _iFormDetail = repo;
+    private readonly IHttpContextAccessor _httpContext = httpContext;
+
+    private string CurrentUser => _httpContext.HttpContext?.User?.Identity?.Name ?? "N/A";
+    private string RequestPath => _httpContext.HttpContext?.Request.Path.Value ?? "N/A";
+
     public async Task<ApiResponse<dynamic>> AddAsync(FormDetails formDetails)
     {
         try
         {
-            formDetails.CreatedBy = _httpContext.HttpContext!.User.Identity?.Name;
-            await _iRepo.AddAsync(formDetails);
-            return ApiResponse<dynamic>.Success(null, "Form detail created successfully!");
+            formDetails.CreatedBy = CurrentUser;
+            await _iFormDetail.AddAsync(formDetails);
+            return ApiResponse<dynamic>.Success(true, "Form detail created successfully!");
         }
         catch (Exception ex)
         {
-            Log.Error(ex, MessageHelper.GenerateErrorMsg(_httpContext.HttpContext!.Request.Path, formDetails, _httpContext.HttpContext.User.Identity?.Name));
+            Log.Error(ex, MessageHelper.GenerateErrorMsg(RequestPath, formDetails, CurrentUser));
             return ApiResponse<dynamic>.Fail("Something went wrong!");
         }
     }
@@ -32,12 +36,12 @@ public class FormDetailService(IGenericRepo<FormDetails> repo, IHttpContextAcces
     {
         try
         {
-            var result = await _iRepo.GetAllAsync(parameter);
+            var result = await _iFormDetail.GetAllAsync(parameter);
             return ApiResponse<IList<FormDetails>>.Success(result, "Form details retrieved successfully!");
         }
         catch (Exception ex)
         {
-            Log.Error(ex, MessageHelper.GenerateErrorMsg(_httpContext.HttpContext!.Request.Path, parameter, _httpContext.HttpContext.User.Identity?.Name));
+            Log.Error(ex, MessageHelper.GenerateErrorMsg(RequestPath, parameter, CurrentUser));
             return ApiResponse<IList<FormDetails>>.Fail("Something went wrong!");
         }
     }
@@ -46,12 +50,12 @@ public class FormDetailService(IGenericRepo<FormDetails> repo, IHttpContextAcces
     {
         try
         {
-            var result = await _iRepo.GetByIdAsync(id);
+            var result = await _iFormDetail.GetByIdAsync(id);
             return ApiResponse<FormDetails>.Success(result, "Form detail retrieved successfully!");
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
-            Log.Error(ex, MessageHelper.GenerateErrorMsg(_httpContext.HttpContext!.Request.Path, id, _httpContext.HttpContext.User.Identity?.Name));
+            Log.Error(ex, MessageHelper.GenerateErrorMsg(RequestPath, id, CurrentUser));
             return ApiResponse<FormDetails>.Fail("Something went wrong!");
         }
     }
@@ -60,12 +64,12 @@ public class FormDetailService(IGenericRepo<FormDetails> repo, IHttpContextAcces
     {
         try
         {
-            await _iRepo.RemoveAsync(id);
-            return ApiResponse<dynamic>.Success(null, "Form detail removed successfully!");
+            await _iFormDetail.RemoveAsync(id);
+            return ApiResponse<dynamic>.Success(true, "Form detail removed successfully!");
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
-            Log.Error(ex, MessageHelper.GenerateErrorMsg(_httpContext.HttpContext!.Request.Path, id, _httpContext.HttpContext.User.Identity?.Name));
+            Log.Error(ex, MessageHelper.GenerateErrorMsg(RequestPath, id, CurrentUser));
             return ApiResponse<dynamic>.Fail("Something went wrong!");
         }
     }
@@ -74,14 +78,14 @@ public class FormDetailService(IGenericRepo<FormDetails> repo, IHttpContextAcces
     {
         try
         {
-            formDetails.ModifiedBy = _httpContext.HttpContext!.User.Identity?.Name;
+            formDetails.ModifiedBy = CurrentUser;
             formDetails.ModifiedDate = DateTime.Now.ToBangladeshTime();
-            await _iRepo.UpdateAsync(formDetails);
-            return ApiResponse<dynamic>.Success(null, "Form detail updated successfully!");
+            await _iFormDetail.UpdateAsync(formDetails);
+            return ApiResponse<dynamic>.Success(true, "Form detail updated successfully!");
         }
         catch (Exception ex)
         {
-            Log.Error(ex, MessageHelper.GenerateErrorMsg(_httpContext.HttpContext!.Request.Path, formDetails, _httpContext.HttpContext.User.Identity?.Name));
+            Log.Error(ex, MessageHelper.GenerateErrorMsg(RequestPath, formDetails, CurrentUser));
             return ApiResponse<dynamic>.Fail("Something went wrong!");
         }
     }
