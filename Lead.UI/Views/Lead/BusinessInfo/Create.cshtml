@@ -1,58 +1,86 @@
-﻿@model Core.Models.Auth.AspNetBusinessInfo
+﻿@model Core.ViewModels.Dto.Lead.AspNetBusinessInfoDto
 
 @{
     ViewData["Title"] = "Create Business Info";
 }
 
-<h2>Create Business Info</h2>
+<div class="container py-1">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow rounded-3">
+                <div class="card-header bg-primary text-white text-center">
+                    <h4 class="mb-0">Create Business</h4>
+                </div>
+                <div class="card-body">
+                    <form asp-action="Create" method="post">
+                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
 
-<form asp-action="Create" method="post">
-    <div class="form-group">
-        <label asp-for="ServiceId"></label>
-        <select asp-for="ServiceId" asp-items="ViewBag.ServiceId" class="form-control"></select>
+                        <div class="mb-3">
+                            <label asp-for="UserId" class="form-label fw-bold"></label>
+                            <select asp-for="UserId" asp-items="ViewBag.UserId" class="form-select">
+                                <option disabled selected>-- Select User --</option>
+                            </select>
+                            <span asp-validation-for="UserId" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="ServiceId" class="form-label fw-bold"></label>
+                            <select asp-for="ServiceId" asp-items="ViewBag.ServiceId" class="form-select">
+                                <option disabled selected>-- Select Service --</option>
+                            </select>
+                            <span asp-validation-for="ServiceId" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="BusinessName" class="form-label fw-bold"></label>
+                            <input asp-for="BusinessName" class="form-control" placeholder="Enter business name" />
+                            <span asp-validation-for="BusinessName" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Phone" class="form-label fw-bold"></label>
+                            <input asp-for="Phone" class="form-control" placeholder="Enter phone number" />
+                            <span asp-validation-for="Phone" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Email" class="form-label fw-bold"></label>
+                            <input asp-for="Email" class="form-control" placeholder="Enter email address" />
+                            <span asp-validation-for="Email" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="WhatsApp" class="form-label fw-bold"></label>
+                            <input asp-for="WhatsApp" class="form-control" placeholder="Enter WhatsApp number" />
+                            <span asp-validation-for="WhatsApp" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Website" class="form-label fw-bold"></label>
+                            <input asp-for="Website" class="form-control" placeholder="Enter website URL" />
+                            <span asp-validation-for="Website" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Address" class="form-label fw-bold"></label>
+                            <textarea asp-for="Address" class="form-control" rows="3" placeholder="Enter address"></textarea>
+                            <span asp-validation-for="Address" class="text-danger"></span>
+                        </div>
+
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-success btn-lg">
+                                <i class="bi bi-plus-circle"></i> Create
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div class="text-center mt-3">
+                <a asp-action="Index" class="text-decoration-none">
+                    ← Back to List
+                </a>
+            </div>
+        </div>
     </div>
+</div>
 
-    <div class="form-group">
-        <label asp-for="BusinessName"></label>
-        <input asp-for="BusinessName" class="form-control" />
-        <span asp-validation-for="BusinessName" class="text-danger"></span>
-    </div>
-
-    <div class="form-group">
-        <label asp-for="Phone"></label>
-        <input asp-for="Phone" class="form-control" />
-        <span asp-validation-for="Phone" class="text-danger"></span>
-    </div>
-
-    <div class="form-group">
-        <label asp-for="Email"></label>
-        <input asp-for="Email" class="form-control" />
-        <span asp-validation-for="Email" class="text-danger"></span>
-    </div>
-
-    <div class="form-group">
-        <label asp-for="WhatsApp"></label>
-        <input asp-for="WhatsApp" class="form-control" />
-        <span asp-validation-for="WhatsApp" class="text-danger"></span>
-    </div>
-
-    <div class="form-group">
-        <label asp-for="Website"></label>
-        <input asp-for="Website" class="form-control" />
-        <span asp-validation-for="Website" class="text-danger"></span>
-    </div>
-
-    <div class="form-group">
-        <label asp-for="Address"></label>
-        <textarea asp-for="Address" class="form-control"></textarea>
-        <span asp-validation-for="Address" class="text-danger"></span>
-    </div>
-
-    <div class="form-group form-check">
-        <input asp-for="IsActive" class="form-check-input" />
-        <label asp-for="IsActive" class="form-check-label"></label>
-    </div>
-
-    <button type="submit" class="btn btn-success">Save</button>
-    <a asp-action="Index" class="btn btn-secondary">Back</a>
-</form>

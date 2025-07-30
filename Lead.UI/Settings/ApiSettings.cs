@@ -2,80 +2,95 @@
 
 public class ApiSettings
 {
-    public required string BaseUrl { get; set; }
-    public required ControllerNames Versions { get; set; }
-    public required ControllerNames ControllerNames { get; set; }
-    public required Endpoints Endpoints { get; set; }
+    public string BaseUrl { get; set; }
+    public Controllers Controllers { get; set; }
+    public Endpoints Endpoints { get; set; }
 }
 
-public class ControllerNames
+public class Controllers
 {
-    public required string Auth { get; set; }
-    public required string Menu { get; set; }
-    public required string DataTypes { get; set; }
-    public required string FormDetails { get; set; }
-    public required string FormValues { get; set; }
-    public required string BusinessInfo { get; set; }
+    public string Auth { get; set; }
+    public string Roles { get; set; }
+    public string MaintainUser { get; set; }
+    public string Menu { get; set; }
+    public string AdminRights { get; set; }
+    public string DataTypes { get; set; }
+    public string FormDetails { get; set; }
+    public string FormValues { get; set; }
+    public string BusinessInfo { get; set; }
+    public string Utility { get; set; }
 }
-
 
 public class Endpoints
 {
-    public required CommonEndPoints CommonEndPoints { get; set; }
-    public required CAuth Auth { get; set; }
-    public required CMenu Menu { get; set; }
-    public required CFormValues FormValues { get; set; }
-    public required CBusinessInfo BusinessInfo { get; set; }
+    public CommonEndpoints CommonEndPoints { get; set; }
+    public AuthEndpoints Auth { get; set; }
+    public RoleEndpoints Roles { get; set; }
+    public MaintainUserEndpoints MaintainUser { get; set; }
+    public MenuEndpoints Menu { get; set; }
+    public AdminRightsEndpoints AdminRights { get; set; }
+    public FormValuesEndpoints FormValues { get; set; }
+    public BusinessInfoEndpoints BusinessInfo { get; set; }
+    public UtilityEndpoints Utility { get; set; }
 }
 
-public class CommonEndPoints
+public class CommonEndpoints
 {
-    public required string GetAll { get; set; }
-    public required string GetById { get; set; }
-    public required string Add { get; set; }
-    public required string Update { get; set; }
-    public required string Remove { get; set; }
+    public string GetAll { get; set; }
+    public string GetById { get; set; }
+    public string Add { get; set; }
+    public string Update { get; set; }
+    public string Remove { get; set; }
 }
 
-public class CAuth
+public class AuthEndpoints
 {
-    //Authentication and User management
-    public required string Login { get; set; }
-    public required string RefreshToken { get; set; }
-    public required string Register { get; set; }
-    public required string GetUsers { get; set; }
-    public required string GetUserById { get; set; }
-    public required string AssignRole { get; set; }
-
-    //Roles management
-    public required string GetUserRoles { get; set; }
-    public required string GetRoles { get; set; }
-    public required string GetRoleById { get; set; }
-    public required string GetRolesByUserId { get; set; }
-    public required string AddRole { get; set; }
-    public required string UpdateRole { get; set; }
-    public required string DeleteRole { get; set; }
-
+    public string Login { get; set; }
+    public string RefreshToken { get; set; }
+    public string Register { get; set; }
 }
 
-public class CMenu
+public class RoleEndpoints
 {
-    //Menu management
-    public required string GetByUserId { get; set; }
-
-    //User rights management
-    public required string GetAllMenu { get; set; }
-    public required string GetRoleWiseMenu { get; set; }
-    public required string CreateRoleWiseMenu { get; set; }
-    public required string UpdateRoleWiseMenu { get; set; }
+    public string GetRoles { get; set; }
+    public string GetRoleById { get; set; }
+    public string AddRole { get; set; }
+    public string UpdateRole { get; set; }
+    public string DeleteRole { get; set; }
 }
 
-public class CFormValues
+public class MaintainUserEndpoints
 {
-    public required string GetDynamicForm { get; set; }
+    public string GetUsers { get; set; }
+    public string AssignRole { get; set; }
+    public string GetUserRoles { get; set; }
 }
 
-public class CBusinessInfo
+public class MenuEndpoints
 {
-    public required string GetServiceType { get; set; }
+    public string GetByUserId { get; set; }
+
+}
+public class AdminRightsEndpoints
+{
+    public string GetAllMenu { get; set; }
+    public string GetRoleWiseMenu { get; set; }
+    public string CreateRoleWiseMenu { get; set; }
+    public string UpdateRoleWiseMenu { get; set; }
+}
+
+public class FormValuesEndpoints
+{
+    public string GetDynamicForm { get; set; }
+}
+
+public class BusinessInfoEndpoints
+{
+    public string GetServiceType { get; set; }
+}
+
+public class UtilityEndpoints
+{
+    public string GetDropdown { get; set; }
+    public string GetUserDropdown { get; set; }
 }

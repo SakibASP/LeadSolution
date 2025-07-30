@@ -12,10 +12,7 @@ namespace Lead.UI.Controllers.Lead;
 
 public class FormValuesController(IHttpService httpService, IOptions<ApiSettings> apiSetting) : BaseController(httpService, apiSetting)
 {
-
-    private string ApiVersion => _apiSettings.Versions.FormValues;
-    private string ApiController => _apiSettings.ControllerNames.FormValues;
-    private string VersionedController => $"{ApiVersion}/{ApiController}";
+    private string VersionedController => _apiSettings.Controllers.FormValues;
 
     public async Task<IActionResult> Index()
     {

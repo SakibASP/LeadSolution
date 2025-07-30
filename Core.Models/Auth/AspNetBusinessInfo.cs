@@ -8,6 +8,7 @@ namespace Core.Models.Auth;
 public class AspNetBusinessInfo : BaseModel
 {
     [Required]
+    [Display(Name ="Service")]
     public int ServiceId { get; set; }
 
     [Required, StringLength(128)]

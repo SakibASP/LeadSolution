@@ -1,6 +1,6 @@
 ﻿using Application.Interfaces.Auth;
 using Core.Models.Auth;
-using Infrastructure.Interfaces.Lead;
+using Infrastructure.Interfaces.Common;
 
 namespace Application.Services.Auth;
 

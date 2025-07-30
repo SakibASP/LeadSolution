@@ -1,4 +1,4 @@
-﻿namespace Infrastructure.Interfaces.Lead;
+﻿namespace Infrastructure.Interfaces.Common;
 
 public interface IGenericRepo<T>
 {

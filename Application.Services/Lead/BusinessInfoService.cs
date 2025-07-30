@@ -2,8 +2,9 @@
 using Common.Extentions;
 using Common.Utils.Helper;
 using Core.Models.Auth;
-using Core.Models.Lead;
+using Core.ViewModels.Dto.Lead;
 using Core.ViewModels.Response;
+using Infrastructure.Interfaces.Common;
 using Infrastructure.Interfaces.Lead;
 using Microsoft.AspNetCore.Http;
 using Serilog;
@@ -11,12 +12,12 @@ using Serilog;
 namespace Application.Services.Lead;
 
 public class BusinessInfoService(
-    IGenericRepo<AspNetBusinessInfo> repo,
-    IServiceTypeRepo serviceType,
+    IGenericRepo<AspNetBusinessInfo> genericInfo,
+    IBusinessInfoRepo businessInfo,
     IHttpContextAccessor httpContext) : IBusinessInfoService
 {
-    private readonly IGenericRepo<AspNetBusinessInfo> _iBusinessInfo = repo;
-    private readonly IServiceTypeRepo _iServiceTypes = serviceType;
+    private readonly IGenericRepo<AspNetBusinessInfo> _iGenericRepo = genericInfo;
+    private readonly IBusinessInfoRepo _iBusinessInfo = businessInfo;
     private readonly IHttpContextAccessor _httpContext = httpContext;
 
     private string CurrentUser => _httpContext.HttpContext?.User?.Identity?.Name ?? "N/A";
@@ -26,7 +27,7 @@ public class BusinessInfoService(
     {
         try
         {
-            var result = await _iBusinessInfo.GetAllAsync(parameter);
+            var result = await _iGenericRepo.GetAllAsync(parameter);
             return ApiResponse<IList<AspNetBusinessInfo>>.Success(result, "Business list retrieved successfully!");
         }
         catch (Exception ex)
@@ -40,7 +41,7 @@ public class BusinessInfoService(
     {
         try
         {
-            var result = await _iBusinessInfo.GetByIdAsync(id);
+            var result = await _iGenericRepo.GetByIdAsync(id);
             return ApiResponse<AspNetBusinessInfo>.Success(result, "Business info retrieved successfully!");
         }
         catch (Exception ex)
@@ -50,11 +51,11 @@ public class BusinessInfoService(
         }
     }
 
-    public async Task<ApiResponse<dynamic>> AddAsync(AspNetBusinessInfo businessInfo)
+    public async Task<ApiResponse<dynamic>> AddAsync(AspNetBusinessInfoDto businessInfo)
     {
         try
         {
-            businessInfo.CreatedBy = CurrentUser;
+            businessInfo.UserName = CurrentUser;
             await _iBusinessInfo.AddAsync(businessInfo);
             return ApiResponse<dynamic>.Success(true, "Business info created successfully!");
         }
@@ -85,27 +86,13 @@ public class BusinessInfoService(
     {
         try
         {
-            await _iBusinessInfo.RemoveAsync(id);
+            await _iGenericRepo.RemoveAsync(id);
             return ApiResponse<dynamic>.Success(true, "Business info removed successfully!");
         }
         catch (Exception ex)
         {
             Log.Error(ex, MessageHelper.GenerateErrorMsg(RequestPath, id, CurrentUser));
             return ApiResponse<dynamic>.Fail("Something went wrong!");
-        }
-    }
-
-    public async Task<ApiResponse<IList<AspNetServiceTypes>>> GetAllServiceTypesAsync()
-    {
-        try
-        {
-            var result = await _iServiceTypes.GetAllAsync();
-            return ApiResponse<IList<AspNetServiceTypes>>.Success(result, "Service types retrieved successfully!");
-        }
-        catch (Exception ex)
-        {
-            Log.Error(ex, MessageHelper.GenerateErrorMsg(RequestPath, null, CurrentUser));
-            return ApiResponse<IList<AspNetServiceTypes>>.Fail("Something went wrong!");
         }
     }
 }

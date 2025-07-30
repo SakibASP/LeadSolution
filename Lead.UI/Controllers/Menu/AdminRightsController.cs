@@ -17,15 +17,15 @@ namespace Lead.UI.Controllers.Menu;
 public class AdminRightsController(IHttpService httpService, IOptions<ApiSettings> apiSetting) : BaseController(httpService, apiSetting)
 {
     private void SetToken() => _httpService.SetBearerToken(AccessToken);
-    private string MenuVersion => _apiSettings.Versions.Menu;
-    private string AuthVersion => _apiSettings.Versions.Auth;
+    private string VersionedAdminRights => _apiSettings.Controllers.AdminRights;
+    private string VersionedRoles => _apiSettings.Controllers.Roles;
 
     public async Task<IActionResult> Index()
     {
         SetToken();
 
-        var rolesTask = _httpService.GetAsync<ApiResponse<IList<RoleDto>>>(AuthVersion, _apiSettings.Endpoints.Auth.GetRoles);
-        var menusTask = _httpService.GetAsync<ApiResponse<IList<MenuItem>>>(MenuVersion, _apiSettings.Endpoints.Menu.GetAllMenu);
+        var rolesTask = _httpService.GetAsync<ApiResponse<IList<RoleDto>>>(VersionedRoles, _apiSettings.Endpoints.Roles.GetRoles);
+        var menusTask = _httpService.GetAsync<ApiResponse<IList<MenuItem>>>(VersionedAdminRights, _apiSettings.Endpoints.AdminRights.GetAllMenu);
 
         await Task.WhenAll(rolesTask, menusTask);
 
@@ -55,7 +55,7 @@ public class AdminRightsController(IHttpService httpService, IOptions<ApiSetting
         var queryParams = new Dictionary<string, string> { ["roleId"] = roleId };
 
         var response = await _httpService.GetAsync<ApiResponse<IList<MenuItemViewModel>>>(
-            MenuVersion, _apiSettings.Endpoints.Menu.GetRoleWiseMenu, queryParams);
+            VersionedAdminRights, _apiSettings.Endpoints.AdminRights.GetRoleWiseMenu, queryParams);
 
         return Json(response?.Data, new JsonSerializerOptions());
     }
@@ -71,7 +71,7 @@ public class AdminRightsController(IHttpService httpService, IOptions<ApiSetting
         };
 
         var response = await _httpService.PostAsync<ApiResponse<string>>(
-            MenuVersion, _apiSettings.Endpoints.Menu.UpdateRoleWiseMenu, request);
+            VersionedAdminRights, _apiSettings.Endpoints.AdminRights.UpdateRoleWiseMenu, request);
 
         return Json(response?.Data);
     }

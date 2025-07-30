@@ -19,15 +19,7 @@ public class AuthController(IHttpService httpService, IOptions<ApiSettings> apiS
 {
     private readonly IHttpService _httpService = httpService;
     private readonly ApiSettings _apiSettings = apiSetting.Value;
-
-    private AuthResponseDto? SessionAuth => HttpContext.Session.Get<AuthResponseDto>(Constants.AuthResponseDto);
-    private bool EnsureSessionToken()
-    {
-        if (SessionAuth is null) return false;
-        _httpService.SetBearerToken(SessionAuth.Token ?? "");
-        ViewBag.AuthResponseDto = SessionAuth;
-        return true;
-    }
+    private string VersionedController => _apiSettings.Controllers.Auth;
 
     [HttpGet]
     public IActionResult Login() => View();
@@ -49,7 +41,7 @@ public class AuthController(IHttpService httpService, IOptions<ApiSettings> apiS
     private async Task LoginAsync(LoginDto loginDto)
     {
         var response = await _httpService.PostAsync<ApiResponse<AuthResponseDto>>(
-            _apiSettings.Versions.Auth, _apiSettings.Endpoints.Auth.Login, loginDto);
+            VersionedController, _apiSettings.Endpoints.Auth.Login, loginDto);
 
         if (response?.IsSuccess == true)
         {
@@ -69,7 +61,7 @@ public class AuthController(IHttpService httpService, IOptions<ApiSettings> apiS
     public async Task<IActionResult> Register(RegisterDto registerDto)
     {
         var response = await _httpService.PostAsync<ApiResponse<AuthResponseDto>>(
-            _apiSettings.Versions.Auth, _apiSettings.Endpoints.Auth.Register, registerDto);
+            VersionedController, _apiSettings.Endpoints.Auth.Register, registerDto);
 
         if (response?.IsSuccess == true)
             await LoginAsync(new() { Email = registerDto.Email, Password = registerDto.Password });

@@ -40,7 +40,7 @@ public class MenuViewComponent(IHttpService httpService, IOptions<ApiSettings> a
             };
 
             // Attempt to refresh the token
-            var response = await _httpService.PostAsync<ApiResponse<AuthResponseDto>?>(_apiSettings.Versions.Auth, _apiSettings.Endpoints.Auth.RefreshToken, tokenDto);
+            var response = await _httpService.PostAsync<ApiResponse<AuthResponseDto>?>(_apiSettings.Controllers.Auth, _apiSettings.Endpoints.Auth.RefreshToken, tokenDto);
             if (!(response?.IsSuccess ?? false))
             {
                 // If the refresh token request fails, redirect to the login page
@@ -56,7 +56,7 @@ public class MenuViewComponent(IHttpService httpService, IOptions<ApiSettings> a
         _httpService.SetBearerToken(sessionAuth!.Token ?? "");
 
         // Fetch menu items for the authenticated user
-        var data = await _httpService.GetAsync<ApiResponse<IList<DynamicMenuItemDto>>?>(_apiSettings.Versions.Menu, _apiSettings.Endpoints.Menu.GetByUserId);
+        var data = await _httpService.GetAsync<ApiResponse<IList<DynamicMenuItemDto>>?>(_apiSettings.Controllers.Menu, _apiSettings.Endpoints.Menu.GetByUserId);
         var menuList = data?.Data ?? [];
 
         List<DynamicMenuItemDto>? _menuList;

@@ -13,7 +13,7 @@ public class HomeController(IHttpService httpService, IOptions<ApiSettings> apiS
 {
     public IActionResult Index()
     {
-        var name = "to Khan Lead";
+        var name = "to Lead Solution.";
         ViewBag.Name = name;
         return View();
     }

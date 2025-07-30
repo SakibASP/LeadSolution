@@ -1,4 +1,4 @@
-﻿using Infrastructure.Interfaces.Lead;
+﻿using Infrastructure.Interfaces.Common;
 using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Repositories.Data;

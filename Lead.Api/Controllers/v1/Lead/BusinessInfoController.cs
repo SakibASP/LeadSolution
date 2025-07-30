@@ -1,6 +1,7 @@
 ﻿using Application.Interfaces.Lead;
 using Common.Utils.Helper;
 using Core.Models.Auth;
+using Core.ViewModels.Dto.Lead;
 using Core.ViewModels.Response;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -22,14 +23,11 @@ public class BusinessInfoController(IBusinessInfoService businessInfoService) : 
     [HttpGet("get-all")]
     public async Task<IActionResult> GetAll([FromQuery] dynamic? parameter) => Ok(await _iBusinessInfo.GetAllAsync(parameter));
 
-    [HttpGet("get-all-service-types")]
-    public async Task<IActionResult> GetAllService() => Ok(await _iBusinessInfo.GetAllServiceTypesAsync());
-
     [HttpGet("get-by-id")]
     public async Task<IActionResult> GetById([FromQuery] int id) => Ok(await _iBusinessInfo.GetByIdAsync(id));
 
     [HttpPost("add")]
-    public async Task<IActionResult> Add([FromBody] AspNetBusinessInfo businessInfo) => Ok(await _iBusinessInfo.AddAsync(businessInfo));
+    public async Task<IActionResult> Add([FromBody] AspNetBusinessInfoDto businessInfo) => Ok(await _iBusinessInfo.AddAsync(businessInfo));
 
     [HttpPost("update")]
     public async Task<IActionResult> Update([FromBody] AspNetBusinessInfo businessInfo) => Ok(await _iBusinessInfo.UpdateAsync(businessInfo));

@@ -1,5 +1,8 @@
 ﻿using Common.Utils.Constant;
+using Common.Utils.Enums;
 using Core.Models.Auth;
+using Core.ViewModels.Dto.Common;
+using Core.ViewModels.Dto.Lead;
 using Core.ViewModels.Response;
 using Lead.UI.Controllers.Common;
 using Lead.UI.Interfaces;
@@ -12,20 +15,20 @@ namespace Lead.UI.Controllers.Lead;
 
 public class BusinessInfoController(IHttpService httpService, IOptions<ApiSettings> apiSetting) : BaseController(httpService, apiSetting)
 {
-    private string ApiVersion => _apiSettings.Versions.BusinessInfo;
-    private string ApiController => _apiSettings.ControllerNames.BusinessInfo;
-    private string VersionedController => $"{ApiVersion}/{ApiController}";
-
+    private string UtilityVersion => $"{_apiSettings.Controllers.Utility}";
+    private string VersionedController => $"{_apiSettings.Controllers.BusinessInfo}";
     private void SetToken() => _httpService.SetBearerToken(AccessToken);
+
+    private readonly Dictionary<string, string> GetParam = [];
 
     public async Task<IActionResult> Index()
     {
         SetToken();
+
         var response = await _httpService.GetAsync<ApiResponse<IList<AspNetBusinessInfo>>>(
             VersionedController, _apiSettings.Endpoints.CommonEndPoints.GetAll);
 
-        if (response?.IsSuccess != true)
-            TempData[Constants.Error] = response?.Message;
+        if (response?.IsSuccess != true) TempData[Constants.Error] = response?.Message;
 
         return View(response?.Data ?? []);
     }
@@ -33,35 +36,51 @@ public class BusinessInfoController(IHttpService httpService, IOptions<ApiSettin
     public async Task<IActionResult> Create()
     {
         SetToken();
-        var viewBagResponse = await _httpService.GetAsync<ApiResponse<IList<AspNetServiceTypes>>>(
-            VersionedController, _apiSettings.Endpoints.BusinessInfo.GetServiceType);
 
-        if (viewBagResponse?.IsSuccess is not true) TempData[Constants.Error] = viewBagResponse?.Message;
+        GetParam.Clear();
+        GetParam.Add("Id", ((int)DropdownEnum.ServiceTypes).ToString());
+        var serviceDropdownTask = _httpService.GetAsync<ApiResponse<IList<DropdownDto>>>(
+            UtilityVersion, _apiSettings.Endpoints.Utility.GetDropdown, GetParam);
 
-        ViewBag.ServiceId = new SelectList(viewBagResponse?.Data, "Id", "Name");
+        GetParam.Clear();
+        GetParam.Add("Id", ((int)DropdownEnum.Users).ToString());
+        var userDropdownTask = _httpService.GetAsync<ApiResponse<IList<UserDropdownDto>>>(
+             UtilityVersion, _apiSettings.Endpoints.Utility.GetUserDropdown, GetParam);
+
+        await Task.WhenAll(serviceDropdownTask, userDropdownTask);
+
+        var serviceResponse = await serviceDropdownTask;
+        if (serviceResponse?.IsSuccess is not true)
+        {
+            TempData[Constants.Error] = serviceResponse?.Message;
+            return RedirectToAction(nameof(Index));
+        }
+
+        var userResponse = await userDropdownTask;
+        if (userResponse?.IsSuccess is not true)
+        {
+            TempData[Constants.Error] = userResponse?.Message;
+            return RedirectToAction(nameof(Index));
+        }
+
+        ViewBag.ServiceId = new SelectList(serviceResponse?.Data, "Id", "Name");
+        ViewBag.UserId = new SelectList(userResponse?.Data, "Id", "Name");
         return View();
     }
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Create(AspNetBusinessInfo businessInfo)
+    public async Task<IActionResult> Create(AspNetBusinessInfoDto businessInfo)
     {
         if (!ModelState.IsValid)
             return View(businessInfo);
 
         SetToken();
-        var postTask = _httpService.PostAsync<ApiResponse<dynamic>>(
-            VersionedController, _apiSettings.Endpoints.CommonEndPoints.Add, businessInfo);
 
-        var getTask = _httpService.GetAsync<ApiResponse<IList<AspNetServiceTypes>>>(
-            VersionedController, _apiSettings.Endpoints.BusinessInfo.GetServiceType);
-
-        await Task.WhenAll(postTask, getTask);
-
-        var response = await postTask;
-        var viewBagResponse = await getTask;
-
-        ViewBag.ServiceId = new SelectList(viewBagResponse?.Data, "Id", "Name", businessInfo.ServiceId);
+        var response = await _httpService.PostAsync<ApiResponse<dynamic>>(
+            VersionedController,
+            _apiSettings.Endpoints.CommonEndPoints.Add,
+            businessInfo);
 
         TempData[response?.IsSuccess == true ? Constants.Success : Constants.Error] = response?.Message;
         return RedirectToAction(nameof(Index));
@@ -74,22 +93,46 @@ public class BusinessInfoController(IHttpService httpService, IOptions<ApiSettin
 
         SetToken();
 
-        var getDetailTask = _httpService.GetAsync<ApiResponse<AspNetBusinessInfo>>(
-            VersionedController, _apiSettings.Endpoints.CommonEndPoints.GetById,
-            new() { ["id"] = id.ToString()! });
+        // getting the row to edit
+        GetParam.Clear();
+        GetParam.Add("Id", id.ToString()!);
+        var businessInfoTask = _httpService.GetAsync<ApiResponse<AspNetBusinessInfo>>(
+            VersionedController, 
+            _apiSettings.Endpoints.CommonEndPoints.GetById,
+            GetParam);
 
-        var getTypeTask = _httpService.GetAsync<ApiResponse<IList<AspNetServiceTypes>>>(
-            VersionedController, _apiSettings.Endpoints.BusinessInfo.GetServiceType);
+        // getting service type dropdown 
+        GetParam.Clear();
+        GetParam.Add("Id", ((int)DropdownEnum.ServiceTypes).ToString());
+        var serviceDropdownTask = _httpService.GetAsync<ApiResponse<IList<DropdownDto>>>(
+            UtilityVersion, 
+            _apiSettings.Endpoints.Utility.GetDropdown,
+            GetParam);
 
-        await Task.WhenAll(getDetailTask, getTypeTask);
+        // getting user dropdown 
+        GetParam.Clear();
+        GetParam.Add("Id", ((int)DropdownEnum.BusinessWiseUsers).ToString());
+        GetParam.Add("Param1", id.ToString()!);
+        var userDropdownTask = _httpService.GetAsync<ApiResponse<IList<UserDropdownDto>>>(
+            UtilityVersion,
+            _apiSettings.Endpoints.Utility.GetUserDropdown,
+            GetParam);
 
-        var response = await getDetailTask;
-        var viewBagResponse = await getTypeTask;
+        await Task.WhenAll(businessInfoTask, serviceDropdownTask, userDropdownTask);
 
-        if (viewBagResponse?.IsSuccess is not true) TempData[Constants.Error] = viewBagResponse?.Message;
+        var response = await businessInfoTask;
+        var serviceResponse = await serviceDropdownTask;
+        var userResponse = await userDropdownTask;
 
-        ViewBag.ServiceId = new SelectList(viewBagResponse?.Data, "Id", "Name", response?.Data?.ServiceId);
-        TempData[response?.IsSuccess == true ? Constants.Success : Constants.Error] = response?.Message;
+        if (serviceResponse?.IsSuccess is not true)
+        {
+            TempData[Constants.Error] = serviceResponse?.Message;
+            return RedirectToAction(nameof(Index));
+        }
+        
+        ViewBag.ServiceId = new SelectList(serviceResponse?.Data, "Id", "Name", response?.Data?.ServiceId);
+        ViewBag.UserId = new SelectList(userResponse?.Data, "Id", "Name");
+
         return response?.Data is null ? NotFound() : View(response.Data);
     }
 
@@ -104,18 +147,12 @@ public class BusinessInfoController(IHttpService httpService, IOptions<ApiSettin
             return View(businessInfo);
 
         SetToken();
-        var postTask = _httpService.PostAsync<ApiResponse<dynamic>>(
-            VersionedController, _apiSettings.Endpoints.CommonEndPoints.Update, businessInfo);
 
-        var getTask = _httpService.GetAsync<ApiResponse<IList<AspNetServiceTypes>>>(
-            VersionedController, _apiSettings.Endpoints.BusinessInfo.GetServiceType);
+        //saving data
+        var response = await _httpService.PostAsync<ApiResponse<dynamic>>(
+            VersionedController, 
+            _apiSettings.Endpoints.CommonEndPoints.Update, businessInfo);
 
-        await Task.WhenAll(postTask, getTask);
-
-        var response = await postTask;
-        var viewBagResponse = await getTask;
-
-        ViewBag.ServiceId = new SelectList(viewBagResponse?.Data, "Id", "Name", businessInfo.ServiceId);
         TempData[response?.IsSuccess == true ? Constants.Success : Constants.Error] = response?.Message;
         return RedirectToAction(nameof(Index));
     }
@@ -123,8 +160,10 @@ public class BusinessInfoController(IHttpService httpService, IOptions<ApiSettin
     public async Task<IActionResult> Remove(int id)
     {
         SetToken();
+
         var response = await _httpService.PostAsync<ApiResponse<dynamic>>(
-            VersionedController, _apiSettings.Endpoints.CommonEndPoints.Remove, id);
+            VersionedController, 
+            _apiSettings.Endpoints.CommonEndPoints.Remove, id);
 
         TempData[response?.IsSuccess == true ? Constants.Success : Constants.Error] = response?.Message;
         return RedirectToAction(nameof(Index));

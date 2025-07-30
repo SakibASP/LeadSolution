@@ -14,6 +14,41 @@ $(function () {
     };
 });
 
+
+//$(function () {
+//    const sidebarKey = 'sidebar-toggled';
+
+//    // 1. Always start minimized if no preference
+//    if (!localStorage.getItem(sidebarKey)) {
+//        localStorage.setItem(sidebarKey, 'true'); // true = minimized
+//    }
+
+//    // 2. Apply the state on load
+//    const isToggled = localStorage.getItem(sidebarKey) === 'true';
+//    toggleSidebar(isToggled);
+
+//    // 3. Toggle on button click and update localStorage
+//    $('#sidebarToggle').on('click', function () {
+//        const isCurrentlyToggled = $('body').hasClass('sidebar-toggled');
+//        toggleSidebar(!isCurrentlyToggled);
+//        localStorage.setItem(sidebarKey, !isCurrentlyToggled);
+//    });
+
+//    // Helper function to toggle
+//    function toggleSidebar(toggled) {
+//        if (toggled) {
+//            $('body').addClass('sidebar-toggled');
+//            $('.sidebar').addClass('toggled');
+//            $('.sidebar .collapse').collapse('hide');
+//        } else {
+//            $('body').removeClass('sidebar-toggled');
+//            $('.sidebar').removeClass('toggled');
+//            $('.sidebar .collapse').collapse('show');
+//        }
+//    }
+//});
+
+
 // Write your JavaScript code.
 document.addEventListener("DOMContentLoaded", (event) => {
     typeWriting(event);

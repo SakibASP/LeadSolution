@@ -1,5 +1,7 @@
 ﻿using Common.Utils.Constant;
+using Common.Utils.Enums;
 using Core.Models.Lead;
+using Core.ViewModels.Dto.Common;
 using Core.ViewModels.Response;
 using Lead.UI.Controllers.Common;
 using Lead.UI.Interfaces;
@@ -12,15 +14,17 @@ namespace Lead.UI.Controllers.Lead;
 
 public class FormDetailsController(IHttpService httpService, IOptions<ApiSettings> apiSetting) : BaseController(httpService, apiSetting)
 {
-    private string ApiVersion => _apiSettings.Versions.FormDetails;
-    private string ApiController => _apiSettings.ControllerNames.FormDetails;
-    private string VersionedController => $"{ApiVersion}/{ApiController}";
+    private string UtilityVersion => $"{_apiSettings.Controllers.Utility}";
+    private string VersionedController => $"{_apiSettings.Controllers.FormDetails}";
 
     private void SetToken() => _httpService.SetBearerToken(AccessToken);
+
+    private readonly Dictionary<string, string> GetParam = [];
 
     public async Task<IActionResult> Index()
     {
         SetToken();
+
         var response = await _httpService.GetAsync<ApiResponse<IList<FormDetails>>>(
             VersionedController, _apiSettings.Endpoints.CommonEndPoints.GetAll);
 
@@ -32,10 +36,12 @@ public class FormDetailsController(IHttpService httpService, IOptions<ApiSetting
 
     public async Task<IActionResult> Create()
     {
-
         SetToken();
-        var viewBagResponse = await _httpService.GetAsync<ApiResponse<IList<DataTypes>>>(
-            $"{_apiSettings.Versions.DataTypes}/{_apiSettings.ControllerNames.DataTypes}", _apiSettings.Endpoints.CommonEndPoints.GetAll);
+
+        GetParam.Clear();
+        GetParam.Add("Id", ((int)DropdownEnum.DataTypes).ToString());
+        var viewBagResponse = await _httpService.GetAsync<ApiResponse<IList<DropdownDto>>>(
+             UtilityVersion, _apiSettings.Endpoints.Utility.GetDropdown, GetParam);
 
         if (viewBagResponse?.IsSuccess is not true) TempData[Constants.Error] = viewBagResponse?.Message;
 
@@ -51,22 +57,13 @@ public class FormDetailsController(IHttpService httpService, IOptions<ApiSetting
             return View(formDetails);
 
         SetToken();
+
         // Start both tasks
-        var postTask = _httpService.PostAsync<ApiResponse<dynamic>>(
+        var response = await _httpService.PostAsync<ApiResponse<dynamic>>(
             VersionedController,
             _apiSettings.Endpoints.CommonEndPoints.Add,
             formDetails);
 
-        var getTask = _httpService.GetAsync<ApiResponse<IList<DataTypes>>>(
-            $"{_apiSettings.Versions.DataTypes}/{_apiSettings.ControllerNames.DataTypes}",
-            _apiSettings.Endpoints.CommonEndPoints.GetAll);
-
-        await Task.WhenAll(postTask, getTask);
-
-        var response = await postTask;
-        var viewBagResponse = await getTask;
-
-        ViewBag.TypeId = new SelectList(viewBagResponse?.Data, "Id", "Name", formDetails.TypeId);
         TempData[response?.IsSuccess == true ? Constants.Success : Constants.Error] = response?.Message;
         return RedirectToAction(nameof(Index));
     }
@@ -78,14 +75,17 @@ public class FormDetailsController(IHttpService httpService, IOptions<ApiSetting
             return NotFound();
 
         SetToken();
+
+        GetParam.Clear();
+        GetParam.Add("Id", id.ToString()!);
         var getDetailTask = _httpService.GetAsync<ApiResponse<FormDetails>>(
             VersionedController, 
-            _apiSettings.Endpoints.CommonEndPoints.GetById,
-            new() { ["id"] = id.ToString()! });
+            _apiSettings.Endpoints.CommonEndPoints.GetById, GetParam);
 
-        var getTypeTask = _httpService.GetAsync<ApiResponse<IList<DataTypes>>>(
-            $"{_apiSettings.Versions.DataTypes}/{_apiSettings.ControllerNames.DataTypes}",
-            _apiSettings.Endpoints.CommonEndPoints.GetAll);
+        GetParam.Clear();
+        GetParam.Add("Id", ((int)DropdownEnum.DataTypes).ToString());
+        var getTypeTask = _httpService.GetAsync<ApiResponse<IList<DropdownDto>>>(
+             UtilityVersion, _apiSettings.Endpoints.Utility.GetDropdown, GetParam);
 
         await Task.WhenAll(getDetailTask, getTypeTask);
 
@@ -109,19 +109,11 @@ public class FormDetailsController(IHttpService httpService, IOptions<ApiSetting
             return View(formdetails);
 
         SetToken();
-        var postTask = _httpService.PostAsync<ApiResponse<dynamic>>(
+
+        var response = await _httpService.PostAsync<ApiResponse<dynamic>>(
             VersionedController, 
             _apiSettings.Endpoints.CommonEndPoints.Update, formdetails);
-        var getTask = _httpService.GetAsync<ApiResponse<IList<DataTypes>>>(
-            $"{_apiSettings.Versions.DataTypes}/{_apiSettings.ControllerNames.DataTypes}",
-            _apiSettings.Endpoints.CommonEndPoints.GetAll);
 
-        await Task.WhenAll(postTask, getTask);
-
-        var response = await postTask;
-        var viewBagResponse = await getTask;
-
-        ViewBag.TypeId = new SelectList(viewBagResponse?.Data, "Id", "Name", response?.Data?.TypeId);
         TempData[response?.IsSuccess == true ? Constants.Success : Constants.Error] = response?.Message;
         return RedirectToAction(nameof(Index));
     }
@@ -129,6 +121,7 @@ public class FormDetailsController(IHttpService httpService, IOptions<ApiSetting
     public async Task<IActionResult> Remove(int id)
     {
         SetToken();
+
         var response = await _httpService.PostAsync<ApiResponse<FormDetails>>(
             VersionedController, _apiSettings.Endpoints.CommonEndPoints.Remove, id);
 

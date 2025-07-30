@@ -12,13 +12,14 @@ namespace Lead.UI.Controllers.Auth;
 
 public class MaintainUserController(IHttpService httpService, IOptions<ApiSettings> apiSetting) : BaseController(httpService, apiSetting)
 {
-    private string Version => _apiSettings.Versions.Auth;
+    private string VersionedController => _apiSettings.Controllers.MaintainUser;
     private void SetToken() => _httpService.SetBearerToken(AccessToken);
+
     public async Task<IActionResult> UserList()
     {
         SetToken();
         var response = await _httpService.GetAsync<ApiResponse<IList<UserRolesDto>>>(
-            Version, _apiSettings.Endpoints.Auth.GetUsers);
+            VersionedController, _apiSettings.Endpoints.MaintainUser.GetUsers);
 
         return View(response?.Data ?? []);
     }
@@ -30,7 +31,7 @@ public class MaintainUserController(IHttpService httpService, IOptions<ApiSettin
         ViewBag.userId = userId;
 
         var response = await _httpService.GetAsync<ApiResponse<IList<ManageUserRoleDto>>>(
-            Version, _apiSettings.Endpoints.Auth.GetUserRoles,
+             VersionedController, _apiSettings.Endpoints.MaintainUser.GetUserRoles,
             new Dictionary<string, string> { ["userId"] = userId });
 
         return View(response?.Data ?? []);
@@ -47,7 +48,7 @@ public class MaintainUserController(IHttpService httpService, IOptions<ApiSettin
         };
 
         var response = await _httpService.PostAsync<ApiResponse<string>>(
-            Version, _apiSettings.Endpoints.Auth.AssignRole, request);
+             VersionedController, _apiSettings.Endpoints.MaintainUser.AssignRole, request);
 
         TempData[response?.IsSuccess == true ? Constants.Success : Constants.Error] = response?.Data;
         return RedirectToAction(nameof(UserList));

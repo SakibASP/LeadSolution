@@ -1,6 +1,6 @@
 ﻿namespace Common.Utils.Constant;
 
-public class Constants
+public static class Constants
 {
     //Session keys
     public const string AuthResponseDto = "AuthResponseDto";
@@ -18,4 +18,9 @@ public class Constants
     //TempMessage keys
     public const string Error = "Error";
     public const string Success = "Success";
+}
+
+public static class Sp
+{
+    public const string usp_get_dropdownList = "exec usp_get_dropdownList";
 }

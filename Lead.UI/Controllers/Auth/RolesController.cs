@@ -12,13 +12,13 @@ namespace Lead.UI.Controllers.Auth;
 
 public class RolesController(IHttpService httpService, IOptions<ApiSettings> apiSetting) : BaseController(httpService, apiSetting)
 {
-    private string Version => _apiSettings.Versions.Auth;
+    private string VersionedController => _apiSettings.Controllers.Roles;
     private void SetToken() => _httpService.SetBearerToken(AccessToken);
     public async Task<IActionResult> RoleList()
     {
         SetToken();
         var response = await _httpService.GetAsync<ApiResponse<IList<RoleDto>>>(
-            Version, _apiSettings.Endpoints.Auth.GetRoles);
+            VersionedController, _apiSettings.Endpoints.Roles.GetRoles);
 
         return response == null ? RedirectToAction(nameof(Login)) : View(response.Data);
     }
@@ -27,7 +27,7 @@ public class RolesController(IHttpService httpService, IOptions<ApiSettings> api
     {
         SetToken();
         var response = await _httpService.PostAsync<ApiResponse<string>>(
-            Version, _apiSettings.Endpoints.Auth.AddRole, roleName);
+            VersionedController, _apiSettings.Endpoints.Roles.AddRole, roleName);
 
         TempData[response?.IsSuccess == true ? Constants.Success : Constants.Error] = response?.Message;
         return RedirectToAction(nameof(RoleList));
@@ -37,7 +37,7 @@ public class RolesController(IHttpService httpService, IOptions<ApiSettings> api
     {
         SetToken();
         var response = await _httpService.GetAsync<ApiResponse<RoleDto>>(
-            Version, _apiSettings.Endpoints.Auth.GetRoleById,
+            VersionedController, _apiSettings.Endpoints.Roles.GetRoleById,
             new Dictionary<string, string> { ["roleId"] = roleId });
 
         return response == null ? RedirectToAction(nameof(Login)) : View(response.Data);
@@ -47,7 +47,7 @@ public class RolesController(IHttpService httpService, IOptions<ApiSettings> api
     {
         SetToken();
         var response = await _httpService.PostAsync<ApiResponse<string>>(
-            Version, _apiSettings.Endpoints.Auth.UpdateRole, role);
+            VersionedController, _apiSettings.Endpoints.Roles.UpdateRole, role);
 
         TempData[response?.IsSuccess == true ? Constants.Success : Constants.Error] = response?.Message;
         return RedirectToAction(nameof(RoleList));
@@ -57,7 +57,7 @@ public class RolesController(IHttpService httpService, IOptions<ApiSettings> api
     {
         SetToken();
         var response = await _httpService.PostAsync<ApiResponse<string>>(
-            Version, _apiSettings.Endpoints.Auth.DeleteRole, roleId);
+            VersionedController, _apiSettings.Endpoints.Roles.DeleteRole, roleId);
 
         TempData[response?.IsSuccess == true ? Constants.Success : Constants.Error] = response?.Message;
         return RedirectToAction(nameof(RoleList));

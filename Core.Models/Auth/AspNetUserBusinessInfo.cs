@@ -7,10 +7,10 @@ namespace Core.Models.Auth;
 public class AspNetUserBusinessInfo : BaseModel
 {
     [Required]
-    public string UserId { get; set; }
+    public string? UserId { get; set; }
 
     [Required]
-    public int BusinessId { get; set; }
+    public int? BusinessId { get; set; }
 
     // Navigation properties
     [ForeignKey(nameof(UserId))]

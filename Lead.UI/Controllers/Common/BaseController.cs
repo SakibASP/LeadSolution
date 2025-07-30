@@ -64,7 +64,7 @@ public class BaseController(IHttpService httpService, IOptions<ApiSettings> apiS
             };
 
             // Call the API to refresh the token and get the response
-            var response = await _httpService.PostAsync<ApiResponse<AuthResponseDto>?>(_apiSettings.Versions.Auth, _apiSettings.Endpoints.Auth.RefreshToken, tokenDto);
+            var response = await _httpService.PostAsync<ApiResponse<AuthResponseDto>?>(_apiSettings.Controllers.Auth, _apiSettings.Endpoints.Auth.RefreshToken, tokenDto);
 
             // Check response status, if not success then redirect to login page
             if (!(response?.IsSuccess ?? false))

@@ -3,7 +3,7 @@ using Common.Extentions;
 using Common.Utils.Helper;
 using Core.Models.Lead;
 using Core.ViewModels.Response;
-using Infrastructure.Interfaces.Lead;
+using Infrastructure.Interfaces.Common;
 using Microsoft.AspNetCore.Http;
 using Serilog;
 
