@@ -1,39 +1,61 @@
 ﻿using Common.Utils.Constant;
+using Common.Utils.Enums;
 using Core.Models.Lead;
+using Core.ViewModels.Dto.Common;
 using Core.ViewModels.Dto.Lead;
 using Core.ViewModels.Response;
 using Lead.UI.Controllers.Common;
 using Lead.UI.Interfaces;
 using Lead.UI.Settings;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.Extensions.Options;
 
 namespace Lead.UI.Controllers.Lead;
 
 public class FormValuesController(IHttpService httpService, IOptions<ApiSettings> apiSetting) : BaseController(httpService, apiSetting)
 {
+    private string UtilityVersion => $"{_apiSettings.Controllers.Utility}";
     private string VersionedController => _apiSettings.Controllers.FormValues;
-
+    private void SetToken() => _httpService.SetBearerToken(AccessToken);
+    private readonly Dictionary<string, string> GetParam = [];
     public async Task<IActionResult> Index()
     {
-        //SetToken();
+        SetToken();
         var response = await _httpService.GetAsync<ApiResponse<IList<FormValues>>>(
             VersionedController, _apiSettings.Endpoints.CommonEndPoints.GetAll);
 
         if (response?.IsSuccess != true)
             TempData[Constants.Error] = response?.Message;
 
+        ViewBag.Headers = response?.Data?.Select(x => x.FormDetails!.Name).ToList();
+        // 1. Get all FormDetail names
+        //ViewBag.Headers = await _context.FormDetails
+        //    .OrderBy(f => f.Id)
+        //    .Select(f => f.Name)
+        //    .ToListAsync();
         return View(response?.Data ?? []);
     }
 
     [HttpGet]
     public async Task<IActionResult> DynamicForm()
     {
+        SetToken();
+
+        GetParam.Clear();
+        GetParam.Add("Id", ((int)DropdownEnum.UserWiseBusinesses).ToString());
+        var viewBagResponse = await _httpService.GetAsync<ApiResponse<IList<DropdownDto>>>(
+             UtilityVersion, _apiSettings.Endpoints.Utility.GetDropdown, GetParam);
+
+        if (viewBagResponse?.IsSuccess is not true) TempData[Constants.Error] = viewBagResponse?.Message;
+
         var response = await _httpService.GetAsync<ApiResponse<DynamicFormViewModel>>(
             VersionedController,
             _apiSettings.Endpoints.FormValues.GetDynamicForm);
 
         if (response?.IsSuccess is not true) TempData[Constants.Error] = response?.Message;
+
+        ViewBag.BusinessId = new SelectList(viewBagResponse?.Data, "Id", "Name");
         return View(response?.Data);
     }
 

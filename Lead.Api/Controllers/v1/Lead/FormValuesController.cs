@@ -1,10 +1,7 @@
 ﻿using Application.Interfaces.Lead;
-using Common.Utils.Helper;
-using Core.Models.Lead;
 using Core.ViewModels.Dto.Lead;
-using Core.ViewModels.Response;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Serilog;
 
 namespace Lead.Api.Controllers.v1.Lead;
 
@@ -17,8 +14,9 @@ namespace Lead.Api.Controllers.v1.Lead;
 [Route("api/v1/[controller]")]
 public class FormValuesController(IFormValueService formValue) : Controller
 {
-    private readonly IFormValueService _iFormValue = formValue;  
+    private readonly IFormValueService _iFormValue = formValue;
 
+    [Authorize]
     [HttpGet("get-all")]
     public async Task<IActionResult> GetAll() => Ok(await _iFormValue.GetAllAsync());
 

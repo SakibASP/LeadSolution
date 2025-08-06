@@ -1,11 +1,8 @@
 ﻿using Application.Interfaces.Lead;
-using Common.Utils.Helper;
 using Core.Models.Auth;
 using Core.ViewModels.Dto.Lead;
-using Core.ViewModels.Response;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Serilog;
 
 /// <summary>
 /// Md. Sakibur Rahman

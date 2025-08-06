@@ -5,40 +5,49 @@
     var headers = (List<string?>?)ViewBag.Headers;
 }
 
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="text-primary fw-bold">Lead Responses</h2>
+</div>
 
-@if (Model.Any() && headers?.Count > 0)
-{
-    <table class="table table-bordered">
-        <thead class="table-dark">
-            <tr>
-                @foreach (var header in headers)
-                {
-                    <th>@header</th>
-                }
-            </tr>
-        </thead>
-        <tbody>
-            @* Group by a common field — assuming FormValue has a SubmissionId or use CreatedDate if needed *@
-            @{
-                var grouped = Model
-                .GroupBy(v => v.SubmissionId) // simulate group by timestamp
-                .ToList();
-            }
+<div class="card shadow rounded">
+    <div class="card-body p-0">
+        @if (Model.Any() && headers?.Count > 0)
+        {
+            <div class="table-responsive">
+                <table class="table table-bordered table-hover mb-0 align-middle">
+                    <thead class="table-dark">
+                        <tr>
+                            @foreach (var header in headers)
+                            {
+                                <th>@header</th>
+                            }
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @* Group by a common field — assuming FormValue has a SubmissionId or use CreatedDate if needed *@
+                        @{
+                            var grouped = Model
+                            .GroupBy(v => v.SubmissionId) // simulate group by timestamp
+                            .ToList();
+                        }
 
-            @foreach (var group in grouped)
-            {
-                <tr>
-                    @foreach (var header in headers)
-                    {
-                        var match = group.FirstOrDefault(v => v.FormDetails?.Name == header);
-                        <td>@match?.FormValue</td>
-                    }
-                </tr>
-            }
-        </tbody>
-    </table>
-}
-else
-{
-    <p>No data found.</p>
-}
+                        @foreach (var group in grouped)
+                        {
+                            <tr>
+                                @foreach (var header in headers)
+                                {
+                                    var match = group.FirstOrDefault(v => v.FormDetails?.Name == header);
+                                    <td>@match?.FormValue</td>
+                                }
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+        else
+        {
+            <p>No data found.</p>
+        }
+    </div>
+</div>

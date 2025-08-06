@@ -6,4 +6,5 @@ public enum DropdownEnum
     DataTypes = 2,
     Users = 3,
     BusinessWiseUsers = 4,
+    UserWiseBusinesses = 5,
 }

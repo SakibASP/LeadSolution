@@ -48,6 +48,15 @@ ELSE IF(@Id = 4) -- Business Wise Users
 		INNER JOIN AspNetUserBusinessInfo ub ON u.Id = ub.UserId
 		WHERE ub.BusinessId = CONVERT(int,@Param1);
 	END
+ELSE IF(@Id = 5) -- User Wise Businesses
+	BEGIN
+		SELECT 
+			b.Id,b.BusinessName Name
+		FROM  AspNetUserBusinessInfo ub
+		INNER JOIN dbo.AspNetUsers u ON ub.UserId = u.Id
+		INNER JOIN AspNetBusinessInfo b ON ub.BusinessId = b.Id
+		WHERE u.Id = @Param1;
+	END
 
 
 SET TRANSACTION ISOLATION LEVEL READ COMMITTED;

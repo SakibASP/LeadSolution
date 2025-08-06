@@ -21,13 +21,16 @@ public class FormValueRepo(LeadContext context) : IFormValueRepo, IAsyncDisposab
     {
         IList<FormValues> formValues = [];
         if (model.Inputs == null) return;
+        var submissionId = (await _context.FormValues.MaxAsync(x => x.SubmissionId) ?? 0) + 1;
         foreach (var input in model.Inputs)
         {
             if (input == null) continue;
             formValues.Add(new FormValues
             {
                 FormId = input.FormDetailId,
-                FormValue = input.Value
+                FormValue = input.Value,
+                BusinessId = model.BusinessId,
+                SubmissionId = submissionId
             });
         }
 

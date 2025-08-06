@@ -7,6 +7,7 @@ using Core.ViewModels.Response;
 using Infrastructure.Interfaces.Common;
 using Microsoft.AspNetCore.Http;
 using Serilog;
+using System.Security.Claims;
 
 namespace Application.Services.Common;
 
@@ -22,6 +23,8 @@ public class DropdownService(IDropdownRepo repo, IHttpContextAccessor httpContex
     {
         try
         {
+            // if the dropdown is 'user wise business' then it takes the related dropdown using the user id
+            if (request.Id == (int)DropdownEnum.UserWiseBusinesses) request.Param1 = _httpContext.HttpContext?.User.FindFirstValue(ClaimTypes.NameIdentifier);
             var result = await _iDropRepo.GetDropdownListAsync(request);
             return ApiResponse<IList<DropdownDto>>.Success(result, string.Empty);
         }
