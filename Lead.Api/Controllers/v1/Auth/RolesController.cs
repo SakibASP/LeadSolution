@@ -4,9 +4,11 @@ using Common.Utils.Helper;
 using Core.ViewModels.Dto.Auth.Roles;
 using Core.ViewModels.Response;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Serilog;
+using System.Data;
 
 namespace Lead.Api.Controllers.v1.Auth;
 
@@ -20,10 +22,16 @@ namespace Lead.Api.Controllers.v1.Auth;
 [Authorize(Roles = Constants.AdminAuthRoles)]
 public class RolesController(
     RoleManager<IdentityRole> roleManager,
-    IAdminRightsService adminRights) : Controller
+    IAdminRightsService adminRights,
+    IHttpContextAccessor httpContext) : Controller
 {
     private readonly RoleManager<IdentityRole> _roleManager = roleManager;
     private readonly IAdminRightsService _iAdminRights = adminRights;
+    private readonly IHttpContextAccessor _httpContext = httpContext;
+
+    private string CurrentUser => _httpContext.HttpContext?.User?.Identity?.Name ?? "N/A";
+    private string RequestPath => _httpContext.HttpContext?.Request.Path.Value ?? "N/A";
+
 
     [HttpGet("all-roles")]
     public async Task<IActionResult> GetAllRoles()
@@ -36,7 +44,10 @@ public class RolesController(
         }
         catch (Exception ex)
         {
-            Log.Error(ex, MessageHelper.GenerateErrorMsg(HttpContext.Request.Path, null, User.Identity?.Name));
+            Log
+                .ForContext("UserName", CurrentUser)
+                .ForContext("Path", RequestPath)
+                .Error(ex, "Error getting roles");
             return Ok(ApiResponse<IList<IdentityRole>>.Fail("No role found!"));
         }
     }
@@ -57,7 +68,10 @@ public class RolesController(
         }
         catch (Exception ex)
         {
-            Log.Error(ex, MessageHelper.GenerateErrorMsg(HttpContext.Request.Path, null, User.Identity?.Name));
+            Log
+                .ForContext("UserName", CurrentUser)
+                .ForContext("Path", RequestPath)
+                .Error(ex, "Error getting roles {roleId}", roleId);
             return Ok(ApiResponse<IdentityRole>.Fail("Something went wrong!"));
         }
     }
@@ -79,7 +93,10 @@ public class RolesController(
         }
         catch (Exception ex)
         {
-            Log.Error(ex, MessageHelper.GenerateErrorMsg(HttpContext.Request.Path, null, User.Identity?.Name));
+            Log
+                .ForContext("UserName", CurrentUser)
+                .ForContext("Path", RequestPath)
+                .Error(ex, "Error creating role {roleName}", roleName);
             return Ok(ApiResponse<IList<IdentityRole>>.Fail("Something went wrong!"));
         }
     }
@@ -108,7 +125,10 @@ public class RolesController(
         }
         catch (Exception ex)
         {
-            Log.Error(ex, MessageHelper.GenerateErrorMsg(HttpContext.Request.Path, null, User.Identity?.Name));
+            Log
+                .ForContext("UserName", CurrentUser)
+                .ForContext("Path", RequestPath)
+                .Error(ex, "Error updaing role {role}", role);
             return Ok(ApiResponse<string>.Fail("Something went wrong!"));
         }
     }
@@ -130,7 +150,10 @@ public class RolesController(
         }
         catch (Exception ex)
         {
-            Log.Error(ex, MessageHelper.GenerateErrorMsg(HttpContext.Request.Path, null, User.Identity?.Name));
+            Log
+                .ForContext("UserName", CurrentUser)
+                .ForContext("Path", RequestPath)
+                .Error(ex, "Error deleting role {role}", roleId);
             return Ok(ApiResponse<string>.Fail("Something went wrong!"));
         }
     }

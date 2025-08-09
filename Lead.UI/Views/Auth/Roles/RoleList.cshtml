@@ -29,10 +29,10 @@
                 <tr>
                     <td>@role.Name</td>
                     <td>
-                        @Html.ActionLink("Edit", "EditRole", "Auth", new { roleId = role.Id }, new { @class = "btn btn-info btn-sm" })
+                        @Html.ActionLink("Edit", "EditRole", "Roles", new { roleId = role.Id }, new { @class = "btn btn-info btn-sm" })
                         <a href="javascript:void(0);"
                            class="btn btn-danger btn-sm"
-                           onclick="confirmDelete('@Url.Action("DeleteRole", "Auth", new { roleId = role.Id })')">
+                           onclick="confirmDelete('@Url.Action("DeleteRole", "Roles", new { roleId = role.Id })')">
                             Delete
                         </a>
                     </td>

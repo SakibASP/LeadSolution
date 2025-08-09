@@ -122,7 +122,7 @@ public class FormDetailsController(IHttpService httpService, IOptions<ApiSetting
     {
         SetToken();
 
-        var response = await _httpService.PostAsync<ApiResponse<FormDetails>>(
+        var response = await _httpService.PostAsync<ApiResponse<dynamic>>(
             VersionedController, _apiSettings.Endpoints.CommonEndPoints.Remove, id);
 
         TempData[response?.IsSuccess == true ? Constants.Success : Constants.Error] = response?.Message;

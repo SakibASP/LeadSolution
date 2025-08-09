@@ -10,36 +10,55 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Serilog;
 using Serilog.Events;
+using Serilog.Sinks.MSSqlServer;
+using System.Collections.ObjectModel;
 using System.Text;
 
-//Creating Serilog configuration
+
+var builder = WebApplication.CreateBuilder(args);
+
+
+// Configure Serilog to log only to SQL Server
+var columnOptions = new ColumnOptions
+{
+    AdditionalColumns =
+    [
+        new SqlColumn("UserName", System.Data.SqlDbType.NVarChar, dataLength: 256),
+        new SqlColumn("Path", System.Data.SqlDbType.NVarChar, dataLength: 256)
+    ]
+};
+
+var sinkOptions = new MSSqlServerSinkOptions
+{
+    TableName = "Logs",
+    AutoCreateSqlTable = true,
+    // Optionally adjust batching:
+    BatchPostingLimit = 100,
+    BatchPeriod = TimeSpan.FromSeconds(5)
+};
+
 Log.Logger = new LoggerConfiguration()
     .MinimumLevel.Information()
     .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
     .MinimumLevel.Override("System", LogEventLevel.Warning)
     .MinimumLevel.Override("AspNetCore", LogEventLevel.Warning)
-    .WriteTo.Logger(lc => lc
-        .Filter.ByIncludingOnly(e => e.Level == LogEventLevel.Information)
-        .WriteTo.File("Logs/InfoLogs/logs-.txt", rollingInterval: RollingInterval.Day)
+    .WriteTo.MSSqlServer(
+        connectionString: builder.Configuration.GetConnectionString("DefaultConnection"),
+        sinkOptions: sinkOptions,
+        columnOptions: columnOptions,
+        restrictedToMinimumLevel: LogEventLevel.Information
     )
-    .WriteTo.Logger(lc => lc
-        .Filter.ByIncludingOnly(e => e.Level == LogEventLevel.Fatal)
-        .WriteTo.File("Logs/FatalLogs/logs-.txt", rollingInterval: RollingInterval.Day)
-    )
-    .WriteTo.Logger(lc => lc
-        .Filter.ByIncludingOnly(e => e.Level == LogEventLevel.Error)
-        .WriteTo.File("Logs/ErrorLogs/logs-.txt", rollingInterval: RollingInterval.Day)
-    )
-    .Filter.ByExcluding(e => e.Properties.ContainsKey("SourceContext") &&
-                              (e.Properties["SourceContext"].ToString().Contains("Microsoft.EntityFrameworkCore")
-                              || e.MessageTemplate.Text.Contains("HTTP")
-    ))
+    .Filter.ByExcluding(e =>
+        e.Properties.ContainsKey("SourceContext") &&
+        (e.Properties["SourceContext"].ToString().Contains("Microsoft.EntityFrameworkCore") ||
+         e.MessageTemplate.Text.Contains("HTTP")))
     .CreateLogger();
+
+builder.Host.UseSerilog();
+
 
 try
 {
-    var builder = WebApplication.CreateBuilder(args);
-
     // Add services to the container.
     builder.Services.AddDbContext<LeadContext>(options =>
         options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
@@ -139,16 +158,22 @@ try
     builder.Services.AddAuthorization();
 
     // Add CORS policy
-    var allowedOrigins = new[] { "https://localhost:7131", "http://localhost:5186" };
+    //var allowedOrigins = new[] { "https://localhost:7131", "http://localhost:5186" };
 
+    //builder.Services.AddCors(options =>
+    //{
+    //    options.AddPolicy("AllowSpecificOrigins", policy =>
+    //        policy.WithOrigins(allowedOrigins) // Allow multiple origins
+    //              .AllowAnyMethod()            // Allow all HTTP methods (GET, POST, etc.)
+    //              .AllowAnyHeader());          // Allow all headers
+    //});
     builder.Services.AddCors(options =>
     {
-        options.AddPolicy("AllowSpecificOrigins", policy =>
-            policy.WithOrigins(allowedOrigins) // Allow multiple origins
-                  .AllowAnyMethod()            // Allow all HTTP methods (GET, POST, etc.)
-                  .AllowAnyHeader());          // Allow all headers
+        options.AddPolicy("AllowAll", policy =>
+            policy.AllowAnyOrigin()   // ✅ Allow requests from any origin
+                  .AllowAnyMethod()   // ✅ Allow all HTTP methods
+                  .AllowAnyHeader()); // ✅ Allow all headers
     });
-
 
     builder.Services.AddControllers();
 
@@ -179,8 +204,8 @@ try
 
 
     // Use the CORS policy
-    //app.UseCors("AllowAll");
-    app.UseCors("AllowSpecificOrigins");
+    app.UseCors("AllowAll");
+    //app.UseCors("AllowSpecificOrigins");
 
     // Register your middleware before routing
     app.UseMiddleware<RequestLoggingMiddleware>();

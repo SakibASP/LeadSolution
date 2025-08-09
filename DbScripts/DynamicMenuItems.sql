@@ -6,6 +6,7 @@ SELECT * FROM MenuItem
 SET IDENTITY_INSERT [MenuItem] ON
 INSERT INTO MenuItem([MenuId],[MenuName],[MenuUrl],[MenuParentId],[Active],[FaIcon]) VALUES (1,N'Admin',N'#',null,1,'fas fa-user-circle')
 INSERT INTO MenuItem([MenuId],[MenuName],[MenuUrl],[MenuParentId],[Active],[FaIcon]) VALUES (2,N'Master',N'#',null ,1,'fa fa-info-circle')
+INSERT INTO MenuItem([MenuId],[MenuName],[MenuUrl],[MenuParentId],[Active],[FaIcon]) VALUES (3,N'Config',N'#',null ,1,'fa fa-cog')
 INSERT INTO MenuItem([MenuId],[MenuName],[MenuUrl],[MenuParentId],[Active],[FaIcon]) VALUES (100,N'SuperAdmin',N'#',null,1,'fas fa-user-tie')
 SET IDENTITY_INSERT [MenuItem] OFF
 
@@ -16,10 +17,10 @@ INSERT INTO MenuItem([MenuId],[MenuName],[MenuUrl],[MenuParentId],[Active],[FaIc
 SET IDENTITY_INSERT [MenuItem] OFF
 
 SET IDENTITY_INSERT [MenuItem] ON
-INSERT INTO MenuItem([MenuId],[MenuName],[MenuUrl],[MenuParentId],[Active],[FaIcon]) VALUES (201,N'Data Types Config',N'/DataTypes/Index',2,1,null)
-INSERT INTO MenuItem([MenuId],[MenuName],[MenuUrl],[MenuParentId],[Active],[FaIcon]) VALUES (202,N'Form Config',N'/FormDetails/Index',2,1,null)
+INSERT INTO MenuItem([MenuId],[MenuName],[MenuUrl],[MenuParentId],[Active],[FaIcon]) VALUES (201,N'Data Types Config',N'/DataTypes/Index',3,1,null)
+INSERT INTO MenuItem([MenuId],[MenuName],[MenuUrl],[MenuParentId],[Active],[FaIcon]) VALUES (202,N'Form Config',N'/FormDetails/Index',3,1,null)
 INSERT INTO MenuItem([MenuId],[MenuName],[MenuUrl],[MenuParentId],[Active],[FaIcon]) VALUES (203,N'Messages',N'/FormValues/Index',2,1,null)
 INSERT INTO MenuItem([MenuId],[MenuName],[MenuUrl],[MenuParentId],[Active],[FaIcon]) VALUES (204,N'Business Info',N'/BusinessInfo/Index',2,1,null)
-INSERT INTO MenuItem([MenuId],[MenuName],[MenuUrl],[MenuParentId],[Active],[FaIcon]) VALUES (250,N'Data Entry Check',N'/FormValues/DynamicForm',2,1,null)
+INSERT INTO MenuItem([MenuId],[MenuName],[MenuUrl],[MenuParentId],[Active],[FaIcon]) VALUES (250,N'Form Settings',N'/FormValues/DynamicForm',3,1,null)
 SET IDENTITY_INSERT [MenuItem] OFF
 

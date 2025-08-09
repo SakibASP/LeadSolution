@@ -1,14 +1,11 @@
 ﻿using Application.Interfaces.Auth;
-using Application.Interfaces.Menu;
 using Common.Extentions;
-using Common.Utils.Constant;
 using Common.Utils.Helper;
 using Core.Models.Auth;
 using Core.ViewModels.Dto.Auth.Auth;
-using Core.ViewModels.Dto.Auth.Roles;
-using Core.ViewModels.Request.Auth;
 using Core.ViewModels.Response;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -29,12 +26,17 @@ namespace Lead.Api.Controllers.v1.Auth;
 public class AuthController(
     UserManager<ApplicationUser> userManager, 
     ITokenService tokenService, 
-    IOptions<JwtOptions> jwtOptions) : Controller
+    IOptions<JwtOptions> jwtOptions,
+    IHttpContextAccessor httpContext) : Controller
 {
     private readonly UserManager<ApplicationUser> _userManager = userManager;
     private readonly ITokenService _iTokenService = tokenService;
     private readonly JwtOptions _jwtOptions = jwtOptions.Value;
     private readonly DateTime _bdTime = DateTime.Now.ToBangladeshTime();
+    private readonly IHttpContextAccessor _httpContext = httpContext;
+
+    private string CurrentUser => _httpContext.HttpContext?.User?.Identity?.Name ?? "N/A";
+    private string RequestPath => _httpContext.HttpContext?.Request.Path.Value ?? "N/A";
 
     [HttpPost("register")]
     public async Task<IActionResult> Register([FromBody] RegisterDto dto)
@@ -60,7 +62,10 @@ public class AuthController(
         }
         catch (Exception ex)
         {
-            Log.Error(ex, MessageHelper.GenerateErrorMsg(HttpContext.Request.Path, null, User.Identity?.Name));
+            Log
+                .ForContext("UserName", CurrentUser)
+                .ForContext("Path", RequestPath)
+                .Error(ex, "Error registering user {dto}", dto);
             return Ok(ApiResponse<AuthResponseDto>.Fail("Something went wrong!"));
         }
         
@@ -102,7 +107,10 @@ public class AuthController(
         }
         catch (Exception ex)
         {
-            Log.Error(ex, MessageHelper.GenerateErrorMsg(HttpContext.Request.Path, null, User.Identity?.Name));
+            Log
+                .ForContext("UserName", CurrentUser)
+                .ForContext("Path", RequestPath)
+                .Error(ex, "Error login user {dto}", dto);
             return Ok(ApiResponse<AuthResponseDto>.Fail("Something went wrong!"));
         }
     }
@@ -155,7 +163,10 @@ public class AuthController(
         }
         catch (Exception ex)
         {
-            Log.Error(ex, MessageHelper.GenerateErrorMsg(HttpContext.Request.Path, null, User.Identity?.Name));
+            Log
+                .ForContext("UserName", CurrentUser)
+                .ForContext("Path", RequestPath)
+                .Error(ex, "Error generating token {dto}", dto);
             return Ok(ApiResponse<AuthResponseDto>.Fail("Something went wrong!"));
         }
     }

@@ -11,9 +11,6 @@ public class FormDetails : BaseModel
     [DisplayName("Type")]
     public int? TypeId { get; set; }
 
-    [DisplayName("Support Null")]
-    public bool IsNullSupported { get; set; } = true;
-
     [DisplayName("Select Input")]
     public bool IsSelectInput { get; set; } = false;
 

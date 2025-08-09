@@ -14,7 +14,8 @@ public class DataTypeService(IGenericRepo<DataTypes> repo, IHttpContextAccessor 
     private readonly IGenericRepo<DataTypes> _iDataType = repo;
     private readonly IHttpContextAccessor _httpContext = httpContext;
 
-    private string? CurrentUser => _httpContext.HttpContext?.User?.Identity?.Name;
+    private string CurrentUser => _httpContext.HttpContext?.User?.Identity?.Name ?? "N/A";
+    private string RequestPath => _httpContext.HttpContext?.Request.Path.Value ?? "N/A";
 
     public async Task<ApiResponse<dynamic>> AddAsync(DataTypes dataTypes)
     {
@@ -26,7 +27,10 @@ public class DataTypeService(IGenericRepo<DataTypes> repo, IHttpContextAccessor 
         }
         catch (Exception ex)
         {
-            Log.Error(ex, $"Error creating DataType by user {CurrentUser}");
+            Log
+                .ForContext("UserName", CurrentUser)
+                .ForContext("Path", RequestPath)
+                .Error(ex, "Error creating DataType {dataTypes}", dataTypes);
             return ApiResponse<dynamic>.Fail("Something went wrong!");
         }
     }
@@ -40,7 +44,10 @@ public class DataTypeService(IGenericRepo<DataTypes> repo, IHttpContextAccessor 
         }
         catch (Exception ex)
         {
-            Log.Error(ex, $"Error retrieving DataTypes by user {CurrentUser}");
+            Log
+                .ForContext("UserName", CurrentUser)
+                .ForContext("Path", RequestPath)
+                .Error(ex, "Error retrieving DataTypes {parameter}", parameter);
             return ApiResponse<IList<DataTypes>>.Fail("Something went wrong!");
         }
     }
@@ -54,7 +61,10 @@ public class DataTypeService(IGenericRepo<DataTypes> repo, IHttpContextAccessor 
         }
         catch (Exception ex)
         {
-            Log.Error(ex, $"Error retrieving DataType Id={id} by user {CurrentUser}");
+            Log
+                .ForContext("UserName", CurrentUser)
+                .ForContext("Path", RequestPath)
+                .Error(ex, "Error retrieving DataType Id={Id}", id);
             return ApiResponse<DataTypes>.Fail("Something went wrong!");
         }
     }
@@ -68,7 +78,10 @@ public class DataTypeService(IGenericRepo<DataTypes> repo, IHttpContextAccessor 
         }
         catch (Exception ex)
         {
-            Log.Error(ex, $"Error removing DataType Id={id} by user {CurrentUser}");
+            Log
+                .ForContext("UserName", CurrentUser)
+                .ForContext("Path", RequestPath)
+                .Error(ex, "Error removing DataType Id={Id}", id);
             return ApiResponse<dynamic>.Fail("Something went wrong!");
         }
     }
@@ -84,8 +97,12 @@ public class DataTypeService(IGenericRepo<DataTypes> repo, IHttpContextAccessor 
         }
         catch (Exception ex)
         {
-            Log.Error(ex, $"Error updating DataType Id={dataTypes.Id} by user {CurrentUser}");
+            Log
+                .ForContext("UserName", CurrentUser)
+                .ForContext("Path", RequestPath)
+                .Error(ex, "Error updating DataType {dataTypes}", dataTypes);
             return ApiResponse<dynamic>.Fail("Something went wrong!");
         }
     }
+
 }

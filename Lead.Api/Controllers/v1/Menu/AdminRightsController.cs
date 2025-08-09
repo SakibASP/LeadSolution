@@ -1,11 +1,11 @@
 ﻿using Application.Interfaces.Menu;
 using Common.Utils.Constant;
-using Common.Utils.Helper;
 using Core.Models.Menu;
 using Core.ViewModels.Dto.Menu;
 using Core.ViewModels.Request.Menu;
 using Core.ViewModels.Response;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Serilog;
 
@@ -13,11 +13,15 @@ namespace Lead.Api.Controllers.v1.Menu;
 
 [ApiController]
 [Route("api/v1/[controller]")]
-public class AdminRightsController(IAdminRightsService adminRights) : Controller
+[Authorize(Roles = Constants.AdminAuthRoles)]
+public class AdminRightsController(IAdminRightsService adminRights, IHttpContextAccessor httpContext) : Controller
 {
     private readonly IAdminRightsService _iAdminRights = adminRights;
+    private readonly IHttpContextAccessor _httpContext = httpContext;
 
-    [Authorize(Roles = Constants.AdminAuthRoles)]
+    private string CurrentUser => _httpContext.HttpContext?.User?.Identity?.Name ?? "N/A";
+    private string RequestPath => _httpContext.HttpContext?.Request.Path.Value ?? "N/A";
+
     [HttpGet("get-all-menu")]
     public async Task<IActionResult> GetAllMenu()
     {
@@ -29,12 +33,14 @@ public class AdminRightsController(IAdminRightsService adminRights) : Controller
         }
         catch (Exception ex)
         {
-            Log.Error(ex, MessageHelper.GenerateErrorMsg(HttpContext.Request.Path, null, User.Identity?.Name));
+            Log
+                .ForContext("UserName", CurrentUser)
+                .ForContext("Path", RequestPath)
+                .Error(ex, "Error getting all menu");
             return Ok(ApiResponse<IList<MenuItem>>.Fail("Something went wrong!"));
         }
     }
 
-    [Authorize(Roles = Constants.AdminAuthRoles)]
     [HttpGet("get-role-wise-menu")]
     public async Task<IActionResult> GetRoleWiseMenu([FromQuery] string roleId)
     {
@@ -45,12 +51,14 @@ public class AdminRightsController(IAdminRightsService adminRights) : Controller
         }
         catch (Exception ex)
         {
-            Log.Error(ex, MessageHelper.GenerateErrorMsg(HttpContext.Request.Path, null, User.Identity?.Name));
+            Log
+                .ForContext("UserName", CurrentUser)
+                .ForContext("Path", RequestPath)
+                .Error(ex, "Error getting role-wise menu for RoleId: {RoleId}", roleId);
             return Ok(ApiResponse<IList<MenuItemViewModel>>.Fail("Something went wrong!"));
         }
     }
 
-    [Authorize(Roles = Constants.AdminAuthRoles)]
     [HttpPost("create-role-wise-menu")]
     public async Task<IActionResult> CreateRoleWiseMenu([FromBody] MenuItemViewModel menuItem)
     {
@@ -61,12 +69,14 @@ public class AdminRightsController(IAdminRightsService adminRights) : Controller
         }
         catch (Exception ex)
         {
-            Log.Error(ex, MessageHelper.GenerateErrorMsg(HttpContext.Request.Path, menuItem, User.Identity?.Name));
+            Log
+                .ForContext("UserName", CurrentUser)
+                .ForContext("Path", RequestPath)
+                .Error(ex, "Error creating role-wise menu: {@MenuItem}", menuItem);
             return Ok(ApiResponse<string>.Fail("Something went wrong!"));
         }
     }
 
-    [Authorize(Roles = Constants.AdminAuthRoles)]
     [HttpPost("update-role-wise-menu")]
     public async Task<IActionResult> UpdateRoleWiseMenu([FromBody] UpdateAdminRightsRequest updateRequest)
     {
@@ -77,8 +87,12 @@ public class AdminRightsController(IAdminRightsService adminRights) : Controller
         }
         catch (Exception ex)
         {
-            Log.Error(ex, MessageHelper.GenerateErrorMsg(HttpContext.Request.Path, updateRequest, User.Identity?.Name));
+            Log
+                .ForContext("UserName", CurrentUser)
+                .ForContext("Path", RequestPath)
+                .Error(ex, "Error updating role-wise menu: {@UpdateRequest}", updateRequest);
             return Ok(ApiResponse<string>.Fail("Something went wrong!"));
         }
     }
+
 }

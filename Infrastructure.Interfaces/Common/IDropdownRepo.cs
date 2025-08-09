@@ -5,6 +5,5 @@ namespace Infrastructure.Interfaces.Common;
 
 public interface IDropdownRepo
 {
-    Task<IList<DropdownDto>> GetDropdownListAsync(DropdownRequest request);
-    Task<IList<UserDropdownDto>> GetUserDropdownListAsync(DropdownRequest request);
+    Task<IList<T>> GetDropdownListAsync<T>(DropdownRequest request);
 }

@@ -36,16 +36,16 @@ GO
 
 CREATE TABLE [dbo].[Audit](
 	[Id] [bigint] IDENTITY(1,1) NOT NULL,
-	[TableName] [nvarchar](max) NULL,
-	[UserId] [nvarchar](max) NULL,
-	[Actions] [nvarchar](max) NULL,
+	[TableName] [nvarchar](128) NULL,
+	[UserId] [nvarchar](256) NULL,
+	[Actions] [nvarchar](128) NULL,
 	[KeyValue] [bigint] NULL,
 	[OldData] [nvarchar](max) NULL,
 	[NewData] [nvarchar](max) NULL,
-	[OperatingSystem] [nvarchar](max) NULL,
-	[IPAddress] [nvarchar](max) NULL,
-	[AreaAccessed] [nvarchar](max) NULL,
-	[UpdateDate] [datetime2](7) NULL,
+	[OperatingSystem] [nvarchar](128) NULL,
+	[IPAddress] [nvarchar](256) NULL,
+	[AreaAccessed] [nvarchar](512) NULL,
+	[UpdateDate] [datetime] NULL,
  CONSTRAINT [PK_Audit] PRIMARY KEY CLUSTERED 
 (
 	[Id] ASC

@@ -5,25 +5,65 @@
     ViewData["Title"] = "Create";
 }
 
-<div class="container py-1">
-    <div class="row justify-content-center">
-        <div class="col-md-8 col-lg-6">
+<div class="py-1">
+    <div class="row">
+        <div class="col-md-12 col-lg-6">
             <div class="card shadow rounded-3">
-                <div class="card-header bg-success text-white text-center">
-                    <h4 class="mb-0">Dynamic Form</h4>
+                <div class="card-header bg-primary text-white text-center">
+                    <h4 class="mb-0">Form Configuration</h4>
                 </div>
                 <div class="card-body">
-                    <form asp-action="DynamicForm" method="post" novalidate>
+                    <div class="form-group mb-3">
+                        <label asp-for="BusinessId" class="form-label fw-bold"></label>
+                        <select class="form-select" asp-items="ViewBag.BusinessId" id="drpBusinessId">
+                        </select>
+                    </div>
+                    <hr />
+
+                    <div class="row mt-3">
                         @if (Model.Inputs?.Count > 0)
                         {
-                            <div class="row">
-                                <div class="form-group mb-3">
-                                    <label asp-for="BusinessId" class="form-label fw-bold"></label>
-                                    <select asp-for="BusinessId" class="form-select" asp-items="ViewBag.BusinessId">
-                                        @* <option disabled selected>-- Select Business --</option> *@
-                                    </select>
+                            foreach (var input in Model.Inputs)
+                            {
+                                <div class="col-12 col-md-4 mb-3">
+                                    <div class="form-check p-3 shadow-sm rounded bg-white">
+                                        <input class="form-check-input"
+                                               type="checkbox"
+                                               id="@($"chk_{input.FormDetailId}")"
+                                               @(input.IsActive ? "checked" : "") />
+                                        <label class="form-check-label" for="@($"chk_{input.FormDetailId}")">
+                                            @input.Label
+                                        </label>
+                                    </div>
                                 </div>
-                                @for (int i = 0; i < Model.Inputs.Count; i++)
+                            }
+                        }
+                    </div>
+
+                    <div class="mt-4 d-flex gap-2">
+                        <button type="submit" class="btn btn-primary">Save</button>
+
+                        <!-- New button to open modal -->
+                        <button type="button" class="btn btn-outline-secondary" data-toggle="modal" data-target="#embedCodeModal">
+                            Generate Embeddable Form Code
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-12 col-lg-6">
+            <div class="card shadow rounded-3">
+                <div class="card-header bg-success text-white text-center">
+                    <h4 class="mb-0">Lead Form</h4>
+                </div>
+                <div class="card-body">
+                    <form id="dynamicForm" asp-action="DynamicForm" method="post" novalidate>
+                        <input type="hidden" asp-for="BusinessId" id="BusinessId" />
+                        @if (Model.Inputs?.Where(x => x.IsActive).Count() > 0)
+                        {
+                            <div class="row">
+                                @for (int i = 0; i < Model.Inputs.Where(x=>x.IsActive).Count(); i++)
                                 {
                                     @if (Model.Inputs[i].IsSelectInput)
                                     {
@@ -63,9 +103,9 @@
 
                                     @* Hidden fields *@
                                     <input type="hidden" asp-for="Inputs[@i].FormDetailId" />
-                                    <input type="hidden" asp-for="Inputs[@i].Label" />
+                                    @* <input type="hidden" asp-for="Inputs[@i].Label" />
                                     <input type="hidden" asp-for="Inputs[@i].InputType" />
-                                    <input type="hidden" asp-for="Inputs[@i].IsSelectInput" />
+                                    <input type="hidden" asp-for="Inputs[@i].IsSelectInput" /> *@
 
                                 }
                             </div>
@@ -77,14 +117,42 @@
                             </div>
                         }
                     </form>
+
+                    
+
                 </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Modal -->
+<div class="modal fade" id="embedCodeModal" tabindex="-1" role="dialog" aria-labelledby="embedCodeModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="embedCodeModalLabel">Embeddable HTML</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="d-flex align-items-center justify-content-between mb-2">
+                    <div>
+                        <button type="button" class="btn btn-sm btn-success" onclick="generateEmbeddableForm()">Generate</button>
+                        <button type="button" class="btn btn-sm btn-primary me-2" onclick="copyEmbedCode()">Copy</button>
+                        <button type="button" class="btn btn-sm btn-danger" onclick="clearEmbedCode()">Clear</button>
+                    </div>
+                </div>
+                <textarea id="embedCode" class="form-control" rows="10" readonly onclick="this.select();"></textarea>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
             </div>
         </div>
     </div>
 </div>
 
 @section Scripts {
-    @{
-        await Html.RenderPartialAsync("_ValidationScriptsPartial");
-    }
+    <partial name="_ValidationScriptsPartial" />
+    <script src="~/manager/lead/formvalues/form-embedding.js"></script>
 }

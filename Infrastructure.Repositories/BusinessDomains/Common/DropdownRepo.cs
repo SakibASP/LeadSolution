@@ -1,48 +1,31 @@
 ﻿using Common.Utils.Constant;
-using Common.Utils.Helper;
-using Core.ViewModels.Dto.Common;
 using Core.ViewModels.Request.Common;
+using Dapper;
 using Infrastructure.Interfaces.Common;
-using Infrastructure.Repositories.Data;
-using Microsoft.Data.SqlClient;
-using Microsoft.EntityFrameworkCore;
+using System.Data;
 
 namespace Infrastructure.Repositories.BusinessDomains.Common;
 
-public class DropdownRepo(LeadContext context) : IDropdownRepo
+public class DropdownRepo(IDapperContext dapper) : IDropdownRepo
 {
-    private readonly LeadContext _context = context;
-    public async Task<IList<DropdownDto>> GetDropdownListAsync(DropdownRequest request)
+    private readonly IDapperContext _dapper = dapper;
+
+    public async Task<IList<T>> GetDropdownListAsync<T>(DropdownRequest request)
     {
-        var parameters = GetParameter(request);
-        var extendedSp = SpNameHelper.GetSpName(Sp.usp_get_dropdownList, parameters);
+        var parameters = new DynamicParameters();
+        parameters.Add("@Id", request.Id);
+        parameters.Add("@Param1", request.Param1);
+        parameters.Add("@Param2", request.Param2);
+        parameters.Add("@Param3", request.Param3);
+        parameters.Add("@Param4", request.Param4);
 
-        return await _context.Database
-                .SqlQueryRaw<DropdownDto>(extendedSp, parameters)
-                .AsNoTracking()
-                .ToListAsync();
-    }
+        using var connection = _dapper.CreateConnection();
+        await connection.OpenAsync();
+        var result = await connection.QueryAsync<T>(
+            Sp.usp_GetDropdownList,
+            parameters,
+            commandType: CommandType.StoredProcedure);
 
-    public async Task<IList<UserDropdownDto>> GetUserDropdownListAsync(DropdownRequest request)
-    {
-        var parameters = GetParameter(request);
-        var extendedSp = SpNameHelper.GetSpName(Sp.usp_get_dropdownList, parameters);
-
-        return await _context.Database
-                .SqlQueryRaw<UserDropdownDto>(extendedSp, parameters)
-                .AsNoTracking()
-                .ToListAsync();
-    }
-
-    private static SqlParameter[] GetParameter(DropdownRequest request)
-    {
-        return
-        [
-            new SqlParameter("@Id", request.Id),
-            new SqlParameter("@Param1", request.Param1 ?? (object)DBNull.Value),
-            new SqlParameter("@Param2", request.Param2 ?? (object)DBNull.Value),
-            new SqlParameter("@Param3", request.Param3 ?? (object)DBNull.Value),
-            new SqlParameter("@Param4", request.Param4 ?? (object)DBNull.Value)
-        ];
+        return [.. result];
     }
 }

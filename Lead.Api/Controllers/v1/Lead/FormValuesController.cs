@@ -21,7 +21,7 @@ public class FormValuesController(IFormValueService formValue) : Controller
     public async Task<IActionResult> GetAll() => Ok(await _iFormValue.GetAllAsync());
 
     [HttpGet("get-dynamic-form")]
-    public async Task<IActionResult> GetDynamicForm() => Ok(await _iFormValue.GetDynamicFormAsync());
+    public async Task<IActionResult> GetDynamicForm([FromQuery] int? businessId) => Ok(await _iFormValue.GetDynamicFormAsync(businessId));
 
     [HttpPost("add")]
     public async Task<IActionResult> Add([FromBody] DynamicFormViewModel formValues) => Ok(await _iFormValue.AddAsync(formValues));

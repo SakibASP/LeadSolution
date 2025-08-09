@@ -1,6 +1,5 @@
 ﻿using Application.Interfaces.Lead;
 using Common.Extentions;
-using Common.Utils.Helper;
 using Core.Models.Auth;
 using Core.ViewModels.Dto.Lead;
 using Core.ViewModels.Response;
@@ -32,7 +31,10 @@ public class BusinessInfoService(
         }
         catch (Exception ex)
         {
-            Log.Error(ex, MessageHelper.GenerateErrorMsg(RequestPath, parameter, CurrentUser));
+            Log
+                .ForContext("UserName", CurrentUser)
+                .ForContext("Path", RequestPath)
+                .Error(ex, "Error retrieving business list with parameter: {@Parameter}", parameter);
             return ApiResponse<IList<AspNetBusinessInfo>>.Fail("Something went wrong!");
         }
     }
@@ -46,7 +48,10 @@ public class BusinessInfoService(
         }
         catch (Exception ex)
         {
-            Log.Error(ex, MessageHelper.GenerateErrorMsg(RequestPath, id, CurrentUser));
+            Log
+                .ForContext("UserName", CurrentUser)
+                .ForContext("Path", RequestPath)
+                .Error(ex, "Error retrieving business info by Id: {Id}", id);
             return ApiResponse<AspNetBusinessInfo>.Fail("Something went wrong!");
         }
     }
@@ -61,7 +66,10 @@ public class BusinessInfoService(
         }
         catch (Exception ex)
         {
-            Log.Error(ex, MessageHelper.GenerateErrorMsg(RequestPath, businessInfo, CurrentUser));
+            Log
+                .ForContext("UserName", CurrentUser)
+                .ForContext("Path", RequestPath)
+                .Error(ex, "Error creating business info: {@BusinessInfo}", businessInfo);
             return ApiResponse<dynamic>.Fail("Something went wrong!");
         }
     }
@@ -77,7 +85,10 @@ public class BusinessInfoService(
         }
         catch (Exception ex)
         {
-            Log.Error(ex, MessageHelper.GenerateErrorMsg(RequestPath, businessInfo, CurrentUser));
+            Log
+                .ForContext("UserName", CurrentUser)
+                .ForContext("Path", RequestPath)
+                .Error(ex, "Error updating business info: {@BusinessInfo}", businessInfo);
             return ApiResponse<dynamic>.Fail("Something went wrong!");
         }
     }
@@ -91,8 +102,12 @@ public class BusinessInfoService(
         }
         catch (Exception ex)
         {
-            Log.Error(ex, MessageHelper.GenerateErrorMsg(RequestPath, id, CurrentUser));
+            Log
+                .ForContext("UserName", CurrentUser)
+                .ForContext("Path", RequestPath)
+                .Error(ex, "Error removing business info by Id: {Id}", id);
             return ApiResponse<dynamic>.Fail("Something went wrong!");
         }
     }
+
 }

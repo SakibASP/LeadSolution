@@ -3,12 +3,13 @@
 Author : Md. Sakibur Rahman
 Created Date : 2025-07-30 
 
-EXEC usp_get_dropdownList @Id = 1
+EXEC usp_GetDropdownList @Id = 1
 
 =================================
 */
 
-CREATE OR ALTER PROCEDURE dbo.usp_get_dropdownList
+
+CREATE OR ALTER PROCEDURE dbo.usp_GetDropdownList
 	@Id INT,
 	@Param1 NVARCHAR(256) = NULL,
 	@Param2 NVARCHAR(256) = NULL,

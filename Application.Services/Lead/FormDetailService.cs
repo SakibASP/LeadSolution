@@ -27,7 +27,10 @@ public class FormDetailService(IGenericRepo<FormDetails> repo, IHttpContextAcces
         }
         catch (Exception ex)
         {
-            Log.Error(ex, MessageHelper.GenerateErrorMsg(RequestPath, formDetails, CurrentUser));
+            Log
+                .ForContext("UserName", CurrentUser)
+                .ForContext("Path", RequestPath)
+                .Error(ex, "Error adding FormDetails: {@FormDetails}", formDetails);
             return ApiResponse<dynamic>.Fail("Something went wrong!");
         }
     }
@@ -41,7 +44,10 @@ public class FormDetailService(IGenericRepo<FormDetails> repo, IHttpContextAcces
         }
         catch (Exception ex)
         {
-            Log.Error(ex, MessageHelper.GenerateErrorMsg(RequestPath, parameter, CurrentUser));
+            Log
+                .ForContext("UserName", CurrentUser)
+                .ForContext("Path", RequestPath)
+                .Error(ex, "Error retrieving all FormDetails with parameter: {@Parameter}", parameter);
             return ApiResponse<IList<FormDetails>>.Fail("Something went wrong!");
         }
     }
@@ -55,7 +61,10 @@ public class FormDetailService(IGenericRepo<FormDetails> repo, IHttpContextAcces
         }
         catch (Exception ex)
         {
-            Log.Error(ex, MessageHelper.GenerateErrorMsg(RequestPath, id, CurrentUser));
+            Log
+                .ForContext("UserName", CurrentUser)
+                .ForContext("Path", RequestPath)
+                .Error(ex, "Error retrieving FormDetails by Id: {Id}", id);
             return ApiResponse<FormDetails>.Fail("Something went wrong!");
         }
     }
@@ -69,10 +78,14 @@ public class FormDetailService(IGenericRepo<FormDetails> repo, IHttpContextAcces
         }
         catch (Exception ex)
         {
-            Log.Error(ex, MessageHelper.GenerateErrorMsg(RequestPath, id, CurrentUser));
+            Log
+                .ForContext("UserName", CurrentUser)
+                .ForContext("Path", RequestPath)
+                .Error(ex, "Error removing FormDetails by Id: {Id}", id);
             return ApiResponse<dynamic>.Fail("Something went wrong!");
         }
     }
+
 
     public async Task<ApiResponse<dynamic>> UpdateAsync(FormDetails formDetails)
     {
@@ -85,7 +98,10 @@ public class FormDetailService(IGenericRepo<FormDetails> repo, IHttpContextAcces
         }
         catch (Exception ex)
         {
-            Log.Error(ex, MessageHelper.GenerateErrorMsg(RequestPath, formDetails, CurrentUser));
+            Log
+                .ForContext("UserName", CurrentUser)
+                .ForContext("Path", RequestPath)
+                .Error(ex, "Error updating FormDetails: {@FormDetails}", formDetails);
             return ApiResponse<dynamic>.Fail("Something went wrong!");
         }
     }

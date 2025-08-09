@@ -1,6 +1,7 @@
 ﻿using Application.Interfaces.Common;
 using Common.Utils.Enums;
 using Common.Utils.Helper;
+using Core.Models.Lead;
 using Core.ViewModels.Dto.Common;
 using Core.ViewModels.Request.Common;
 using Core.ViewModels.Response;
@@ -24,13 +25,17 @@ public class DropdownService(IDropdownRepo repo, IHttpContextAccessor httpContex
         try
         {
             // if the dropdown is 'user wise business' then it takes the related dropdown using the user id
-            if (request.Id == (int)DropdownEnum.UserWiseBusinesses) request.Param1 = _httpContext.HttpContext?.User.FindFirstValue(ClaimTypes.NameIdentifier);
-            var result = await _iDropRepo.GetDropdownListAsync(request);
+            if (request.Id == (int)DropdownEnum.UserWiseBusinesses) 
+                request.Param1 = _httpContext.HttpContext?.User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var result = await _iDropRepo.GetDropdownListAsync<DropdownDto>(request);
             return ApiResponse<IList<DropdownDto>>.Success(result, string.Empty);
         }
         catch (Exception ex)
         {
-            Log.Error(ex, MessageHelper.GenerateErrorMsg(RequestPath, request, CurrentUser));
+            Log
+                .ForContext("UserName", CurrentUser)
+                .ForContext("Path", RequestPath)
+                .Error(ex, "Error getting dropdown: {@request}", request);
             return ApiResponse<IList<DropdownDto>>.Fail("Something went wrong!");
         }
     }
@@ -39,12 +44,15 @@ public class DropdownService(IDropdownRepo repo, IHttpContextAccessor httpContex
     {
         try
         {
-            var result = await _iDropRepo.GetUserDropdownListAsync(request);
+            var result = await _iDropRepo.GetDropdownListAsync<UserDropdownDto>(request);
             return ApiResponse<IList<UserDropdownDto>>.Success(result, string.Empty);
         }
         catch (Exception ex)
         {
-            Log.Error(ex, MessageHelper.GenerateErrorMsg(RequestPath, request, CurrentUser));
+            Log
+                .ForContext("UserName", CurrentUser)
+                .ForContext("Path", RequestPath)
+                .Error(ex, "Error getting dropdown: {@request}", request);
             return ApiResponse<IList<UserDropdownDto>>.Fail("Something went wrong!");
         }
     }

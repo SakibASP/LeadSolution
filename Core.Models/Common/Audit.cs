@@ -1,6 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
-
-namespace Core.Models.Common;
+﻿namespace Core.Models.Common;
 
 public class Audit
 {

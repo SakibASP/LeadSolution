@@ -38,7 +38,7 @@ public class FormValuesController(IHttpService httpService, IOptions<ApiSettings
     }
 
     [HttpGet]
-    public async Task<IActionResult> DynamicForm()
+    public async Task<IActionResult> DynamicForm(int? businessId)
     {
         SetToken();
 
@@ -49,13 +49,20 @@ public class FormValuesController(IHttpService httpService, IOptions<ApiSettings
 
         if (viewBagResponse?.IsSuccess is not true) TempData[Constants.Error] = viewBagResponse?.Message;
 
+        var selectedId = businessId ?? viewBagResponse?.Data?.FirstOrDefault()?.Id ?? 0;
+        GetParam.Clear();
+        GetParam.Add("businessId", selectedId.ToString());
         var response = await _httpService.GetAsync<ApiResponse<DynamicFormViewModel>>(
             VersionedController,
-            _apiSettings.Endpoints.FormValues.GetDynamicForm);
+            _apiSettings.Endpoints.FormValues.GetDynamicForm, GetParam);
 
-        if (response?.IsSuccess is not true) TempData[Constants.Error] = response?.Message;
+        if (response?.IsSuccess is not true)
+        {
+            TempData[Constants.Error] = response?.Message;
+            return RedirectToAction("Index","Home");
+        }
 
-        ViewBag.BusinessId = new SelectList(viewBagResponse?.Data, "Id", "Name");
+        ViewBag.BusinessId = new SelectList(viewBagResponse?.Data, "Id", "Name", selectedId);
         return View(response?.Data);
     }
 

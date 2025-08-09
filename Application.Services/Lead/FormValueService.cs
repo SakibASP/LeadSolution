@@ -13,7 +13,8 @@ public class FormValueService(IFormValueRepo repo, IHttpContextAccessor httpCont
     private readonly IFormValueRepo _iRepo = repo;
     private readonly IHttpContextAccessor _httpContext = httpContext;
 
-    private string? CurrentUser => _httpContext.HttpContext?.User?.Identity?.Name;
+    private string RequestPath => _httpContext.HttpContext?.Request.Path.Value ?? "N/A";
+    private string CurrentUser => _httpContext.HttpContext?.User?.Identity?.Name ?? "N/A";
 
     public async Task<ApiResponse<dynamic>> AddAsync(DynamicFormViewModel viewModel)
     {
@@ -24,7 +25,10 @@ public class FormValueService(IFormValueRepo repo, IHttpContextAccessor httpCont
         }
         catch (Exception ex)
         {
-            Log.Error(ex, $"Error adding form value by user {CurrentUser}");
+            Log
+                .ForContext("UserName", CurrentUser)
+                .ForContext("Path", RequestPath)
+                .Error(ex, "Error adding DynamicForm: {@ViewModel}", viewModel);
             return ApiResponse<dynamic>.Fail("Something went wrong!");
         }
     }
@@ -38,23 +42,30 @@ public class FormValueService(IFormValueRepo repo, IHttpContextAccessor httpCont
         }
         catch (Exception ex)
         {
-            Log.Error(ex, $"Error retrieving all form values by user {CurrentUser}, Param: {param}");
+            Log
+                .ForContext("UserName", CurrentUser)
+                .ForContext("Path", RequestPath)
+                .Error(ex, "Error retrieving messages with parameter: {@Param}", param);
             return ApiResponse<IList<FormValues>>.Fail("Something went wrong!");
         }
     }
 
-    public async Task<ApiResponse<DynamicFormViewModel>> GetDynamicFormAsync(dynamic? param = null)
+    public async Task<ApiResponse<DynamicFormViewModel>> GetDynamicFormAsync(int? businessId)
     {
         try
         {
-            var result = await _iRepo.GetDynamicFormAsync(param);
+            var result = await _iRepo.GetDynamicFormAsync(businessId);
             return ApiResponse<DynamicFormViewModel>.Success(result, "Form values retrieved successfully!");
         }
         catch (Exception ex)
         {
-            Log.Error(ex, $"Error retrieving dynamic form by user {CurrentUser}, Param: {param}");
+            Log
+                .ForContext("UserName", CurrentUser)
+                .ForContext("Path", RequestPath)
+                .Error(ex, "Error retrieving dynamic form for BusinessId: {BusinessId}", businessId);
             return ApiResponse<DynamicFormViewModel>.Fail("Something went wrong!");
         }
     }
+
 }
 

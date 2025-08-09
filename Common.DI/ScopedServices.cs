@@ -39,6 +39,7 @@ public static class ScopedServices
         services.AddScoped<IDropdownRepo, DropdownRepo>();
         services.AddScoped<IBusinessInfoRepo, BusinessInfoRepo>();
         services.AddScoped(typeof(IGenericRepo<>), typeof(GenericRepo<>));
+        services.AddScoped<IDapperContext, DapperContext>();
 
 
         return services;

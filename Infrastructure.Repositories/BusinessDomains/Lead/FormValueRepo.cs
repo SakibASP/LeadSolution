@@ -1,14 +1,19 @@
-﻿using Core.Models.Lead;
+﻿using Common.Utils.Constant;
+using Core.Models.Lead;
 using Core.ViewModels.Dto.Lead;
+using Dapper;
+using Infrastructure.Interfaces.Common;
 using Infrastructure.Interfaces.Lead;
 using Infrastructure.Repositories.Data;
 using Microsoft.EntityFrameworkCore;
+using System.Data;
 
 namespace Infrastructure.Repositories.BusinessDomains.Lead;
 
-public class FormValueRepo(LeadContext context) : IFormValueRepo, IAsyncDisposable
+public class FormValueRepo(LeadContext context, IDapperContext dapper) : IFormValueRepo, IAsyncDisposable
 {
     private readonly LeadContext _context = context;
+    private readonly IDapperContext _dapper = dapper;
 
     public async Task<IList<FormValues>> GetAllAsync(dynamic? param = null)
     {
@@ -40,22 +45,22 @@ public class FormValueRepo(LeadContext context) : IFormValueRepo, IAsyncDisposab
         await _context.SaveChangesAsync();
     }
 
-    public async Task<DynamicFormViewModel> GetDynamicFormAsync(dynamic? param = null)
+    public async Task<DynamicFormViewModel> GetDynamicFormAsync(int? businessId)
     {
-        var formDetails = await _context.FormDetails
-            .AsNoTracking()
-            .Where(x=>x.IsActive)
-            .ToListAsync();
+        var parameters = new DynamicParameters();
+        parameters.Add("@BusinessId", businessId, DbType.Int32);
+
+        using var connection = _dapper.CreateConnection();
+        await connection.OpenAsync();
+        var result = await connection.QueryAsync<DynamicFormDto>(
+            Sp.usp_GetBusinessSupportedForms,
+            parameters,
+            commandType: CommandType.StoredProcedure);
+
 
         return new DynamicFormViewModel
         {
-            Inputs = [.. formDetails.Select(f => new DynamicFormDto
-            {
-                FormDetailId = f.Id,
-                Label = f.Name,
-                InputType = f.DataTypes?.Name ?? "text",
-                IsSelectInput = f.IsSelectInput
-            })]
+            Inputs = [.. result],
         };
     }
 

@@ -19,7 +19,6 @@
                     <tr>
                         <th>@Html.DisplayNameFor(model => model.First().Name)</th>
                         <th>@Html.DisplayNameFor(model => model.First().TypeId)</th>
-                        <th>@Html.DisplayNameFor(model => model.First().IsNullSupported)</th>
                         <th>@Html.DisplayNameFor(model => model.First().IsSelectInput)</th>
                         <th>@Html.DisplayNameFor(model => model.First().IsActive)</th>
                         <th>Actions</th>
@@ -31,11 +30,6 @@
                         <tr>
                             <td>@item.Name</td>
                             <td>@item.DataTypes?.Name</td>
-                            <td>
-                                <span class="badge bg-@(item.IsNullSupported ? "success" : "danger")">
-                                    @(item.IsNullSupported ? "Yes" : "No")
-                                </span>
-                            </td>
                             <td>
                                 <span class="badge bg-@(item.IsSelectInput ? "success" : "danger")">
                                     @(item.IsSelectInput ? "Yes" : "No")
@@ -52,7 +46,7 @@
                                 </a>
                                 <button type="button"
                                         class="btn btn-sm btn-outline-danger"
-                                        onclick="confirmDelete('@Url.Action("Remove", "FormDetails", new { roleId = item.Id })')">
+                                        onclick="confirmDelete('@Url.Action("Remove", "FormDetails", new { item.Id })')">
                                     <i class="fas fa-trash-alt"></i> Delete
                                 </button>
                             </td>

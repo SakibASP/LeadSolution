@@ -47,6 +47,7 @@ public class LeadContext : IdentityDbContext<ApplicationUser>
     public virtual DbSet<DataTypes> DataTypes { get; set; } = default!;
     public virtual DbSet<FormDetails> FormDetails { get; set; } = default!;
     public virtual DbSet<FormValues> FormValues { get; set; } = default!;
+    public virtual DbSet<BusinessSupportedFormId> BusinessSupportedFormId { get; set; } = default!;
     #endregion
 
     #region Audit
@@ -60,8 +61,6 @@ public class LeadContext : IdentityDbContext<ApplicationUser>
     /// Date        : 01 Jun 2025
     /// Description : Tracing modified data
     /// </summary>
-    /// <param name="cancellationToken"></param>
-    /// <returns></returns>
     public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {
         auditList.Clear();
@@ -108,7 +107,6 @@ public class LeadContext : IdentityDbContext<ApplicationUser>
     /// Md. Sakibur Rahman
     /// 21 Jun 2035
     /// </summary>
-    /// <param name="modelBuilder"></param>
     private static void RegisterAutoIncludes(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<AspNetBusinessInfo>()
