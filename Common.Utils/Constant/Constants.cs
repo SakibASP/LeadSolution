@@ -24,4 +24,5 @@ public static class Sp
 {
     public const string usp_GetDropdownList = "dbo.usp_GetDropdownList";
     public const string usp_GetBusinessSupportedForms = "dbo.usp_GetBusinessSupportedForms";
+    public const string usp_InsertUpdateBusinessSupportedForms = "dbo.usp_InsertUpdateBusinessSupportedForms";
 }

@@ -193,3 +193,24 @@ const confirmDelete = (deleteUrl) => {
         }
     });
 }
+
+
+const reloadWithAlert = (success, message) => {
+    if (success) {
+        Swal.fire({
+            title: 'Success!',
+            text: message,
+            icon: 'success',
+            confirmButtonText: 'OK'
+        }).then(() => {
+            window.location.reload();
+        });
+    } else {
+        Swal.fire({
+            title: 'Error!',
+            text: message,
+            icon: 'error',
+            confirmButtonText: 'OK'
+        });
+    }
+};

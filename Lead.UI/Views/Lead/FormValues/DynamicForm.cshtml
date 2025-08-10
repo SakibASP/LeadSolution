@@ -41,7 +41,7 @@
                     </div>
 
                     <div class="mt-4 d-flex gap-2">
-                        <button type="submit" class="btn btn-primary">Save</button>
+                        <button type="submit" class="btn btn-primary" onclick="updateFormSettings()">Save</button>
 
                         <!-- New button to open modal -->
                         <button type="button" class="btn btn-outline-secondary" data-toggle="modal" data-target="#embedCodeModal">
@@ -63,49 +63,52 @@
                         @if (Model.Inputs?.Where(x => x.IsActive).Count() > 0)
                         {
                             <div class="row">
-                                @for (int i = 0; i < Model.Inputs.Where(x=>x.IsActive).Count(); i++)
+                                @for (int i = 0; i < Model.Inputs.Count; i++)
                                 {
-                                    @if (Model.Inputs[i].IsSelectInput)
+                                    @if (Model.Inputs[i].IsActive)
                                     {
-                                        <div class="col-md-12 mb-2">
-                                            <label asp-for="Inputs[@i].Value" class="form-label fw-semibold">
-                                                @Model.Inputs[i].Label
-                                            </label>
-                                            <select asp-for="Inputs[@i].Value" class="form-select" aria-label="@Model.Inputs[i].Label">
-                                                <option value="">-- Select --</option>
-                                                <option>Option 1</option>
-                                                <option>Option 2</option>
-                                            </select>
-                                            <span asp-validation-for="Inputs[@i].Value" class="text-danger small"></span>
-                                        </div>
-                                    }
-                                    else if (Model.Inputs[i].InputType!.Equals("textarea", StringComparison.CurrentCultureIgnoreCase))
-                                    {
-                                        <div class="col-md-12 mb-2">
-                                            <label asp-for="Inputs[@i].Value" class="form-label fw-semibold">
-                                                @Model.Inputs[i].Label
-                                            </label>
-                                            <textarea asp-for="Inputs[@i].Value" rows="5" cols="5" class="form-control" placeholder="@Model.Inputs[i].Label"></textarea>
-                                            <span asp-validation-for="Inputs[@i].Value" class="text-danger small"></span>
-                                        </div>
-                                    }
-                                    else
-                                    {
-                                        <div class="col-md-12 mb-2">
-                                            <label asp-for="Inputs[@i].Value" class="form-label fw-semibold">
-                                                @Model.Inputs[i].Label
-                                            </label>
-                                            <input asp-for="Inputs[@i].Value" type="@Model.Inputs[i].InputType" class="form-control" placeholder="@Model.Inputs[i].Label" />
-                                            <span asp-validation-for="Inputs[@i].Value" class="text-danger small"></span>
-                                        </div>
-                                    }
+                                        if (Model.Inputs[i].IsSelectInput)
+                                        {
+                                            <div class="col-md-12 mb-2">
+                                                <label asp-for="Inputs[@i].Value" class="form-label fw-semibold">
+                                                    @Model.Inputs[i].Label
+                                                </label>
+                                                <select asp-for="Inputs[@i].Value" class="form-select" aria-label="@Model.Inputs[i].Label">
+                                                    <option value="">-- Select --</option>
+                                                    <option>Option 1</option>
+                                                    <option>Option 2</option>
+                                                </select>
+                                                <span asp-validation-for="Inputs[@i].Value" class="text-danger small"></span>
+                                            </div>
+                                        }
+                                        else if (Model.Inputs[i].InputType!.Equals("textarea", StringComparison.CurrentCultureIgnoreCase))
+                                        {
+                                            <div class="col-md-12 mb-2">
+                                                <label asp-for="Inputs[@i].Value" class="form-label fw-semibold">
+                                                    @Model.Inputs[i].Label
+                                                </label>
+                                                <textarea asp-for="Inputs[@i].Value" rows="5" cols="5" class="form-control" placeholder="@Model.Inputs[i].Label"></textarea>
+                                                <span asp-validation-for="Inputs[@i].Value" class="text-danger small"></span>
+                                            </div>
+                                        }
+                                        else
+                                        {
+                                            <div class="col-md-12 mb-2">
+                                                <label asp-for="Inputs[@i].Value" class="form-label fw-semibold">
+                                                    @Model.Inputs[i].Label
+                                                </label>
+                                                <input asp-for="Inputs[@i].Value" type="@Model.Inputs[i].InputType" class="form-control" placeholder="@Model.Inputs[i].Label" />
+                                                <span asp-validation-for="Inputs[@i].Value" class="text-danger small"></span>
+                                            </div>
+                                        }
 
 
-                                    @* Hidden fields *@
-                                    <input type="hidden" asp-for="Inputs[@i].FormDetailId" />
-                                    @* <input type="hidden" asp-for="Inputs[@i].Label" />
+                                        @* Hidden fields *@
+                                        <input type="hidden" asp-for="Inputs[@i].FormDetailId" />
+                                        @* <input type="hidden" asp-for="Inputs[@i].Label" />
                                     <input type="hidden" asp-for="Inputs[@i].InputType" />
                                     <input type="hidden" asp-for="Inputs[@i].IsSelectInput" /> *@
+                                    }
 
                                 }
                             </div>
@@ -154,5 +157,5 @@
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
-    <script src="~/manager/lead/formvalues/form-embedding.js"></script>
+    <script src="~/manager/lead/formvalues/dynamic-form-configure.js"></script>
 }

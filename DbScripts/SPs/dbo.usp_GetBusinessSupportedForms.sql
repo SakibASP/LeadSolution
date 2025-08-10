@@ -24,7 +24,7 @@ BEGIN
         ISNULL(BSF.IsActive, 0) AS IsActive
     FROM dbo.FormDetails FD
     INNER JOIN dbo.DataTypes DT ON FD.TypeId = DT.Id
-    LEFT JOIN dbo.BusinessSupportedFormIds BSF ON FD.Id = BSF.FormId AND BSF.BusinessId = @BusinessId
+    LEFT JOIN dbo.BusinessSupportedFormIds BSF ON FD.Id = BSF.FormId AND BSF.BusinessId = @BusinessId AND BSF.IsActive = 1
     WHERE FD.IsActive = 1
 
     SET TRANSACTION ISOLATION LEVEL READ COMMITTED;

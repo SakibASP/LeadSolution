@@ -1,4 +1,6 @@
-﻿namespace Core.Models.Lead;
+﻿using Common.Extentions;
+
+namespace Core.Models.Lead;
 
 public class BusinessSupportedFormId
 {
@@ -12,7 +14,7 @@ public class BusinessSupportedFormId
 
     public bool IsNullSupported { get; set; } = true;
 
-    public DateTime CreatedDate { get; set; } = DateTime.Now;
+    public DateTime CreatedDate { get; set; } = DateTime.Now.ToBangladeshTime();
 
     public string CreatedBy { get; set; } = null!;  // Not null in DB
 

@@ -1,6 +1,7 @@
 ﻿using Application.Interfaces.Lead;
 using Core.Models.Lead;
 using Core.ViewModels.Dto.Lead;
+using Core.ViewModels.Request.Lead;
 using Core.ViewModels.Response;
 using Infrastructure.Interfaces.Lead;
 using Microsoft.AspNetCore.Http;
@@ -67,5 +68,22 @@ public class FormValueService(IFormValueRepo repo, IHttpContextAccessor httpCont
         }
     }
 
+    public async Task<ApiResponse<dynamic>> UpdateFormSettingsAsync(UpdateFormSettingsRequest request)
+    {
+        try
+        {
+            request.Username = CurrentUser;
+            await _iRepo.UpdateFormSettingsAsync(request);
+            return ApiResponse<dynamic>.Success(true, "Form updated successfully!");
+        }
+        catch (Exception ex)
+        {
+            Log
+                .ForContext("UserName", CurrentUser)
+                .ForContext("Path", RequestPath)
+                .Error(ex, "Error updating DynamicForm: {@ViewModel}", request);
+            return ApiResponse<dynamic>.Fail("Something went wrong!");
+        }
+    }
 }
 

@@ -1,12 +1,14 @@
 ﻿using Common.Utils.Constant;
 using Core.Models.Lead;
 using Core.ViewModels.Dto.Lead;
+using Core.ViewModels.Request.Lead;
 using Dapper;
 using Infrastructure.Interfaces.Common;
 using Infrastructure.Interfaces.Lead;
 using Infrastructure.Repositories.Data;
 using Microsoft.EntityFrameworkCore;
 using System.Data;
+using System.Text.Json;
 
 namespace Infrastructure.Repositories.BusinessDomains.Lead;
 
@@ -68,6 +70,28 @@ public class FormValueRepo(LeadContext context, IDapperContext dapper) : IFormVa
     {
         await _context.DisposeAsync();
         GC.SuppressFinalize(this);
+    }
+
+    public async Task UpdateFormSettingsAsync(UpdateFormSettingsRequest request)
+    {
+        var parameters = new DynamicParameters();
+        parameters.Add("@BusinessId", request.BusinessId, DbType.Int32);
+        parameters.Add("@Username", request.Username ?? string.Empty, DbType.String);
+
+        // Serialize FormSelectDetails to JSON string
+        var json = JsonSerializer.Serialize(new
+        {
+            FormSelectDetails = request.FormSelectDetails ?? []
+        });
+        parameters.Add("@JsonObject", json, DbType.String);
+
+        using var connection = _dapper.CreateConnection();
+        await connection.OpenAsync();
+
+        await connection.ExecuteAsync(
+            "dbo.usp_InsertUpdateBusinessSupportedForms",
+            parameters,
+            commandType: CommandType.StoredProcedure);
     }
 
 }

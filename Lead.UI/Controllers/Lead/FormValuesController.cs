@@ -3,6 +3,7 @@ using Common.Utils.Enums;
 using Core.Models.Lead;
 using Core.ViewModels.Dto.Common;
 using Core.ViewModels.Dto.Lead;
+using Core.ViewModels.Request.Lead;
 using Core.ViewModels.Response;
 using Lead.UI.Controllers.Common;
 using Lead.UI.Interfaces;
@@ -81,4 +82,17 @@ public class FormValuesController(IHttpService httpService, IOptions<ApiSettings
         TempData[response?.IsSuccess == true ? Constants.Success : Constants.Error] = response?.Message;
         return RedirectToAction(nameof(Index));
     }
+
+    [HttpPost]
+    public async Task<IActionResult> UpdateFormSettings([FromBody] UpdateFormSettingsRequest request)
+    {
+
+        SetToken();
+        var response = await _httpService.PostAsync<ApiResponse<dynamic>>(
+            VersionedController,
+            _apiSettings.Endpoints.FormValues.UpdateFormSettings, request);
+
+        return Json(response);
+    }
+
 }

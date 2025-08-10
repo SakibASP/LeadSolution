@@ -1,22 +1,61 @@
-﻿document.addEventListener('DOMContentLoaded', function () {
-    const drpBusinessId = document.getElementById('drpBusinessId');
-    const businessId = document.getElementById('BusinessId');
+﻿const drpBusinessId = document.getElementById('drpBusinessId');
+const businessId = document.getElementById('BusinessId');
 
+document.addEventListener('DOMContentLoaded', function () {
     if (drpBusinessId && businessId) {
         // On page load, set hidden input value
         businessId.value = drpBusinessId.value;
-        console.log(businessId.value);
         // On dropdown change, update hidden input value
         drpBusinessId.addEventListener('change', function () {
-            console.log(businessId.value);
             businessId.value = this.value;
         });
     }
 });
 
 
+const updateFormSettings = () => {
+    if (!businessId) {
+        alert("Please select a Business first.");
+        return;
+    }
+
+    // Collect all checkbox states
+    const formSelectDetails = Array.from(document.querySelectorAll('.form-check-input')).map(chk => {
+        return {
+            FormDetailId: parseInt(chk.id.replace("chk_", "")),
+            IsChecked: chk.checked
+        };
+    });
+
+    // Prepare the payload
+    const payload = {
+        BusinessId: parseInt(businessId.value),
+        FormSelectDetails: formSelectDetails
+    };
+
+    // Send the data
+    fetch('/FormValues/UpdateFormSettings', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload)
+    })
+        .then(response => {
+            if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+            return response.json();
+        })
+        .then(data => {
+            reloadWithAlert(data.isSuccess, data.message);
+        })
+        .catch(err => {
+            console.error("Error updating form settings:", err);
+            alert("Error updating form settings.");
+        });
+}
+
+
 const generateEmbeddableForm = () => {
-    const businessId = document.querySelector('[name="BusinessId"]').value;
     if (!businessId) {
         alert("Please select a Business first.");
         return;
@@ -54,11 +93,11 @@ const generateEmbeddableForm = () => {
     if (businessSelectWrapper) businessSelectWrapper.remove();
 
     // Insert BusinessId as hidden input at top of form
-    const hiddenInput = document.createElement('input');
-    hiddenInput.type = 'hidden';
-    hiddenInput.name = 'BusinessId';
-    hiddenInput.value = businessId;
-    clonedForm.prepend(hiddenInput);
+    //const hiddenInput = document.createElement('input');
+    //hiddenInput.type = 'hidden';
+    //hiddenInput.name = 'BusinessId';
+    //hiddenInput.value = businessId.value;
+    //clonedForm.prepend(hiddenInput);
 
     // Set ID for submission handler
     clonedForm.id = 'embeddedForm';
@@ -123,7 +162,7 @@ const generateEmbeddableForm = () => {
         <!-- End Embedded Contact Form -->
         `.trim();
 
-    fullHtml = fullHtml.replace(/>\s+</g, '><').replace(/\s+/g, ' ').trim();
+    //fullHtml = fullHtml.replace(/>\s+</g, '><').replace(/\s+/g, ' ').trim();
 
     // Output to textarea
     document.getElementById('embedCode').value = fullHtml;
