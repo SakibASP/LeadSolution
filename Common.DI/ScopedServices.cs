@@ -6,9 +6,11 @@ using Application.Services.Auth;
 using Application.Services.Common;
 using Application.Services.Lead;
 using Application.Services.Menu;
+using Infrastructure.Interfaces.Auth;
 using Infrastructure.Interfaces.Common;
 using Infrastructure.Interfaces.Lead;
 using Infrastructure.Interfaces.Menu;
+using Infrastructure.Repositories.BusinessDomains.Auth;
 using Infrastructure.Repositories.BusinessDomains.Common;
 using Infrastructure.Repositories.BusinessDomains.Lead;
 using Infrastructure.Repositories.BusinessDomains.Menu;
@@ -31,6 +33,7 @@ public static class ScopedServices
         services.AddScoped<IFormValueService, FormValueService>();
         services.AddScoped<IBusinessInfoService, BusinessInfoService>();
         services.AddScoped<IDropdownService, DropdownService>();
+        services.AddScoped<IApiKeyService, ApiKeyService>();
 
         //Repositories
         services.AddScoped<IMenuRepo, MenuRepo>();
@@ -38,6 +41,10 @@ public static class ScopedServices
         services.AddScoped<IFormValueRepo, FormValueRepo>();
         services.AddScoped<IDropdownRepo, DropdownRepo>();
         services.AddScoped<IBusinessInfoRepo, BusinessInfoRepo>();
+        services.AddScoped<IApiKeyRepo, ApiKeyRepo>();
+
+
+        //Db Context and Generic Repository
         services.AddScoped(typeof(IGenericRepo<>), typeof(GenericRepo<>));
         services.AddScoped<IDapperContext, DapperContext>();
 

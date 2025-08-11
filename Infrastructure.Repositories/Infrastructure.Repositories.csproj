@@ -30,8 +30,4 @@
     <ProjectReference Include="..\Infrastructure.Interfaces\Infrastructure.Interfaces.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="BusinessDomains\Auth\" />
-  </ItemGroup>
-
 </Project>

@@ -1,0 +1,51 @@
+﻿using Common.Extentions;
+using Common.Utils.Helper;
+using Core.Models.Auth;
+using Infrastructure.Interfaces.Auth;
+using Infrastructure.Repositories.Data;
+using Microsoft.EntityFrameworkCore;
+
+namespace Infrastructure.Repositories.BusinessDomains.Auth;
+
+public class ApiKeyRepo(LeadContext context) : IApiKeyRepo
+{
+    private readonly LeadContext _context = context;
+    public async Task GenerateNewApiKeyAsync(AspNetBusinessApiKeys aspNetBusinessApiKeys)
+    {
+        using var transaction = await _context.Database.BeginTransactionAsync();
+        try
+        {
+            var apikey = await _context.AspNetBusinessApiKeys.FirstOrDefaultAsync(x => x.BusinessId == aspNetBusinessApiKeys.BusinessId && x.IsActive);
+            if (apikey is not null)
+            {
+                apikey.IsActive = false;
+                apikey.ModifiedDate = DateTime.Now.ToBangladeshTime();
+                apikey.ModifiedBy = aspNetBusinessApiKeys.CreatedBy;
+                _context.Update(apikey);
+                await _context.SaveChangesAsync();
+            }
+            await _context.AddAsync(aspNetBusinessApiKeys);
+            await _context.SaveChangesAsync();
+            await transaction.CommitAsync();
+        }
+        catch (Exception ex)
+        {
+            await transaction.RollbackAsync();
+            throw new Exception("Error generating new API key", ex);
+        }
+    }
+
+    public async Task<AspNetBusinessApiKeys?> GetActiveApiKeyAsync(int businessId)
+    {
+        return await _context.AspNetBusinessApiKeys
+            .AsNoTracking()
+            .FirstOrDefaultAsync(x => x.BusinessId == businessId && x.IsActive);
+    }
+
+    public async Task<bool> ValidateKey(int businessId, string key)
+    {
+        var keyToCheck = EncryptionHelper.Decrypt(key);
+        return await _context.AspNetBusinessApiKeys
+            .AnyAsync(x => x.BusinessId == businessId && x.ApiKey == keyToCheck && x.IsActive);
+    }
+}

@@ -1,8 +1,8 @@
-﻿using Microsoft.Data.SqlClient;
+﻿using System.Data;
 
 namespace Infrastructure.Interfaces.Common;
 
 public interface IDapperContext
 {
-    SqlConnection CreateConnection();
+    IDbConnection CreateConnection();
 }

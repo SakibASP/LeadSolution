@@ -53,7 +53,6 @@ public class FormValueRepo(LeadContext context, IDapperContext dapper) : IFormVa
         parameters.Add("@BusinessId", businessId, DbType.Int32);
 
         using var connection = _dapper.CreateConnection();
-        await connection.OpenAsync();
         var result = await connection.QueryAsync<DynamicFormDto>(
             Sp.usp_GetBusinessSupportedForms,
             parameters,
@@ -64,12 +63,6 @@ public class FormValueRepo(LeadContext context, IDapperContext dapper) : IFormVa
         {
             Inputs = [.. result],
         };
-    }
-
-    public async ValueTask DisposeAsync()
-    {
-        await _context.DisposeAsync();
-        GC.SuppressFinalize(this);
     }
 
     public async Task UpdateFormSettingsAsync(UpdateFormSettingsRequest request)
@@ -86,12 +79,17 @@ public class FormValueRepo(LeadContext context, IDapperContext dapper) : IFormVa
         parameters.Add("@JsonObject", json, DbType.String);
 
         using var connection = _dapper.CreateConnection();
-        await connection.OpenAsync();
 
         await connection.ExecuteAsync(
             "dbo.usp_InsertUpdateBusinessSupportedForms",
             parameters,
             commandType: CommandType.StoredProcedure);
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        await _context.DisposeAsync();
+        GC.SuppressFinalize(this);
     }
 
 }

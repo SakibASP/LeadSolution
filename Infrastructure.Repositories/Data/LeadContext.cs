@@ -38,6 +38,7 @@ public class LeadContext : IdentityDbContext<ApplicationUser>
     #region User, Menu and Roles
     public virtual DbSet<AspNetServiceTypes> AspNetServiceTypes { get; set; } = default!;
     public virtual DbSet<AspNetBusinessInfo> AspNetBusinessInfo { get; set; } = default!;
+    public virtual DbSet<AspNetBusinessApiKeys> AspNetBusinessApiKeys { get; set; } = default!;
     public virtual DbSet<AspNetUserBusinessInfo> AspNetUserBusinessInfo { get; set; } = default!;
     public virtual DbSet<MenuItem> MenuItem { get; set; } = default!;
     public virtual DbSet<MenuToRole> MenuToRole { get; set; } = default!;

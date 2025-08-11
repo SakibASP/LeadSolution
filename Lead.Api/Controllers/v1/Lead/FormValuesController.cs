@@ -1,6 +1,7 @@
 ﻿using Application.Interfaces.Lead;
 using Core.ViewModels.Dto.Lead;
 using Core.ViewModels.Request.Lead;
+using Lead.Api.Attributes;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -29,5 +30,6 @@ public class FormValuesController(IFormValueService formValue) : Controller
 
     [AllowAnonymous]
     [HttpPost("add")]
+    [ApiKeyAuth]
     public async Task<IActionResult> Add([FromBody] DynamicFormViewModel formValues) => Ok(await _iFormValue.AddAsync(formValues));
 }

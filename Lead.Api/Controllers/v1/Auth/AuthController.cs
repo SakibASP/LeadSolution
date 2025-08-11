@@ -27,13 +27,15 @@ public class AuthController(
     UserManager<ApplicationUser> userManager, 
     ITokenService tokenService, 
     IOptions<JwtOptions> jwtOptions,
-    IHttpContextAccessor httpContext) : Controller
+    IHttpContextAccessor httpContext,
+    IApiKeyService keyService) : Controller
 {
     private readonly UserManager<ApplicationUser> _userManager = userManager;
     private readonly ITokenService _iTokenService = tokenService;
     private readonly JwtOptions _jwtOptions = jwtOptions.Value;
     private readonly DateTime _bdTime = DateTime.Now.ToBangladeshTime();
     private readonly IHttpContextAccessor _httpContext = httpContext;
+    private readonly IApiKeyService _iKeyService = keyService;
 
     private string CurrentUser => _httpContext.HttpContext?.User?.Identity?.Name ?? "N/A";
     private string RequestPath => _httpContext.HttpContext?.Request.Path.Value ?? "N/A";
@@ -195,6 +197,22 @@ public class AuthController(
         }
 
         return Ok(new { Status = "Success", Message = "All tokens revoked" });
+    }
+
+    [Authorize]
+    [HttpGet("get-api-key")]
+    public async Task<IActionResult> GetApiKey([FromQuery] int businessId)
+    {
+        var key = await _iKeyService.GetKeyByBusinessId(businessId);
+        return Ok(key);
+    }
+
+    [Authorize]
+    [HttpPost("generate-api-key")]
+    public async Task<IActionResult> GenerateApiKey([FromBody] int businessId)
+    {
+        var key = await _iKeyService.GenerateKeyByBusinessId(businessId);
+        return Ok(key);
     }
 
 }

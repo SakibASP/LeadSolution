@@ -20,7 +20,6 @@ public class DropdownRepo(IDapperContext dapper) : IDropdownRepo
         parameters.Add("@Param4", request.Param4);
 
         using var connection = _dapper.CreateConnection();
-        await connection.OpenAsync();
         var result = await connection.QueryAsync<T>(
             Sp.usp_GetDropdownList,
             parameters,
