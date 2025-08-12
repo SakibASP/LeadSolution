@@ -55,3 +55,5 @@
 /Infrastructure.Repositories/bin/Debug/net9.0
 /Infrastructure.Repositories/obj
 /Lead.Api/Logs/FatalLogs
+/Lead.Mobile/bin/Debug
+/Lead.Mobile/obj
