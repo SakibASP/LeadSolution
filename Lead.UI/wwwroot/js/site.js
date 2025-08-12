@@ -195,22 +195,33 @@ const confirmDelete = (deleteUrl) => {
 }
 
 
-const reloadWithAlert = (success, message) => {
+const reloadWithAlertAsync = async (success, message) => {
     if (success) {
-        Swal.fire({
+        const result = await Swal.fire({
             title: 'Success!',
             text: message,
             icon: 'success',
-            confirmButtonText: 'OK'
-        }).then(() => {
-            window.location.reload();
+            showConfirmButton: false,  // no OK button
+            timer: 1000,               // auto close after 2 sec
+            timerProgressBar: true,
+            allowOutsideClick: false,
+            allowEscapeKey: false,
+            willClose: () => {
+                window.location.reload();
+            }
         });
     } else {
-        Swal.fire({
+        await Swal.fire({
             title: 'Error!',
             text: message,
             icon: 'error',
-            confirmButtonText: 'OK'
+            showConfirmButton: false,  // no OK button
+            timer: 3000,               // longer time for error
+            timerProgressBar: true,
+            allowOutsideClick: false,
+            allowEscapeKey: false
         });
     }
 };
+
+

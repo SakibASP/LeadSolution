@@ -23,8 +23,6 @@ public class FormValues
     [Required]
     public long? SubmissionId { get; set; }
     public DateTime CreatedDate { get; set; } = DateTime.Now.ToBangladeshTime();
-    public DateTime? ModifiedDate { get; set; }
-    public string? ModifiedBy { get; set; }
 
     [ForeignKey(nameof(FormId))]
     public FormDetails? FormDetails { get; set; }

@@ -51,20 +51,32 @@ public class FormValuesController(IHttpService httpService, IOptions<ApiSettings
         if (viewBagResponse?.IsSuccess is not true) TempData[Constants.Error] = viewBagResponse?.Message;
 
         var selectedId = businessId ?? viewBagResponse?.Data?.FirstOrDefault()?.Id ?? 0;
+
         GetParam.Clear();
         GetParam.Add("businessId", selectedId.ToString());
-        var response = await _httpService.GetAsync<ApiResponse<DynamicFormViewModel>>(
+        var dynamicFormTask = _httpService.GetAsync<ApiResponse<DynamicFormViewModel>>(
             VersionedController,
             _apiSettings.Endpoints.FormValues.GetDynamicForm, GetParam);
 
-        if (response?.IsSuccess is not true)
+        GetParam.Clear();
+        GetParam.Add("businessId", selectedId.ToString());
+        var apiKeyTask = _httpService.GetAsync<ApiResponse<string?>>(
+            _apiSettings.Controllers.Auth,
+            _apiSettings.Endpoints.Auth.GetApiKey, GetParam);
+
+        await Task.WhenAll(dynamicFormTask, apiKeyTask);
+        var dynamicFormResponse = await dynamicFormTask;
+        var apiKeyResponse = await apiKeyTask;
+
+        if (dynamicFormResponse?.IsSuccess is not true)
         {
-            TempData[Constants.Error] = response?.Message;
+            TempData[Constants.Error] = dynamicFormResponse?.Message;
             return RedirectToAction("Index","Home");
         }
 
+        ViewBag.ApiKey = apiKeyResponse?.Data ?? "";
         ViewBag.BusinessId = new SelectList(viewBagResponse?.Data, "Id", "Name", selectedId);
-        return View(response?.Data);
+        return View(dynamicFormResponse?.Data);
     }
 
     [HttpPost]
@@ -86,11 +98,21 @@ public class FormValuesController(IHttpService httpService, IOptions<ApiSettings
     [HttpPost]
     public async Task<IActionResult> UpdateFormSettings([FromBody] UpdateFormSettingsRequest request)
     {
-
         SetToken();
         var response = await _httpService.PostAsync<ApiResponse<dynamic>>(
             VersionedController,
             _apiSettings.Endpoints.FormValues.UpdateFormSettings, request);
+
+        return Json(response);
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> GenerateNewApiKey([FromBody] int businessId)
+    {
+        SetToken();
+        var response = await _httpService.PostAsync<ApiResponse<string>>(
+            _apiSettings.Controllers.Auth,
+            _apiSettings.Endpoints.Auth.GenerateApiKey, businessId);
 
         return Json(response);
     }

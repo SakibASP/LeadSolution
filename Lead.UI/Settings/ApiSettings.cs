@@ -48,6 +48,8 @@ public class AuthEndpoints
     public string Login { get; set; } = default!;
     public string RefreshToken { get; set; } = default!;
     public string Register { get; set; } = default!;
+    public string GetApiKey { get; set; } = default!;
+    public string GenerateApiKey { get; set; } = default!;
 }
 
 public class RoleEndpoints

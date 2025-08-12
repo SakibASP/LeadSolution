@@ -1,8 +1,6 @@
 ﻿using Application.Interfaces.Auth;
-using Common.Utils.Helper;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
-using System.Text.Json;
 
 namespace Lead.Api.Attributes;
 
@@ -61,7 +59,7 @@ public class ApiKeyAuthAttribute : Attribute, IAsyncActionFilter
                 context.Result = new ContentResult
                 {
                     StatusCode = 401,
-                    Content = "Invalid BusinessId or API key."
+                    Content = "Invalid API key."
                 };
                 return;
             }
