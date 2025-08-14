@@ -1,6 +1,8 @@
 ﻿using Common.Extentions;
 using Common.Utils.Constant;
+using Common.Utils.Enums;
 using Core.ViewModels.Dto.Auth.Auth;
+using Core.ViewModels.Dto.Common;
 using Core.ViewModels.Response;
 using Lead.UI.Interfaces;
 using Lead.UI.Settings;
@@ -15,6 +17,7 @@ namespace Lead.UI.Controllers.Common;
 /// </summary>
 public class BaseController(IHttpService httpService, IOptions<ApiSettings> apiSetting) : Controller
 {
+    private readonly Dictionary<string, string> GetParam = [];
     /// <summary>
     /// HTTP service for making API requests.
     /// </summary>
@@ -36,10 +39,29 @@ public class BaseController(IHttpService httpService, IOptions<ApiSettings> apiS
     protected DateTime CurrentBdTime { get; set; } = DateTime.Now.ToBangladeshTime();
 
     /// <summary>
+    /// Get logged users business List
+    /// </summary>
+    protected IList<DropdownDto>? UserBusinessList { get; set; }
+
+    /// <summary>
+    /// Gets the utility controller endpoint from the API settings.
+    /// </summary>
+    protected string UtilityVersion => _apiSettings.Controllers.Utility;
+
+    /// <summary>
+    /// Gets the utility endpoints configuration for the API.
+    /// </summary>
+    protected UtilityEndpoints UtilityEndpoints => _apiSettings.Endpoints.Utility;
+
+    /// <summary>
+    /// Gets the common endpoints configuration used by the API.
+    /// </summary>
+    protected CommonEndpoints CommonEndpoints => _apiSettings.Endpoints.CommonEndPoints;
+
+
+    /// <summary>
     /// Checks authentication and refreshes token if expired before executing an action.
     /// </summary>
-    /// <param name="filterContext">The action executing context.</param>
-    /// <param name="next">Delegate to execute the next action.</param>
     public override async Task OnActionExecutionAsync(ActionExecutingContext filterContext, ActionExecutionDelegate next)
     {
         // getting current auth session
@@ -83,9 +105,37 @@ public class BaseController(IHttpService httpService, IOptions<ApiSettings> apiS
         AccessToken = sessionAuth?.Token ?? string.Empty;
 
         // Pass authentication data to the view
-        ViewBag.AuthResponseDto = sessionAuth;
+        ViewBag.Username = sessionAuth?.UserName ?? "";
+
+        //Populating up user's businesslist variable
+        var businessList = HttpContext.Session.Get<IList<DropdownDto>>(Constants.UserBusinessList);
+        if (businessList is null)
+        {
+            GetParam.Clear();
+            GetParam.Add("Id", ((int)DropdownEnum.UserWiseBusinesses).ToString());
+            _httpService.SetBearerToken(AccessToken);
+            var businessListResponse = await _httpService.GetAsync<ApiResponse<IList<DropdownDto>>>(
+                 UtilityVersion, UtilityEndpoints.GetDropdown, GetParam);
+            UserBusinessList = businessListResponse?.Data;
+            HttpContext.Session.Set(Constants.UserBusinessList, UserBusinessList);
+        }
+        else
+        {
+            UserBusinessList = businessList;
+        }
 
         // Proceed with the action execution
         await next();
+    }
+
+    protected async Task<string> GetActiveApiKey(int businessId)
+    {
+        GetParam.Clear();
+        GetParam.Add("businessId", businessId.ToString());
+        var apiKeyTask = await _httpService.GetAsync<ApiResponse<string?>>(
+            _apiSettings.Controllers.Auth,
+            _apiSettings.Endpoints.Auth.GetApiKey,
+            GetParam);
+        return apiKeyTask?.Data ?? string.Empty;
     }
 }

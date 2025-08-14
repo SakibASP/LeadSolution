@@ -24,6 +24,19 @@ public class FormValueRepo(LeadContext context, IDapperContext dapper) : IFormVa
             .ToListAsync();
     }
 
+    public async Task<dynamic> GetMessagesByBusinessAsync(int businessId)
+    {
+        var parameters = new DynamicParameters();
+        parameters.Add("@BusinessId", businessId, DbType.Int32);
+
+        using var connection = _dapper.CreateConnection();
+        var result = await connection.QueryAsync<dynamic>(
+            Sp.usp_GetDynamicPivotedFormValues,
+            parameters,
+            commandType: CommandType.StoredProcedure);
+        return result.ToList();
+    }
+
     public async Task AddAsync(DynamicFormViewModel model)
     {
         IList<FormValues> formValues = [];

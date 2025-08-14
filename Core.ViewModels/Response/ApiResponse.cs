@@ -1,7 +1,10 @@
-﻿namespace Core.ViewModels.Response;
+﻿
+namespace Core.ViewModels.Response;
 
 public class ApiResponse<T>
 {
+    public IEnumerable<IDictionary<string, object>> da;
+
     public bool IsSuccess { get; set; }
     public string? Message { get; set; }
     public T? Data { get; set; }

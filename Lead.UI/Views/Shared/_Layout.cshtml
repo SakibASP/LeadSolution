@@ -2,8 +2,8 @@
 @using Core.ViewModels.Dto.Auth
 @using Core.ViewModels.Dto.Auth.Auth
 @{
-    var authData = (AuthResponseDto?)ViewBag.AuthResponseDto;
-    var IsAuthenticated = authData is null ? false : !string.IsNullOrEmpty(authData.UserName);
+    var username = (string)ViewBag.Username;
+    var IsAuthenticated = !string.IsNullOrWhiteSpace(username);
     ViewData["Version"] = "1.0";
 }
 <!DOCTYPE html>
@@ -278,11 +278,7 @@
                             <li class="nav-item dropdown no-arrow">
                                 <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
                                    data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                    @{
-                                        string _userName = authData?.UserName ?? "";
-                                        string userName = _userName.Substring(0, _userName.IndexOf('@'));
-                                    }
-                                    <span class="mr-2 d-none d-lg-inline text-gray-600 small">@userName</span>
+                                    <span class="mr-2 d-none d-lg-inline text-gray-600 small">@username.Substring(0, username.IndexOf('@'))</span>
                                     <img class="img-profile rounded-circle"
                                          src="~/sb-admin/img/undraw_profile.svg">
                                 </a>

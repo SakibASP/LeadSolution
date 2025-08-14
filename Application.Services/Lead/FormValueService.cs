@@ -68,6 +68,23 @@ public class FormValueService(IFormValueRepo repo, IHttpContextAccessor httpCont
         }
     }
 
+    public async Task<ApiResponse<dynamic>> GetMessagesByBusinessAsync(int businessId)
+    {
+        try
+        {
+            var result = await _iRepo.GetMessagesByBusinessAsync(businessId);
+            return ApiResponse<dynamic>.Success(result, "Messages retrieved successfully!");
+        }
+        catch (Exception ex)
+        {
+            Log
+                .ForContext("UserName", CurrentUser)
+                .ForContext("Path", RequestPath)
+                .Error(ex, "Error retrieving messages for BusinessId: {BusinessId}", businessId);
+            return ApiResponse<dynamic>.Fail("Something went wrong!");
+        }
+    }
+
     public async Task<ApiResponse<dynamic>> UpdateFormSettingsAsync(UpdateFormSettingsRequest request)
     {
         try

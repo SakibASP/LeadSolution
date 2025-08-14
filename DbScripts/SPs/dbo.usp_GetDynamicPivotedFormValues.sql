@@ -1,3 +1,10 @@
+USE [LeadSolution]
+GO
+/****** Object:  StoredProcedure [dbo].[usp_GetDynamicPivotedFormValues]    Script Date: 2025-08-15 2:11:51 AM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
 /*
 =================================
 Author : Md. Sakibur Rahman
@@ -9,7 +16,7 @@ EXEC usp_GetDynamicPivotedFormValues @BusinessId = 4
 */
 
 
-CREATE OR ALTER PROCEDURE dbo.usp_GetDynamicPivotedFormValues
+ALTER   PROCEDURE [dbo].[usp_GetDynamicPivotedFormValues]
     @BusinessId INT
 AS
 BEGIN
@@ -22,7 +29,7 @@ BEGIN
     FROM (
         SELECT DISTINCT fd.Name
         FROM FormDetails fd
-        JOIN BusinessSupportedFormIds bsf ON fd.Id = bsf.FormId
+        JOIN BusinessSupportedFormIds bsf ON fd.Id = bsf.FormId AND bsf.IsActive = 1
         WHERE bsf.BusinessId = @BusinessId
     ) AS x;
 
@@ -35,8 +42,8 @@ BEGIN
 
     SET @query = '
     SELECT
-        --pvt.SubmissionId,
-        --pvt.BusinessId,
+        pvt.SubmissionId,
+        pvt.BusinessId,
         --pvt.BusinessName,
         ' + @cols + '
     FROM
@@ -50,7 +57,7 @@ BEGIN
         FROM FormValues fv
         JOIN FormDetails fd ON fv.FormId = fd.Id
         JOIN AspNetBusinessInfo bi ON fv.BusinessId = bi.Id
-        JOIN BusinessSupportedFormIds bsf ON fv.FormId = bsf.FormId
+        JOIN BusinessSupportedFormIds bsf ON fv.FormId = bsf.FormId AND bsf.IsActive = 1
         WHERE bsf.BusinessId = @BusinessId
     ) src
     PIVOT

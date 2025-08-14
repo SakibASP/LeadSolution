@@ -11,31 +11,38 @@ using Lead.UI.Settings;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.Extensions.Options;
+using System.Text.Json;
 
 namespace Lead.UI.Controllers.Lead;
 
 public class FormValuesController(IHttpService httpService, IOptions<ApiSettings> apiSetting) : BaseController(httpService, apiSetting)
 {
-    private string UtilityVersion => $"{_apiSettings.Controllers.Utility}";
-    private string VersionedController => _apiSettings.Controllers.FormValues;
+    private string Version => _apiSettings.Controllers.FormValues;
+    private FormValuesEndpoints Endpoints => _apiSettings.Endpoints.FormValues;
+
     private void SetToken() => _httpService.SetBearerToken(AccessToken);
     private readonly Dictionary<string, string> GetParam = [];
-    public async Task<IActionResult> Index()
+
+    public async Task<IActionResult> Index(int? businessId)
     {
         SetToken();
-        var response = await _httpService.GetAsync<ApiResponse<IList<FormValues>>>(
-            VersionedController, _apiSettings.Endpoints.CommonEndPoints.GetAll);
+
+        var selectedId = businessId ?? UserBusinessList?.FirstOrDefault()?.Id ?? 0;
+
+        GetParam.Clear();
+        GetParam.Add("businessId", selectedId.ToString());
+        var response = await _httpService.GetAsync<ApiResponse<dynamic>>(
+            Version, 
+            CommonEndpoints.GetAll, 
+            GetParam);
 
         if (response?.IsSuccess != true)
             TempData[Constants.Error] = response?.Message;
 
-        ViewBag.Headers = response?.Data?.Select(x => x.FormDetails!.Name).ToList();
-        // 1. Get all FormDetail names
-        //ViewBag.Headers = await _context.FormDetails
-        //    .OrderBy(f => f.Id)
-        //    .Select(f => f.Name)
-        //    .ToListAsync();
-        return View(response?.Data ?? []);
+        var rows = JsonSerializer.Deserialize<List<Dictionary<string, object>>>(response?.Data);
+        ViewBag.DynamicRows = rows;
+
+        return View();
     }
 
     [HttpGet]
@@ -43,40 +50,24 @@ public class FormValuesController(IHttpService httpService, IOptions<ApiSettings
     {
         SetToken();
 
-        GetParam.Clear();
-        GetParam.Add("Id", ((int)DropdownEnum.UserWiseBusinesses).ToString());
-        var viewBagResponse = await _httpService.GetAsync<ApiResponse<IList<DropdownDto>>>(
-             UtilityVersion, _apiSettings.Endpoints.Utility.GetDropdown, GetParam);
-
-        if (viewBagResponse?.IsSuccess is not true) TempData[Constants.Error] = viewBagResponse?.Message;
-
-        var selectedId = businessId ?? viewBagResponse?.Data?.FirstOrDefault()?.Id ?? 0;
+        var selectedId = businessId ?? UserBusinessList?.FirstOrDefault()?.Id ?? 0;
 
         GetParam.Clear();
         GetParam.Add("businessId", selectedId.ToString());
-        var dynamicFormTask = _httpService.GetAsync<ApiResponse<DynamicFormViewModel>>(
-            VersionedController,
-            _apiSettings.Endpoints.FormValues.GetDynamicForm, GetParam);
+        var response = await _httpService.GetAsync<ApiResponse<DynamicFormViewModel>>(
+            Version,
+            Endpoints.GetDynamicForm, 
+            GetParam);
 
-        GetParam.Clear();
-        GetParam.Add("businessId", selectedId.ToString());
-        var apiKeyTask = _httpService.GetAsync<ApiResponse<string?>>(
-            _apiSettings.Controllers.Auth,
-            _apiSettings.Endpoints.Auth.GetApiKey, GetParam);
-
-        await Task.WhenAll(dynamicFormTask, apiKeyTask);
-        var dynamicFormResponse = await dynamicFormTask;
-        var apiKeyResponse = await apiKeyTask;
-
-        if (dynamicFormResponse?.IsSuccess is not true)
+        if (response?.IsSuccess is not true)
         {
-            TempData[Constants.Error] = dynamicFormResponse?.Message;
+            TempData[Constants.Error] = response?.Message;
             return RedirectToAction("Index","Home");
         }
 
-        ViewBag.ApiKey = apiKeyResponse?.Data ?? "";
-        ViewBag.BusinessId = new SelectList(viewBagResponse?.Data, "Id", "Name", selectedId);
-        return View(dynamicFormResponse?.Data);
+        ViewBag.ApiKey = await GetActiveApiKey(selectedId);
+        ViewBag.BusinessId = new SelectList(UserBusinessList, "Id", "Name", selectedId);
+        return View(response?.Data);
     }
 
     [HttpPost]
@@ -86,10 +77,11 @@ public class FormValuesController(IHttpService httpService, IOptions<ApiSettings
         if (!ModelState.IsValid)
             return View(formDetails);
 
-        //SetToken();
+        SetToken();
         var response = await _httpService.PostAsync<ApiResponse<dynamic>>(
-            VersionedController, 
-            _apiSettings.Endpoints.CommonEndPoints.Add, formDetails);
+            Version, 
+            CommonEndpoints.Add, 
+            formDetails);
 
         TempData[response?.IsSuccess == true ? Constants.Success : Constants.Error] = response?.Message;
         return RedirectToAction(nameof(Index));
@@ -100,8 +92,9 @@ public class FormValuesController(IHttpService httpService, IOptions<ApiSettings
     {
         SetToken();
         var response = await _httpService.PostAsync<ApiResponse<dynamic>>(
-            VersionedController,
-            _apiSettings.Endpoints.FormValues.UpdateFormSettings, request);
+            Version,
+            Endpoints.UpdateFormSettings, 
+            request);
 
         return Json(response);
     }

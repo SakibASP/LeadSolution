@@ -1,53 +1,70 @@
-﻿@using Core.Models.Lead
-@model IEnumerable<FormValues>
+﻿@using System.Text.Json
 @{
-    ViewData["Title"] = "Index";
-    var headers = (List<string?>?)ViewBag.Headers;
+    var rows = ViewBag.DynamicRows as List<Dictionary<string, object>>;
+    var hiddenCols = new[] { "BusinessId", "SubmissionId" };
 }
 
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <h2 class="text-primary fw-bold">Lead Responses</h2>
-</div>
-
-<div class="card shadow rounded">
-    <div class="card-body p-0">
-        @if (Model.Any() && headers?.Count > 0)
-        {
-            <div class="table-responsive">
-                <table class="table table-bordered table-hover mb-0 align-middle">
-                    <thead class="table-dark">
+@if (rows != null && rows.Any())
+{
+    <div class="mt-4">
+        <div class="card shadow-lg">
+            <div class="card-header bg-primary text-white">
+                <h4 class="mb-0">Submissions</h4>
+            </div>
+            <div class="card-body p-0">
+                <table class="table table-hover table-striped mb-0">
+                    <thead class="thead-dark">
                         <tr>
-                            @foreach (var header in headers)
+                            @foreach (var col in rows.First().Keys.Where(c => !hiddenCols.Contains(c)))
                             {
-                                <th>@header</th>
+                                <th>@col</th>
                             }
+                            <th class="text-center">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
-                        @* Group by a common field — assuming FormValue has a SubmissionId or use CreatedDate if needed *@
-                        @{
-                            var grouped = Model
-                            .GroupBy(v => v.SubmissionId) // simulate group by timestamp
-                            .ToList();
-                        }
-
-                        @foreach (var group in grouped)
+                        @foreach (var row in rows)
                         {
                             <tr>
-                                @foreach (var header in headers)
+                                <!-- Hidden IDs -->
+                                <td style="display:none;">
+                                    <input type="hidden" class="business-id" value="@row["BusinessId"]" />
+                                    <input type="hidden" class="submission-id" value="@row["SubmissionId"]" />
+                                </td>
+
+                                <!-- Visible Columns -->
+                                @foreach (var col in row.Keys.Where(c => !hiddenCols.Contains(c)))
                                 {
-                                    var match = group.FirstOrDefault(v => v.FormDetails?.Name == header);
-                                    <td>@match?.FormValue</td>
+                                    var value = row[col];
+                                    string displayValue = value is JsonElement je
+                                    ? je.ValueKind == JsonValueKind.Null ? "" : je.ToString()
+                                    : value?.ToString() ?? "";
+
+                                    <td>@displayValue</td>
                                 }
+
+                                <!-- Action Icon -->
+                                <td class="text-center">
+                                    <button type="button" class="btn btn-sm btn-outline-info btn-view" title="View">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                </td>
                             </tr>
                         }
                     </tbody>
                 </table>
             </div>
-        }
-        else
-        {
-            <p>No data found.</p>
-        }
+        </div>
     </div>
-</div>
+}
+else
+{
+    <p class="text-muted">No data found.</p>
+}
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script src="~/manager/lead/formvalues/dynamic-message-index.js"></script>
+}
+
+

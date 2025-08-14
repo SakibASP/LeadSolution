@@ -5,6 +5,7 @@ public static class Constants
     //Session keys
     public const string AuthResponseDto = "AuthResponseDto";
     public const string Menu = "Menu"; 
+    public const string UserBusinessList = "UserBusinessList"; 
 
     //Redirections
     public const string RedirectToLogin = "/Auth/Login";
@@ -25,4 +26,5 @@ public static class Sp
     public const string usp_GetDropdownList = "dbo.usp_GetDropdownList";
     public const string usp_GetBusinessSupportedForms = "dbo.usp_GetBusinessSupportedForms";
     public const string usp_InsertUpdateBusinessSupportedForms = "dbo.usp_InsertUpdateBusinessSupportedForms";
+    public const string usp_GetDynamicPivotedFormValues = "dbo.usp_GetDynamicPivotedFormValues";
 }
