@@ -13,14 +13,25 @@ public class HttpService(HttpClient httpClient) : IHttpService
             new AuthenticationHeaderValue("Bearer", token);
     }
 
-    public async Task<T?> PostAsync<T>(string version, string endpoint, object data)
+    public async Task<T?> PostAsync<T>(string version, string endpoint, object data, Dictionary<string, string>? headers = null)
     {
         var url = $"{version}/{endpoint}";
-        var response = await _httpClient.PostAsJsonAsync(url, data); // Handles JSON + headers
+
+        using var request = new HttpRequestMessage(HttpMethod.Post, url)
+        {
+            Content = JsonContent.Create(data) // Handles JSON serialization
+        };
+
+        // Add custom headers if provided
+        if (headers != null)
+            foreach (var header in headers)
+                request.Headers.Add(header.Key, header.Value);
+            
+        var response = await _httpClient.SendAsync(request);
 
         if (!response.IsSuccessStatusCode)
         {
-            // Optionally log error:
+            // Optionally log error
             var err = await response.Content.ReadAsStringAsync();
             Console.WriteLine($"❌ API Error ({response.StatusCode}): {err}");
             return default;
@@ -28,6 +39,8 @@ public class HttpService(HttpClient httpClient) : IHttpService
 
         return await response.Content.ReadFromJsonAsync<T>();
     }
+
+
 
 
     public async Task<T?> GetAsync<T>(string version, string endpoint, Dictionary<string, string>? queryParams = null)
@@ -48,5 +61,4 @@ public class HttpService(HttpClient httpClient) : IHttpService
 
         return await response.Content.ReadFromJsonAsync<T>();
     }
-
 }

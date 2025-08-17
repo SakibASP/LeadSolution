@@ -31,17 +31,17 @@ public class BaseController(IHttpService httpService, IOptions<ApiSettings> apiS
     /// <summary>
     /// Access token for the current session.
     /// </summary>
-    protected string AccessToken { get; set; } = string.Empty;
+    protected string AccessToken { get; private set; } = string.Empty;
 
     /// <summary>
     /// Current Bangladesh Time
     /// </summary>
-    protected DateTime CurrentBdTime { get; set; } = DateTime.Now.ToBangladeshTime();
+    protected DateTime CurrentBdTime { get; private set; } = DateTime.Now.ToBangladeshTime();
 
     /// <summary>
     /// Get logged users business List
     /// </summary>
-    protected IList<DropdownDto>? UserBusinessList { get; set; }
+    protected IList<DropdownDto>? UserBusinessList { get; private set; }
 
     /// <summary>
     /// Gets the utility controller endpoint from the API settings.
@@ -57,7 +57,6 @@ public class BaseController(IHttpService httpService, IOptions<ApiSettings> apiS
     /// Gets the common endpoints configuration used by the API.
     /// </summary>
     protected CommonEndpoints CommonEndpoints => _apiSettings.Endpoints.CommonEndPoints;
-
 
     /// <summary>
     /// Checks authentication and refreshes token if expired before executing an action.

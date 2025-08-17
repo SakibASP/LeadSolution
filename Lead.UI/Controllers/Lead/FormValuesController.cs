@@ -78,10 +78,17 @@ public class FormValuesController(IHttpService httpService, IOptions<ApiSettings
             return View(formDetails);
 
         SetToken();
+        var headers = new Dictionary<string, string>
+            {
+                { "X-Api-Key", await GetActiveApiKey(formDetails.BusinessId) },
+                { "X-Business-Id", formDetails.BusinessId.ToString() }
+            };
+
         var response = await _httpService.PostAsync<ApiResponse<dynamic>>(
             Version, 
             CommonEndpoints.Add, 
-            formDetails);
+            formDetails,
+            headers);
 
         TempData[response?.IsSuccess == true ? Constants.Success : Constants.Error] = response?.Message;
         return RedirectToAction(nameof(Index));
