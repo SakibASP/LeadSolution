@@ -35,7 +35,7 @@ public class LeadContext : IdentityDbContext<ApplicationUser>
         RegisterAutoIncludes(modelBuilder);
     }
 
-    #region User, Menu and Roles
+    #region - User, Menu and Roles -
     public virtual DbSet<AspNetServiceTypes> AspNetServiceTypes { get; set; } = default!;
     public virtual DbSet<AspNetBusinessInfo> AspNetBusinessInfo { get; set; } = default!;
     public virtual DbSet<AspNetBusinessApiKeys> AspNetBusinessApiKeys { get; set; } = default!;
@@ -44,14 +44,14 @@ public class LeadContext : IdentityDbContext<ApplicationUser>
     public virtual DbSet<MenuToRole> MenuToRole { get; set; } = default!;
     #endregion
 
-    #region Lead
+    #region - Lead -
     public virtual DbSet<DataTypes> DataTypes { get; set; } = default!;
     public virtual DbSet<FormDetails> FormDetails { get; set; } = default!;
     public virtual DbSet<FormValues> FormValues { get; set; } = default!;
     public virtual DbSet<BusinessSupportedFormId> BusinessSupportedFormId { get; set; } = default!;
     #endregion
 
-    #region Audit
+    #region - Audit -
     public virtual DbSet<Audit> Audit { get; set; } = default!;
     private AuditTrailFactory? auditFactory = null;
     private readonly List<Audit> auditList = [];

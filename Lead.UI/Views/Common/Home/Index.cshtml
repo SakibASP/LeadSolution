@@ -1,8 +1,160 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "Dashboard";
 }
 
-<div class="text-center">
-    <h1 class="display-4" id="typewriting">Welcome @ViewBag.Name</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div class="container-fluid">
+
+    <!-- Dashboard Heading -->
+    <div class="d-sm-flex align-items-center justify-content-between mb-2">
+        <h1 class="h3 mb-0 text-gray-800">Dashboard</h1>
+        <!-- Business Dropdown -->
+        <div class="d-flex">
+            <!-- Business Dropdown -->
+            <select class="form-control mb-2" asp-items="ViewBag.BusinessId" id="BusinessId" name="BusinessId">
+            </select>
+        </div>
+    </div>
+
+    <!-- Stats Cards Row -->
+    <div class="row">
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-primary shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Total Leads</div>
+                    <div class="h5 mb-0 font-weight-bold text-gray-800">1,245</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-success shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="text-xs font-weight-bold text-success text-uppercase mb-1">Conversion Rate</div>
+                    <div class="h5 mb-0 font-weight-bold text-gray-800">32%</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-info shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="text-xs font-weight-bold text-info text-uppercase mb-1">Unread Messages</div>
+                    <div class="h5 mb-0 font-weight-bold text-gray-800">37</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 4th card to balance row -->
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-warning shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">Pending Tasks</div>
+                    <div class="h5 mb-0 font-weight-bold text-gray-800">14</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Charts Row -->
+    <div class="row">
+        <div class="col-xl-8 col-lg-7">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Leads Overview (Monthly)</h6>
+                </div>
+                <div class="card-body">
+                    <div class="chart-area">
+                        <canvas id="myAreaChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pie Chart -->
+        <div class="col-xl-4 col-lg-5">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Lead Sources</h6>
+                </div>
+                <div class="card-body">
+                    <div class="chart-pie pt-4">
+                        <canvas id="myPieChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bar Chart Row -->
+    <div class="row">
+        <div class="col-xl-12">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Revenue Performance</h6>
+                </div>
+                <div class="card-body">
+                    <div class="chart-bar">
+                        <canvas id="myBarChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Leads Table -->
+    <div class="row">
+        <div class="col-xl-12">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Recent Leads</h6>
+                </div>
+                <div class="card-body">
+                    <table class="table table-hover table-bordered" id="dataTable">
+                        <thead class="thead-dark">
+                            <tr>
+                                <th>Date</th>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Message</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>2025-08-18</td>
+                                <td>John Doe</td>
+                                <td>john@example.com</td>
+                                <td>Interested in your services.</td>
+                            </tr>
+                            <tr>
+                                <td>2025-08-18</td>
+                                <td>Jane Smith</td>
+                                <td>jane@example.com</td>
+                                <td>Can you call me tomorrow?</td>
+                            </tr>
+                            <tr>
+                                <td>2025-08-17</td>
+                                <td>Mike Johnson</td>
+                                <td>mike@example.com</td>
+                                <td>Please send me a quote.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
 </div>
+
+@section Scripts {
+    <!-- Scripts -->
+    <script src="~/sb-admin/vendor/chart.js/chart.bundle.min.js"></script>
+    <script src="~/sb-admin/vendor/chart.js/chart.bundle.js"></script>
+    <script src="~/sb-admin/vendor/chart.js/chart.min.js"></script>
+    <script src="~/sb-admin/vendor/chart.js/chart.js"></script>
+    <script src="~/sb-admin/js/demo/chart-area-demo.js"></script>
+    <script src="~/sb-admin/js/demo/chart-bar-demo.js"></script>
+    <script src="~/sb-admin/js/demo/chart-pie-demo.js"></script>
+}
+

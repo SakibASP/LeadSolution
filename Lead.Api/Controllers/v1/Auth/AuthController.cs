@@ -5,6 +5,7 @@ using Core.Models.Auth;
 using Core.ViewModels.Dto.Auth.Auth;
 using Core.ViewModels.Response;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -28,7 +29,8 @@ public class AuthController(
     ITokenService tokenService, 
     IOptions<JwtOptions> jwtOptions,
     IHttpContextAccessor httpContext,
-    IApiKeyService keyService) : Controller
+    IApiKeyService keyService
+    ) : Controller
 {
     private readonly UserManager<ApplicationUser> _userManager = userManager;
     private readonly ITokenService _iTokenService = tokenService;
@@ -40,6 +42,7 @@ public class AuthController(
     private string CurrentUser => _httpContext.HttpContext?.User?.Identity?.Name ?? "N/A";
     private string RequestPath => _httpContext.HttpContext?.Request.Path.Value ?? "N/A";
 
+    #region - register , login , refresh token -
     [HttpPost("register")]
     public async Task<IActionResult> Register([FromBody] RegisterDto dto)
     {
@@ -172,7 +175,9 @@ public class AuthController(
             return Ok(ApiResponse<AuthResponseDto>.Fail("Something went wrong!"));
         }
     }
+    #endregion
 
+    #region - revoke -
     [Authorize]
     [HttpPost("revoke")]
     public async Task<IActionResult> Revoke([FromBody] string username)
@@ -198,7 +203,9 @@ public class AuthController(
 
         return Ok(new { Status = "Success", Message = "All tokens revoked" });
     }
+    #endregion
 
+    #region - api key -
     [Authorize]
     [HttpGet("get-api-key")]
     public async Task<IActionResult> GetApiKey([FromQuery] int businessId)
@@ -214,5 +221,5 @@ public class AuthController(
         var key = await _iKeyService.GenerateKeyByBusinessId(businessId);
         return Ok(key);
     }
-
+    #endregion
 }

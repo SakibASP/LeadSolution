@@ -4,6 +4,7 @@ using Lead.UI.Interfaces;
 using Lead.UI.Models;
 using Lead.UI.Settings;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.Extensions.Options;
 using System.Diagnostics;
 
@@ -11,10 +12,10 @@ namespace Lead.UI.Controllers.Common;
 
 public class HomeController(IHttpService httpService, IOptions<ApiSettings> apiSetting) : BaseController(httpService, apiSetting)
 {
-    public IActionResult Index()
+    public IActionResult Index(int? businessId)
     {
-        var name = "to Lead Solution.";
-        ViewBag.Name = name;
+        var selectedId = businessId ?? UserBusinessList?.FirstOrDefault()?.Id ?? 0;
+        ViewBag.BusinessId = new SelectList(UserBusinessList, "Id", "Name", selectedId);
         return View();
     }
 

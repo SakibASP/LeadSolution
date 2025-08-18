@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Serilog;
 
 namespace Lead.Api.Controllers.v1.Auth;
 
@@ -18,15 +19,22 @@ namespace Lead.Api.Controllers.v1.Auth;
 
 [ApiController]
 [Route("api/v1/[controller]")]
-[Authorize(Roles = Constants.AdminAuthRoles)]
+[Authorize]
 public class MaintainUserController(
     UserManager<ApplicationUser> userManager,
-    IAdminRightsService adminRights) : Controller
+    IAdminRightsService adminRights,
+    IHttpContextAccessor httpContext
+    ) : Controller
 {
     private readonly UserManager<ApplicationUser> _userManager = userManager;
     private readonly IAdminRightsService _iAdminRights = adminRights;
+    private readonly IHttpContextAccessor _httpContext = httpContext;
+
+    private string CurrentUser => _httpContext.HttpContext?.User?.Identity?.Name ?? "N/A";
+    private string RequestPath => _httpContext.HttpContext?.Request.Path.Value ?? "N/A";
 
     [HttpGet("get-users")]
+    [Authorize(Roles = Constants.AdminAuthRoles)]
     public async Task<IActionResult> GetAllUsers()
     {
         var isSuperAdmin = User.IsInRole(Constants.SuperAdmin);
@@ -49,6 +57,7 @@ public class MaintainUserController(
     }
 
     [HttpGet("get-user-roles")]
+    [Authorize(Roles = Constants.AdminAuthRoles)]
     public async Task<IActionResult> GetUserRoles([FromQuery] string userId)
     {
         var isSuperAdmin = User.IsInRole(Constants.SuperAdmin);
@@ -76,6 +85,7 @@ public class MaintainUserController(
     }
 
     [HttpPost("assign-role")]
+    [Authorize(Roles = Constants.AdminAuthRoles)]
     public async Task<IActionResult> AssignRole([FromBody] UpdateUserRoleRequest request)
     {
         if (string.IsNullOrEmpty(request?.UserId)) return Ok(ApiResponse<string>.Fail("No user found!"));
@@ -93,6 +103,25 @@ public class MaintainUserController(
         if (!result.Succeeded) return Ok(ApiResponse<string>.Fail("Something went wrong!"));
 
         return Ok(ApiResponse<string>.Success(null, "Role assigned successfully"));
+    }
+
+    [HttpGet("get-user-profile")]
+    public async Task<IActionResult> GetUserInfo()
+    {
+        try
+        {
+            var userInfo = _httpContext.HttpContext!.User;
+            var user = await _userManager.GetUserAsync(userInfo);
+            return Ok(ApiResponse<ApplicationUser>.Success(user,"User retrived successfully!"));
+        }
+        catch (Exception ex)
+        {
+            Log
+                .ForContext("UserName", CurrentUser)
+                .ForContext("Path", RequestPath)
+                .Error(ex, "Error retrieving userinfo");
+            return Ok(ApiResponse<ApplicationUser>.Fail("Failed! Something went wrong."));
+        }
     }
 
     private async Task<List<string>> GetRoleNames(ApplicationUser user)

@@ -66,6 +66,7 @@ public class MaintainUserEndpoints
     public string GetUsers { get; set; } = default!;
     public string AssignRole { get; set; } = default!;
     public string GetUserRoles { get; set; } = default!;
+    public string GetUserProfile { get; set; } = default!;
 }
 
 public class MenuEndpoints

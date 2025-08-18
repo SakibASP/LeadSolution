@@ -1,4 +1,6 @@
 ﻿using Common.Utils.Constant;
+using Core.Models.Auth;
+using Core.ViewModels.Dto.Auth.Auth;
 using Core.ViewModels.Dto.Auth.Roles;
 using Core.ViewModels.Request.Auth;
 using Core.ViewModels.Response;
@@ -22,6 +24,50 @@ public class MaintainUserController(IHttpService httpService, IOptions<ApiSettin
             VersionedController, _apiSettings.Endpoints.MaintainUser.GetUsers);
 
         return View(response?.Data ?? []);
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> UserProfile()
+    {
+        SetToken();
+        var response = await _httpService.GetAsync<ApiResponse<ApplicationUser>>(
+            VersionedController, _apiSettings.Endpoints.MaintainUser.GetUserProfile);
+
+        if (response?.IsSuccess is not true)
+        {
+            TempData[Constants.Error] = response?.Message;
+            return RedirectToAction("Index", "Home");
+        }
+
+        ApplicationUser user = response.Data!;
+        // Fetch current user details from DB
+        var model = new ProfileViewModel
+        {
+            UserId = user.Id,
+            UserName = user.UserName,
+            Email = user.Email,
+            PhoneNumber = user.PhoneNumber,
+            NID = user.NID,
+        };
+
+        return View(model);
+    }
+
+    [HttpPost]
+    public IActionResult UserProfile(ProfileViewModel model)
+    {
+        SetToken();
+        if (!ModelState.IsValid)
+        {
+            TempData[Constants.Error] = "Model in not valid";
+            return View(model);
+        }
+
+        // Update profile in DB here
+        // If password fields filled, validate and update password
+
+        TempData["UserSuccess"] = "Profile updated successfully!";
+        return View(model);
     }
 
     [HttpGet]

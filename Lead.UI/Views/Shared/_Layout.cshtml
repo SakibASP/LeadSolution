@@ -24,7 +24,7 @@
     <link href="~/sb-admin/vendor/fontawesome-free/css/all.min.css" rel="stylesheet" />
     <link href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i"
           rel="stylesheet">
-
+    <link href="~/sb-admin/vendor/datatables/datatables.bootstrap4.min.css" rel="stylesheet" />
     <!-- SweetAlert2 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet" />
 
@@ -284,7 +284,7 @@
                                 </a>
                                 <!-- Dropdown - User Information -->
                                 <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in" aria-labelledby="userDropdown">
-                                    <form class="form-inline" asp-controller="Auth" asp-action="Manage">
+                                    <form class="form-inline" asp-controller="MaintainUser" asp-action="UserProfile" method="get">
                                         <button type="submit" class="btn btn-default">
                                             <i class="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i>
                                             Profile
@@ -364,19 +364,29 @@
     <!-- Bootstrap core JavaScript-->
     @* <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script> *@
+
     <script src="~/sb-admin/vendor/jquery/jquery.min.js"></script>
     <script src="~/sb-admin/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-    <script src="~/js/site.js" asp-append-version="true"></script>
+    <!-- SweetAlert2 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <!-- Datatables -->
+    <script src="~/sb-admin/vendor/datatables/jquery.datatables.min.js"></script>
+    <script src="~/sb-admin/vendor/datatables/datatables.bootstrap4.min.js"></script>
 
     <!-- Core plugin JavaScript-->
     <script src="~/sb-admin/vendor/jquery-easing/jquery.easing.min.js"></script>
 
+    <!--Toast JS-->
+    <script src="~/js/jquery.toast.min.js"></script>
+
     <!-- Custom scripts for all pages-->
     <script src="~/sb-admin/js/sb-admin-2.min.js"></script>
 
-    <script src="~/js/jquery.toast.min.js"></script>
-    <!-- SweetAlert2 JS -->
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <script src="~/sb-admin/js/demo/datatables-demo.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>
