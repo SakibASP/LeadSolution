@@ -5,8 +5,6 @@ using Core.Models.Auth;
 using Core.ViewModels.Dto.Auth.Auth;
 using Core.ViewModels.Response;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.DataProtection;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
