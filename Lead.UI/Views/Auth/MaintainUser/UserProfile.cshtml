@@ -37,11 +37,19 @@
                     <!-- Tab Content -->
                     <div class="tab-content" id="profileTabContent">
 
+                        @if (TempData["UserSuccess"] != null)
+                        {
+                            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                                <i class="fa fa-check-circle mr-2"></i>
+                                @TempData["UserSuccess"]
+                                <button type="button" class="close" data-dismiss="alert">
+                                    <span>&times;</span>
+                                </button>
+                            </div>
+                        }
                         <!-- Profile Info -->
                         <div class="tab-pane fade show active" id="profile-info" role="tabpanel" aria-labelledby="profile-tab">
-                            <form asp-action="UserProfile" method="post">
-                                <input type="hidden" asp-for="UserId" />
-
+                            <form asp-action="UpdateProfile" method="post">
                                 <div class="form-group mb-4">
                                     <label asp-for="Email" class="font-weight-bold"></label>
                                     <input asp-for="Email" class="form-control" type="email" placeholder="Enter email" />
@@ -71,6 +79,7 @@
                         <!-- Change Password -->
                         <div class="tab-pane fade" id="change-password" role="tabpanel" aria-labelledby="password-tab">
                             <form asp-action="ChangePassword" method="post">
+                                <input type="hidden" asp-for="Email" />
                                 <div class="form-group mb-3">
                                     <label asp-for="CurrentPassword" class="font-weight-bold"></label>
                                     <input asp-for="CurrentPassword" type="password" class="form-control"

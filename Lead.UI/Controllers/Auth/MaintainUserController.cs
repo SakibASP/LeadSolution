@@ -1,4 +1,5 @@
-﻿using Common.Utils.Constant;
+﻿using Azure.Core;
+using Common.Utils.Constant;
 using Core.Models.Auth;
 using Core.ViewModels.Dto.Auth.Auth;
 using Core.ViewModels.Dto.Auth.Roles;
@@ -9,6 +10,7 @@ using Lead.UI.Interfaces;
 using Lead.UI.Settings;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
+using System.Threading.Tasks;
 
 namespace Lead.UI.Controllers.Auth;
 
@@ -43,7 +45,6 @@ public class MaintainUserController(IHttpService httpService, IOptions<ApiSettin
         // Fetch current user details from DB
         var model = new ProfileViewModel
         {
-            UserId = user.Id,
             UserName = user.UserName,
             Email = user.Email,
             PhoneNumber = user.PhoneNumber,
@@ -54,22 +55,40 @@ public class MaintainUserController(IHttpService httpService, IOptions<ApiSettin
     }
 
     [HttpPost]
-    public IActionResult UserProfile(ProfileViewModel model)
+    public async Task<IActionResult> UpdateProfile(ProfileViewModel model)
     {
         SetToken();
         if (!ModelState.IsValid)
         {
             TempData[Constants.Error] = "Model in not valid";
-            return View(model);
+            return View(nameof(UserProfile), model);
         }
 
-        // Update profile in DB here
-        // If password fields filled, validate and update password
-
-        TempData["UserSuccess"] = "Profile updated successfully!";
-        return View(model);
+        var response = await _httpService.PostAsync<ApiResponse<string>>(
+             VersionedController, _apiSettings.Endpoints.MaintainUser.UpdateProfile, model);
+        if (response?.IsSuccess is true) TempData["UserSuccess"] = response?.Message;
+        else TempData[Constants.Error] = response?.Message;
+        return View(nameof(UserProfile),model);
     }
 
+    [HttpPost]
+    public async Task<IActionResult> ChangePassword(ProfileViewModel model)
+    {
+        SetToken();
+        if (!ModelState.IsValid)
+        {
+            TempData[Constants.Error] = "Model in not valid";
+            return View(nameof(UserProfile), model);
+        }
+
+        var response = await _httpService.PostAsync<ApiResponse<string>>(
+             VersionedController, _apiSettings.Endpoints.MaintainUser.ChangePassword, model);
+        if (response?.IsSuccess is true) TempData["UserSuccess"] = response?.Message;
+        else TempData[Constants.Error] = response?.Message;
+        return View(nameof(UserProfile), model);
+    }
+
+    #region - user role management -
     [HttpGet]
     public async Task<IActionResult> ManageUser(string userId)
     {
@@ -99,4 +118,5 @@ public class MaintainUserController(IHttpService httpService, IOptions<ApiSettin
         TempData[response?.IsSuccess == true ? Constants.Success : Constants.Error] = response?.Data;
         return RedirectToAction(nameof(UserList));
     }
+    #endregion
 }

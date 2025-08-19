@@ -4,13 +4,11 @@ namespace Core.ViewModels.Dto.Auth.Auth;
 
 public class ProfileViewModel
 {
-    [Required]
-    public string UserId { get; set; } = default!; // Hidden field
 
-    [Required, Display(Name = "User Name")]
+    [Display(Name = "User Name")]
     public string? UserName { get; set; }
 
-    [Required, Display(Name = "NID")]
+    [Display(Name = "NID")]
     public string? NID { get; set; }
 
     [Required, EmailAddress, Display(Name = "Email")]

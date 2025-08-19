@@ -1,6 +1,7 @@
 ﻿using Application.Interfaces.Menu;
 using Common.Utils.Constant;
 using Core.Models.Auth;
+using Core.ViewModels.Dto.Auth.Auth;
 using Core.ViewModels.Dto.Auth.Roles;
 using Core.ViewModels.Request.Auth;
 using Core.ViewModels.Response;
@@ -9,6 +10,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
+using System.Text.Json;
 
 namespace Lead.Api.Controllers.v1.Auth;
 
@@ -121,6 +123,65 @@ public class MaintainUserController(
                 .ForContext("Path", RequestPath)
                 .Error(ex, "Error retrieving userinfo");
             return Ok(ApiResponse<ApplicationUser>.Fail("Failed! Something went wrong."));
+        }
+    }
+
+    [HttpPost("update-user-profile")]
+    public async Task<IActionResult> UpdateUserInfo([FromBody] ProfileViewModel model)
+    {
+        try
+        {
+            var userInfo = _httpContext.HttpContext!.User;
+            var user = await _userManager.GetUserAsync(userInfo);
+            if (user is not null)
+            {
+                user.PhoneNumber = model.PhoneNumber;
+                user.NID = model.NID;
+                user.Email = model.Email;
+                var result = await _userManager.UpdateAsync(user);
+                if (result.Succeeded)
+                    return Ok(ApiResponse<string>.Success("Success", "Information updated successfully!"));
+                else
+                    return Ok(ApiResponse<string>.Fail($"Failed! Something went wrong. error : {JsonSerializer.Serialize(result.Errors)}"));
+            }
+
+            return Ok(ApiResponse<string>.Fail("Failed! Something went wrong."));
+        }
+        catch (Exception ex)
+        {
+            Log
+                .ForContext("UserName", CurrentUser)
+                .ForContext("Path", RequestPath)
+                .Error(ex, "Error retrieving userinfo");
+            return Ok(ApiResponse<string>.Fail("Failed! Something went wrong."));
+        }
+    }
+
+    [HttpPost("change-password")]
+    public async Task<IActionResult> ChanagePassword([FromBody] ProfileViewModel model)
+    {
+        try
+        {
+            var userInfo = _httpContext.HttpContext!.User;
+            var user = await _userManager.GetUserAsync(userInfo);
+            if (user is not null && !string.IsNullOrEmpty(model.CurrentPassword) && !string.IsNullOrEmpty(model.NewPassword))
+            {
+                var result = await _userManager.ChangePasswordAsync(user, model.CurrentPassword, model.NewPassword);
+                if (result.Succeeded)
+                    return Ok(ApiResponse<string>.Success("Success", "Password changed successfully!"));
+                else
+                    return Ok(ApiResponse<string>.Fail($"Failed! Something went wrong. error : {JsonSerializer.Serialize(result.Errors)}"));
+            }
+
+            return Ok(ApiResponse<string>.Fail("Failed! Something went wrong."));
+        }
+        catch (Exception ex)
+        {
+            Log
+                .ForContext("UserName", CurrentUser)
+                .ForContext("Path", RequestPath)
+                .Error(ex, "Error retrieving userinfo");
+            return Ok(ApiResponse<string>.Fail("Failed! Something went wrong."));
         }
     }
 
