@@ -3,12 +3,55 @@
     x:Class="Lead.Mobile.AppShell"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-    xmlns:local="clr-namespace:Lead.Mobile"
-    Title="Lead.Mobile">
+    xmlns:views="clr-namespace:Lead.Mobile.Views"
+    xmlns:auth="clr-namespace:Lead.Mobile.Views.Auth"
+    Title="Lead Mobile"
+    Shell.FlyoutBehavior="Flyout">
 
+    <!-- Home -->
+    <FlyoutItem Title="Home" Route="MainPage">
+        <ShellContent
+            Title="Home"
+            Icon="home.png"
+            ContentTemplate="{DataTemplate views:MainPage}" />
+    </FlyoutItem>
+
+    <!-- Profile -->
+    <FlyoutItem Title="Profile" Route="ProfilePage">
+        <ShellContent
+            Title="Profile"
+            Icon="profile.png"
+            ContentTemplate="{DataTemplate views:ProfilePage}" />
+    </FlyoutItem>
+
+    <!-- Settings -->
+    <FlyoutItem Title="Settings" Route="SettingsPage">
+        <ShellContent
+            Title="Settings"
+            Icon="settings.png"
+            ContentTemplate="{DataTemplate views:SettingsPage}" />
+    </FlyoutItem>
+
+    <!-- Admin Panel (RBAC controlled) -->
+    <FlyoutItem Title="Admin Panel" Route="AdminPage" x:Name="AdminPage">
+        <ShellContent
+            Title="Admin"
+            Icon="admin.png"
+            ContentTemplate="{DataTemplate views:AdminPage}" />
+    </FlyoutItem>
+
+
+    <!-- Authentication (Login Page) -->
     <ShellContent
-        Title="Home"
-        ContentTemplate="{DataTemplate local:MainPage}"
-        Route="MainPage" />
+    Title="Login"
+    Route="LoginPage"
+    FlyoutItemIsVisible="False">
+        <ShellContent.ContentTemplate>
+            <DataTemplate>
+                <auth:Login />
+            </DataTemplate>
+        </ShellContent.ContentTemplate>
+    </ShellContent>
+
 
 </Shell>
