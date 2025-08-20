@@ -9,6 +9,11 @@ using Microsoft.Extensions.Configuration;
 
 namespace Infrastructure.Repositories.Data;
 
+
+/// <summary>
+/// Author: Md. Sakibur Rahman
+/// </summary>
+
 public class LeadContext : IdentityDbContext<ApplicationUser>
 {
     public LeadContext() { }
@@ -42,6 +47,12 @@ public class LeadContext : IdentityDbContext<ApplicationUser>
     public virtual DbSet<AspNetUserBusinessInfo> AspNetUserBusinessInfo { get; set; } = default!;
     public virtual DbSet<MenuItem> MenuItem { get; set; } = default!;
     public virtual DbSet<MenuToRole> MenuToRole { get; set; } = default!;
+    #endregion
+
+    #region - Country -
+    public virtual DbSet<Countries> Countries { get; set; } = default!;
+    public virtual DbSet<CountryNativeNames> CountryNativeNames { get; set; } = default!;
+    public virtual DbSet<Currencies> Currencies { get; set; } = default!;
     #endregion
 
     #region - Lead -

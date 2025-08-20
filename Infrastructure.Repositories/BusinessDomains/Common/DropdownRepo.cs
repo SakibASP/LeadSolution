@@ -6,7 +6,12 @@ using System.Data;
 
 namespace Infrastructure.Repositories.BusinessDomains.Common;
 
-public class DropdownRepo(IDapperContext dapper) : IDropdownRepo
+
+/// <summary>
+/// Author: Md. Sakibur Rahman
+/// </summary>
+
+public sealed class DropdownRepo(IDapperContext dapper) : IDropdownRepo
 {
     private readonly IDapperContext _dapper = dapper;
 

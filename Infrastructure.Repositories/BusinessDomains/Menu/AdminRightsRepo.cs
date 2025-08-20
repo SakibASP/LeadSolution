@@ -8,7 +8,11 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Repositories.BusinessDomains.Menu;
 
-public class AdminRightsRepo(LeadContext context) : IAdminRightsRepo, IAsyncDisposable
+/// <summary>
+/// Author: Md. Sakibur Rahman
+/// </summary>
+
+public sealed class AdminRightsRepo(LeadContext context) : IAdminRightsRepo, IAsyncDisposable
 {
     private readonly LeadContext _context = context;
     private const int superAdminId = 100; // 100 -> Menu is only for developer,

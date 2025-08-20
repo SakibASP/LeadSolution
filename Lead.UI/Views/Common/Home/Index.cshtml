@@ -1,5 +1,6 @@
 ﻿@{
     ViewData["Title"] = "Dashboard";
+    var businessList = ViewBag.BusinessId as SelectList;
 }
 
 <div class="container-fluid">
@@ -9,9 +10,27 @@
         <h1 class="h3 mb-0 text-gray-800">Dashboard</h1>
         <!-- Business Dropdown -->
         <div class="d-flex">
-            <!-- Business Dropdown -->
-            <select class="form-control mb-2" asp-items="ViewBag.BusinessId" id="BusinessId" name="BusinessId">
-            </select>
+            <!-- Business Dropdown with Search -->
+            <div class="dropdown w-100">
+                <button class="btn btn-light border w-100 text-left" type="button"
+                        id="customDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    Select Business
+                </button>
+                <div class="dropdown-menu p-2 w-100" aria-labelledby="customDropdown" style="max-height: 300px; overflow-y: auto;">
+
+                    <!-- Search box -->
+                    <input type="text" class="form-control mb-2" id="drpSearch" placeholder="Search...">
+
+                    <!-- Dropdown items (loop from ViewBag.BusinessId) -->
+                    @if(businessList is not null)
+                    {
+                        foreach (var item in businessList)
+                        {
+                            <a class="dropdown-item custom-dropdown-item" data-value="@item.Value">@item.Text</a>
+                        }
+                    }
+                </div>
+            </div>
         </div>
     </div>
 

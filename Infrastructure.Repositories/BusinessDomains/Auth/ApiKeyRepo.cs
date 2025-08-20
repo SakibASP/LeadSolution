@@ -7,7 +7,12 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Repositories.BusinessDomains.Auth;
 
-public class ApiKeyRepo(LeadContext context) : IApiKeyRepo
+
+/// <summary>
+/// Author: Md. Sakibur Rahman
+/// </summary>
+
+public sealed class ApiKeyRepo(LeadContext context) : IApiKeyRepo
 {
     private readonly LeadContext _context = context;
     public async Task GenerateNewApiKeyAsync(AspNetBusinessApiKeys aspNetBusinessApiKeys)

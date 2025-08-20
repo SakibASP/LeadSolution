@@ -5,7 +5,13 @@ using System.Data;
 
 namespace Infrastructure.Repositories.Data;
 
-public class DapperContext(IConfiguration configuration) : IDapperContext
+
+/// <summary>
+/// Author: Md. Sakibur Rahman
+/// </summary>
+
+
+public sealed class DapperContext(IConfiguration configuration) : IDapperContext
 {
     private readonly string _connectionString = configuration.GetConnectionString("DefaultConnection")!;
     public IDbConnection CreateConnection() => new SqlConnection(_connectionString);

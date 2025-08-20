@@ -12,7 +12,12 @@ using System.Text.Json;
 
 namespace Infrastructure.Repositories.BusinessDomains.Lead;
 
-public class FormValueRepo(LeadContext context, IDapperContext dapper) : IFormValueRepo, IAsyncDisposable
+
+/// <summary>
+/// Author: Md. Sakibur Rahman
+/// </summary>
+
+public sealed class FormValueRepo(LeadContext context, IDapperContext dapper) : IFormValueRepo, IAsyncDisposable
 {
     private readonly LeadContext _context = context;
     private readonly IDapperContext _dapper = dapper;

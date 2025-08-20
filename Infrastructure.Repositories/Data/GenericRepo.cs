@@ -3,7 +3,13 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Repositories.Data;
 
-public class GenericRepo<T>(LeadContext context) : IGenericRepo<T> where T : class
+
+/// <summary>
+/// Author: Md. Sakibur Rahman
+/// </summary>
+
+
+public sealed class GenericRepo<T>(LeadContext context) : IGenericRepo<T> where T : class
 {
     private readonly LeadContext _context = context;
     private readonly DbSet<T> _dbSet = context.Set<T>();

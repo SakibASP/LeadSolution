@@ -13,7 +13,7 @@ namespace Infrastructure.Repositories.Data;
 /// Md. Sakibur Rahman
 /// 01 Jun 2025
 /// </summary>
-public class AuditTrailFactory(IHttpContextAccessor httpContext)
+public sealed class AuditTrailFactory(IHttpContextAccessor httpContext)
 {
     // HTTP context accessor for retrieving user and request information
     private readonly IHttpContextAccessor _httpContext = httpContext;

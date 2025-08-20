@@ -33,14 +33,16 @@ public static class ScopedServices
         services.AddScoped<IFormValueService, FormValueService>();
         services.AddScoped<IBusinessInfoService, BusinessInfoService>();
         services.AddScoped<IDropdownService, DropdownService>();
+        services.AddScoped<ICountryService, CountryService>();
         services.AddScoped<IApiKeyService, ApiKeyService>();
 
         //Repositories
         services.AddScoped<IMenuRepo, MenuRepo>();
         services.AddScoped<IAdminRightsRepo, AdminRightsRepo>();
         services.AddScoped<IFormValueRepo, FormValueRepo>();
-        services.AddScoped<IDropdownRepo, DropdownRepo>();
         services.AddScoped<IBusinessInfoRepo, BusinessInfoRepo>();
+        services.AddScoped<IDropdownRepo, DropdownRepo>();
+        services.AddScoped<ICountryRepo, CountryRepo>();
         services.AddScoped<IApiKeyRepo, ApiKeyRepo>();
 
 

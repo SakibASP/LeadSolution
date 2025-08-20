@@ -1,7 +1,6 @@
 ﻿using Common.Extentions;
 using Common.Utils.Constant;
 using Core.ViewModels.Dto.Auth.Auth;
-using Core.ViewModels.Request.Auth;
 using Core.ViewModels.Response;
 using Lead.UI.Interfaces;
 using Lead.UI.Settings;
@@ -51,6 +50,7 @@ public class AuthController(IHttpService httpService, IOptions<ApiSettings> apiS
         else
         {
             HttpContext.Session.Clear();
+            TempData[Constants.Error] = response?.Message;
         }
     }
 

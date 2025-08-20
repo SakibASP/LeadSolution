@@ -5,7 +5,12 @@ using Infrastructure.Repositories.Data;
 
 namespace Infrastructure.Repositories.BusinessDomains.Lead;
 
-public class BusinessInfoRepo(LeadContext context) : IBusinessInfoRepo
+
+/// <summary>
+/// Author: Md. Sakibur Rahman
+/// </summary>
+
+public sealed class BusinessInfoRepo(LeadContext context) : IBusinessInfoRepo
 {
     private readonly LeadContext _context = context;
     public async Task AddAsync(AspNetBusinessInfoDto businessInfo)

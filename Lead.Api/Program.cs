@@ -176,6 +176,8 @@ try
 
     builder.Services.AddControllers();
 
+    builder.Services.AddHttpClient();
+
     builder.Services.AddEndpointsApiExplorer();
     // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
     //builder.Services.AddOpenApi();
