@@ -49,10 +49,12 @@ public class LeadContext : IdentityDbContext<ApplicationUser>
     public virtual DbSet<MenuToRole> MenuToRole { get; set; } = default!;
     #endregion
 
-    #region - Country -
+    #region - Country, State, City, Currency -
     public virtual DbSet<Countries> Countries { get; set; } = default!;
     public virtual DbSet<CountryNativeNames> CountryNativeNames { get; set; } = default!;
     public virtual DbSet<Currencies> Currencies { get; set; } = default!;
+    public virtual DbSet<States> States { get; set; } = default!;
+    public virtual DbSet<Cities> Cities { get; set; } = default!;
     #endregion
 
     #region - Lead -
@@ -141,6 +143,21 @@ public class LeadContext : IdentityDbContext<ApplicationUser>
             .AutoInclude();
         modelBuilder.Entity<FormValues>()
             .Navigation(m => m.AspNetBusinessInfo)
+            .AutoInclude();
+
+        modelBuilder.Entity<Currencies>()
+            .Navigation(m => m.Country)
+            .AutoInclude();
+
+        modelBuilder.Entity<States>()
+            .Navigation(m => m.Country)
+            .AutoInclude();
+
+        modelBuilder.Entity<Cities>()
+            .Navigation(m => m.Country)
+            .AutoInclude();
+        modelBuilder.Entity<Cities>()
+            .Navigation(m => m.State)
             .AutoInclude();
     }
 }

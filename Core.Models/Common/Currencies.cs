@@ -1,5 +1,4 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
-using System.Diagnostics.Metrics;
 
 namespace Core.Models.Common;
 
@@ -10,6 +9,7 @@ public class Currencies
     public string? CurrencyCode { get; set; }
     public string? CurrencyName { get; set; }
     public string? CurrencySymbol { get; set; }
+    public bool IsActive { get; set; } = true;
 
     [ForeignKey(nameof(CountryId))]
     public Countries? Country { get; set; }

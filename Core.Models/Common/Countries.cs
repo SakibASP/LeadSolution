@@ -14,5 +14,6 @@ public class Countries
     public string? FlagPng { get; set; }
     public string? FlagSvg { get; set; }
     public string? FlagAlt { get; set; }
+    public bool IsActive { get; set; } = true;
 
 }

@@ -7,4 +7,7 @@ public enum DropdownEnum
     Users = 3,
     BusinessWiseUsers = 4,
     UserWiseBusinesses = 5,
+    Countries = 6,
+    States = 7,
+    Cities = 8
 }
