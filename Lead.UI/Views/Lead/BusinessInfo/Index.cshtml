@@ -4,50 +4,50 @@
     ViewData["Title"] = "Business Details";
 }
 
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <h2 class="text-primary fw-bold">Business Details</h2>
-    <a asp-action="Create" class="btn btn-success shadow-sm">
-        <i class="fas fa-plus-circle me-1"></i> Create New
-    </a>
-</div>
-
 <div class="card shadow rounded">
-    <div class="card-body p-0">
-        <div class="table-responsive">
-            <table class="table table-bordered table-hover mb-0 align-middle">
-                <thead class="table-dark">
-                    <tr>
-                        <th>Service</th>
-                        <th>Business</th>
-                        <th>Website</th>
-                        <th>Active</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var item in Model)
-                    {
-                        <tr>
-                            <td>@item.AspNetServiceTypes?.Name</td>
-                            <td>@item.BusinessName</td>
-                            <td>@item.Website</td>
-                            <td>
-                                <span class="badge bg-@(item.IsActive ? "success" : "danger")">
-                                    @(item.IsActive ? "Yes" : "No")
-                                </span>
-                            </td>
-                            <td>
-                                <a asp-action="Edit" class="btn btn-primary btn-sm" asp-route-id="@item.Id">Edit</a>
-                                <a href="javascript:void(0);"
-                                   class="btn btn-danger btn-sm"
-                                   onclick="confirmDelete('@Url.Action("Remove", "BusinessInfo", new { item.Id })')">
-                                    Delete
-                                </a>
-                            </td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
+    <div class="card-header">
+        <div class="d-flex justify-content-between align-items-center">
+            <h2 class="text-primary fw-bold">Business Details</h2>
+            <a asp-action="Create" class="btn btn-success shadow-sm">
+                <i class="fas fa-plus-circle me-1"></i> Create New
+            </a>
         </div>
+    </div>
+
+    <div class="card-body">
+        <table class="table table-bordered table-hover" id="dataTable">
+            <thead class="table-dark">
+                <tr>
+                    <th>Service</th>
+                    <th>Business</th>
+                    <th>Website</th>
+                    <th>Active</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>@item.AspNetServiceTypes?.Name</td>
+                        <td>@item.BusinessName</td>
+                        <td>@item.Website</td>
+                        <td>
+                            <span class="badge bg-@(item.IsActive ? "success" : "danger")">
+                                @(item.IsActive ? "Yes" : "No")
+                            </span>
+                        </td>
+                        <td>
+                            <a asp-action="Edit" class="btn btn-primary btn-sm" asp-route-id="@item.Id">Edit</a>
+                            <a href="javascript:void(0);"
+                               class="btn btn-danger btn-sm"
+                               onclick="confirmDelete('@Url.Action("Remove", "BusinessInfo", new { item.Id })')">
+                                Delete
+                            </a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
     </div>
 </div>
