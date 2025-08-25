@@ -15,7 +15,6 @@ namespace Lead.UI.Controllers.Lead;
 
 public class BusinessInfoController(IHttpService httpService, IOptions<ApiSettings> apiSetting) : BaseController(httpService, apiSetting)
 {
-    private string UtilityVersion => $"{_apiSettings.Controllers.Utility}";
     private string VersionedController => $"{_apiSettings.Controllers.BusinessInfo}";
     private void SetToken() => _httpService.SetBearerToken(AccessToken);
 
@@ -38,12 +37,12 @@ public class BusinessInfoController(IHttpService httpService, IOptions<ApiSettin
         SetToken();
 
         GetParam.Clear();
-        GetParam.Add("Id", ((int)DropdownEnum.ServiceTypes).ToString());
+        GetParam.Add("id", ((int)DropdownEnum.ServiceTypes).ToString());
         var serviceDropdownTask = _httpService.GetAsync<ApiResponse<IList<DropdownDto>>>(
             UtilityVersion, _apiSettings.Endpoints.Utility.GetDropdown, GetParam);
 
         GetParam.Clear();
-        GetParam.Add("Id", ((int)DropdownEnum.Users).ToString());
+        GetParam.Add("id", ((int)DropdownEnum.Users).ToString());
         var userDropdownTask = _httpService.GetAsync<ApiResponse<IList<UserDropdownDto>>>(
              UtilityVersion, _apiSettings.Endpoints.Utility.GetUserDropdown, GetParam);
 
@@ -95,7 +94,7 @@ public class BusinessInfoController(IHttpService httpService, IOptions<ApiSettin
 
         // getting the row to edit
         GetParam.Clear();
-        GetParam.Add("Id", id.ToString()!);
+        GetParam.Add("id", id.ToString()!);
         var businessInfoTask = _httpService.GetAsync<ApiResponse<AspNetBusinessInfo>>(
             VersionedController, 
             _apiSettings.Endpoints.CommonEndPoints.GetById,

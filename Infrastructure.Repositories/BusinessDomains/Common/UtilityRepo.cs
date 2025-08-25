@@ -1,7 +1,11 @@
-﻿using Core.Models.Common;
+﻿using Common.Utils.Constant;
+using Core.Models.Common;
+using Core.ViewModels.Request.Common;
+using Dapper;
 using Infrastructure.Interfaces.Common;
 using Infrastructure.Repositories.Data;
 using Microsoft.EntityFrameworkCore;
+using System.Data;
 
 namespace Infrastructure.Repositories.BusinessDomains.Common;
 
@@ -10,10 +14,28 @@ namespace Infrastructure.Repositories.BusinessDomains.Common;
 /// Author: Md. Sakibur Rahman
 /// </summary>
 
-public sealed class CountryRepo(LeadContext context) : ICountryRepo, IAsyncDisposable
+public sealed class UtilityRepo(LeadContext context, IDapperContext dapper) : IUtilityRepo, IAsyncDisposable
 {
     private readonly LeadContext _context = context;
+    private readonly IDapperContext _dapper = dapper;
 
+    public async Task<IList<T>> GetDropdownListAsync<T>(DropdownRequest request)
+    {
+        var parameters = new DynamicParameters();
+        parameters.Add("@Id", request.Id);
+        parameters.Add("@Param1", request.Param1);
+        parameters.Add("@Param2", request.Param2);
+        parameters.Add("@Param3", request.Param3);
+        parameters.Add("@Param4", request.Param4);
+
+        using var connection = _dapper.CreateConnection();
+        var result = await connection.QueryAsync<T>(
+            Sp.usp_GetDropdownList,
+            parameters,
+            commandType: CommandType.StoredProcedure);
+
+        return [.. result];
+    }
     public async Task UpdateCountriesAsync(IList<RestCountry>? restCountries)
     {
         if (restCountries == null || restCountries.Count == 0) return; // No countries to update
@@ -44,7 +66,22 @@ public sealed class CountryRepo(LeadContext context) : ICountryRepo, IAsyncDispo
         }
 
     }
+    public async Task<IList<Logs>> GetLogsAsync()
+    {
+        return await _context.Logs
+            .AsNoTracking()
+            .OrderByDescending(l => l.Id)
+            .Take(10000)
+            .ToListAsync();
+    }
 
+    public async Task<Logs> GetLogsByIdAsync(int id)
+    {
+        var result = await _context.Logs.FindAsync(id);
+        return result is null ? throw new KeyNotFoundException($"Log with ID {id} not found.") : result;
+    }
+
+    #region - private methods for country upsert -
     private async Task UpsertCountryCurrencyAsync(RestCountry c, Countries dbCountry)
     {
         if (c.Currencies != null)
@@ -150,10 +187,11 @@ public sealed class CountryRepo(LeadContext context) : ICountryRepo, IAsyncDispo
         return dbCountry;
     }
 
+    #endregion
+
     public async ValueTask DisposeAsync()
     {
         await _context.DisposeAsync();
         GC.SuppressFinalize(this);
     }
-
 }

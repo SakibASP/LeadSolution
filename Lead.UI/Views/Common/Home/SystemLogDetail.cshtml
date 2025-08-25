@@ -1,0 +1,69 @@
+﻿@model Core.Models.Common.Logs
+
+@{
+    ViewData["Title"] = "Log Details";
+    string[] ignorevalues = ["path", "username"];
+}
+
+<div class="card shadow-lg border-0 rounded-3">
+    <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
+        <h4 class="mb-0">Log #@Model.Id</h4>
+        <span class="badge bg-danger">@Model.Level</span>
+    </div>
+
+    <div class="card-body">
+        <dl class="row">
+
+            <dt class="col-sm-3">Message Template</dt>
+            <dd class="col-sm-9 text-muted">@Model.MessageTemplate</dd>
+
+            <dt class="col-sm-3">TimeStamp</dt>
+            <dd class="col-sm-9">@Model.TimeStamp?.ToString("yyyy-MM-dd HH:mm:ss")</dd>
+
+            <dt class="col-sm-3">User</dt>
+            <dd class="col-sm-9">@Model.UserName</dd>
+
+            <dt class="col-sm-3">Path</dt>
+            <dd class="col-sm-9">
+                <code>@Model.Path</code>
+            </dd>
+
+            <dt class="col-sm-3">Properties</dt>
+            <dd class="col-sm-9">
+                @if (ViewBag.Properties is Dictionary<string, string> props && props.Any())
+                {
+                    <table class="table table-sm table-borderless w-auto">
+                        <tbody>
+                            @foreach (var prop in props.Where(x => !ignorevalues.Contains(x.Key.ToLower())))
+                            {
+                                <tr>
+                                    <td class="fw-bold text-muted">@prop.Key</td>
+                                    <td>@prop.Value</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                }
+                else
+                {
+                    <span class="text-muted">No properties</span>
+                }
+            </dd>
+
+            <dt class="col-sm-3">Exception</dt>
+            <dd class="col-sm-9">
+                @if (!string.IsNullOrEmpty(Model.Exception))
+                {
+                    <pre class="bg-dark text-warning p-3 rounded small" style="white-space: pre-wrap; word-wrap: break-word;">
+                                    @Model.Exception.Trim()
+                                </pre>
+                }
+                else
+                {
+                    <span class="text-success">No exception logged ✅</span>
+                }
+            </dd>
+
+        </dl>
+    </div>
+</div>

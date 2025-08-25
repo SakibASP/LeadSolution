@@ -1,17 +1,19 @@
 ﻿using Application.Interfaces.Lead;
 using Common.Extentions;
-using Common.Utils.Helper;
 using Core.Models.Lead;
 using Core.ViewModels.Response;
 using Infrastructure.Interfaces.Common;
+using Infrastructure.Interfaces.Lead;
 using Microsoft.AspNetCore.Http;
 using Serilog;
+using System.Text.Json;
 
 namespace Application.Services.Lead;
 
-public class FormDetailService(IGenericRepo<FormDetails> repo, IHttpContextAccessor httpContext) : IFormDetailService
+public class FormDetailService(IGenericRepo<FormDetails> repo, IFormDetailRepo detailRepo, IHttpContextAccessor httpContext) : IFormDetailService
 {
-    private readonly IGenericRepo<FormDetails> _iFormDetail = repo;
+    private readonly IGenericRepo<FormDetails> _iGenericRepo = repo;
+    private readonly IFormDetailRepo _iFormDetail = detailRepo;
     private readonly IHttpContextAccessor _httpContext = httpContext;
 
     private string CurrentUser => _httpContext.HttpContext?.User?.Identity?.Name ?? "N/A";
@@ -22,7 +24,7 @@ public class FormDetailService(IGenericRepo<FormDetails> repo, IHttpContextAcces
         try
         {
             formDetails.CreatedBy = CurrentUser;
-            await _iFormDetail.AddAsync(formDetails);
+            await _iGenericRepo.AddAsync(formDetails);
             return ApiResponse<dynamic>.Success(true, "Form detail created successfully!");
         }
         catch (Exception ex)
@@ -30,7 +32,7 @@ public class FormDetailService(IGenericRepo<FormDetails> repo, IHttpContextAcces
             Log
                 .ForContext("UserName", CurrentUser)
                 .ForContext("Path", RequestPath)
-                .Error(ex, "Error adding FormDetails: {@FormDetails}", formDetails);
+                .Error(ex, "Error adding FormDetails: {@FormDetails}", JsonSerializer.Serialize(formDetails));
             return ApiResponse<dynamic>.Fail("Something went wrong!");
         }
     }
@@ -39,7 +41,7 @@ public class FormDetailService(IGenericRepo<FormDetails> repo, IHttpContextAcces
     {
         try
         {
-            var result = await _iFormDetail.GetAllAsync(parameter);
+            var result = await _iGenericRepo.GetAllAsync(parameter);
             return ApiResponse<IList<FormDetails>>.Success(result, "Form details retrieved successfully!");
         }
         catch (Exception ex)
@@ -47,7 +49,7 @@ public class FormDetailService(IGenericRepo<FormDetails> repo, IHttpContextAcces
             Log
                 .ForContext("UserName", CurrentUser)
                 .ForContext("Path", RequestPath)
-                .Error(ex, "Error retrieving all FormDetails with parameter: {@Parameter}", parameter);
+                .Error(ex, "Error retrieving all FormDetails with parameter: {@Parameter}", JsonSerializer.Serialize(parameter));
             return ApiResponse<IList<FormDetails>>.Fail("Something went wrong!");
         }
     }
@@ -56,7 +58,7 @@ public class FormDetailService(IGenericRepo<FormDetails> repo, IHttpContextAcces
     {
         try
         {
-            var result = await _iFormDetail.GetByIdAsync(id);
+            var result = await _iGenericRepo.GetByIdAsync(id);
             return ApiResponse<FormDetails>.Success(result, "Form detail retrieved successfully!");
         }
         catch (Exception ex)
@@ -93,7 +95,7 @@ public class FormDetailService(IGenericRepo<FormDetails> repo, IHttpContextAcces
         {
             formDetails.ModifiedBy = CurrentUser;
             formDetails.ModifiedDate = DateTime.Now.ToBangladeshTime();
-            await _iFormDetail.UpdateAsync(formDetails);
+            await _iGenericRepo.UpdateAsync(formDetails);
             return ApiResponse<dynamic>.Success(true, "Form detail updated successfully!");
         }
         catch (Exception ex)
@@ -101,7 +103,7 @@ public class FormDetailService(IGenericRepo<FormDetails> repo, IHttpContextAcces
             Log
                 .ForContext("UserName", CurrentUser)
                 .ForContext("Path", RequestPath)
-                .Error(ex, "Error updating FormDetails: {@FormDetails}", formDetails);
+                .Error(ex, "Error updating FormDetails: {@FormDetails}", JsonSerializer.Serialize(formDetails));
             return ApiResponse<dynamic>.Fail("Something went wrong!");
         }
     }

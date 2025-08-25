@@ -64,7 +64,8 @@ public class LeadContext : IdentityDbContext<ApplicationUser>
     public virtual DbSet<BusinessSupportedFormId> BusinessSupportedFormId { get; set; } = default!;
     #endregion
 
-    #region - Audit -
+    #region - Audit & Logs -
+    public virtual DbSet<Logs> Logs { get; set; } = default!;
     public virtual DbSet<Audit> Audit { get; set; } = default!;
     private AuditTrailFactory? auditFactory = null;
     private readonly List<Audit> auditList = [];

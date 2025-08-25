@@ -6,6 +6,7 @@ using Application.Services.Auth;
 using Application.Services.Common;
 using Application.Services.Lead;
 using Application.Services.Menu;
+using Core.Models.Lead;
 using Infrastructure.Interfaces.Auth;
 using Infrastructure.Interfaces.Common;
 using Infrastructure.Interfaces.Lead;
@@ -32,17 +33,16 @@ public static class ScopedServices
         services.AddScoped<IFormDetailService, FormDetailService>();
         services.AddScoped<IFormValueService, FormValueService>();
         services.AddScoped<IBusinessInfoService, BusinessInfoService>();
-        services.AddScoped<IDropdownService, DropdownService>();
-        services.AddScoped<ICountryService, CountryService>();
+        services.AddScoped<IUtilityService, UtilityService>();
         services.AddScoped<IApiKeyService, ApiKeyService>();
 
         //Repositories
         services.AddScoped<IMenuRepo, MenuRepo>();
         services.AddScoped<IAdminRightsRepo, AdminRightsRepo>();
+        services.AddScoped<IFormDetailRepo, FormDetailRepo>();
         services.AddScoped<IFormValueRepo, FormValueRepo>();
         services.AddScoped<IBusinessInfoRepo, BusinessInfoRepo>();
-        services.AddScoped<IDropdownRepo, DropdownRepo>();
-        services.AddScoped<ICountryRepo, CountryRepo>();
+        services.AddScoped<IUtilityRepo, UtilityRepo>();
         services.AddScoped<IApiKeyRepo, ApiKeyRepo>();
 
 

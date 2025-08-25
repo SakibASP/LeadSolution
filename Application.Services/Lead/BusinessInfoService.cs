@@ -1,4 +1,5 @@
 ﻿using Application.Interfaces.Lead;
+using Azure.Core;
 using Common.Extentions;
 using Core.Models.Auth;
 using Core.ViewModels.Dto.Lead;
@@ -7,6 +8,7 @@ using Infrastructure.Interfaces.Common;
 using Infrastructure.Interfaces.Lead;
 using Microsoft.AspNetCore.Http;
 using Serilog;
+using System.Text.Json;
 
 namespace Application.Services.Lead;
 
@@ -34,7 +36,7 @@ public class BusinessInfoService(
             Log
                 .ForContext("UserName", CurrentUser)
                 .ForContext("Path", RequestPath)
-                .Error(ex, "Error retrieving business list with parameter: {@Parameter}", parameter);
+                .Error(ex, "Error retrieving business list with parameter: {@Parameter}", JsonSerializer.Serialize(parameter));
             return ApiResponse<IList<AspNetBusinessInfo>>.Fail("Something went wrong!");
         }
     }
@@ -69,7 +71,7 @@ public class BusinessInfoService(
             Log
                 .ForContext("UserName", CurrentUser)
                 .ForContext("Path", RequestPath)
-                .Error(ex, "Error creating business info: {@BusinessInfo}", businessInfo);
+                .Error(ex, "Error creating business info: {@BusinessInfo}", JsonSerializer.Serialize(businessInfo));
             return ApiResponse<dynamic>.Fail("Something went wrong!");
         }
     }
@@ -88,7 +90,7 @@ public class BusinessInfoService(
             Log
                 .ForContext("UserName", CurrentUser)
                 .ForContext("Path", RequestPath)
-                .Error(ex, "Error updating business info: {@BusinessInfo}", businessInfo);
+                .Error(ex, "Error updating business info: {@BusinessInfo}", JsonSerializer.Serialize(businessInfo));
             return ApiResponse<dynamic>.Fail("Something went wrong!");
         }
     }

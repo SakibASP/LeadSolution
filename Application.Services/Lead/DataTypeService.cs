@@ -1,11 +1,14 @@
 ﻿using Application.Interfaces.Lead;
+using Azure.Core;
 using Common.Extentions;
 using Common.Utils.Helper;
 using Core.Models.Lead;
 using Core.ViewModels.Response;
+using DocumentFormat.OpenXml.Office2016.Excel;
 using Infrastructure.Interfaces.Common;
 using Microsoft.AspNetCore.Http;
 using Serilog;
+using System.Text.Json;
 
 namespace Application.Services.Lead;
 
@@ -30,7 +33,7 @@ public class DataTypeService(IGenericRepo<DataTypes> repo, IHttpContextAccessor 
             Log
                 .ForContext("UserName", CurrentUser)
                 .ForContext("Path", RequestPath)
-                .Error(ex, "Error creating DataType {dataTypes}", dataTypes);
+                .Error(ex, "Error creating DataType {dataTypes}", JsonSerializer.Serialize(dataTypes));
             return ApiResponse<dynamic>.Fail("Something went wrong!");
         }
     }
@@ -47,7 +50,7 @@ public class DataTypeService(IGenericRepo<DataTypes> repo, IHttpContextAccessor 
             Log
                 .ForContext("UserName", CurrentUser)
                 .ForContext("Path", RequestPath)
-                .Error(ex, "Error retrieving DataTypes {parameter}", parameter);
+                .Error(ex, "Error retrieving DataTypes {parameter}", JsonSerializer.Serialize(parameter));
             return ApiResponse<IList<DataTypes>>.Fail("Something went wrong!");
         }
     }
@@ -100,7 +103,7 @@ public class DataTypeService(IGenericRepo<DataTypes> repo, IHttpContextAccessor 
             Log
                 .ForContext("UserName", CurrentUser)
                 .ForContext("Path", RequestPath)
-                .Error(ex, "Error updating DataType {dataTypes}", dataTypes);
+                .Error(ex, "Error updating DataType {dataTypes}", JsonSerializer.Serialize(dataTypes));
             return ApiResponse<dynamic>.Fail("Something went wrong!");
         }
     }

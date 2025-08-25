@@ -6,6 +6,7 @@ using Core.ViewModels.Response;
 using Infrastructure.Interfaces.Lead;
 using Microsoft.AspNetCore.Http;
 using Serilog;
+using System.Text.Json;
 
 namespace Application.Services.Lead;
 
@@ -29,7 +30,7 @@ public class FormValueService(IFormValueRepo repo, IHttpContextAccessor httpCont
             Log
                 .ForContext("UserName", CurrentUser)
                 .ForContext("Path", RequestPath)
-                .Error(ex, "Error adding DynamicForm: {@ViewModel}", viewModel);
+                .Error(ex, "Error adding DynamicForm: {@ViewModel}", JsonSerializer.Serialize(viewModel));
             return ApiResponse<dynamic>.Fail("Something went wrong!");
         }
     }
@@ -46,7 +47,7 @@ public class FormValueService(IFormValueRepo repo, IHttpContextAccessor httpCont
             Log
                 .ForContext("UserName", CurrentUser)
                 .ForContext("Path", RequestPath)
-                .Error(ex, "Error retrieving messages with parameter: {@Param}", param);
+                .Error(ex, "Error retrieving messages with parameter: {@Param}", JsonSerializer.Serialize(param));
             return ApiResponse<IList<FormValues>>.Fail("Something went wrong!");
         }
     }
@@ -98,7 +99,7 @@ public class FormValueService(IFormValueRepo repo, IHttpContextAccessor httpCont
             Log
                 .ForContext("UserName", CurrentUser)
                 .ForContext("Path", RequestPath)
-                .Error(ex, "Error updating DynamicForm: {@ViewModel}", request);
+                .Error(ex, "Error updating DynamicForm: {@ViewModel}", JsonSerializer.Serialize(request));
             return ApiResponse<dynamic>.Fail("Something went wrong!");
         }
     }

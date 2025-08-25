@@ -1,5 +1,8 @@
-﻿using Infrastructure.Interfaces.Common;
+﻿using Common.Utils.Constant;
+using Dapper;
+using Infrastructure.Interfaces.Common;
 using Microsoft.EntityFrameworkCore;
+using System.Data;
 
 namespace Infrastructure.Repositories.Data;
 
@@ -9,9 +12,10 @@ namespace Infrastructure.Repositories.Data;
 /// </summary>
 
 
-public sealed class GenericRepo<T>(LeadContext context) : IGenericRepo<T> where T : class
+public sealed class GenericRepo<T>(LeadContext context, IDapperContext dapper) : IGenericRepo<T> where T : class
 {
     private readonly LeadContext _context = context;
+    private readonly IDapperContext _dapper = dapper;
     private readonly DbSet<T> _dbSet = context.Set<T>();
 
     public async Task<IList<T>> GetAllAsync(dynamic? parameter = null) => await _dbSet.AsNoTracking().ToListAsync();
@@ -53,6 +57,7 @@ public sealed class GenericRepo<T>(LeadContext context) : IGenericRepo<T> where 
         _dbSet.RemoveRange(entities);
         await _context.SaveChangesAsync();
     }
+
 }
 
 

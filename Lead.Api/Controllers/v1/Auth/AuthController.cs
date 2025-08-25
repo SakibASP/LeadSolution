@@ -70,7 +70,7 @@ public class AuthController(
             Log
                 .ForContext("UserName", CurrentUser)
                 .ForContext("Path", RequestPath)
-                .Error(ex, "Error registering user {dto}", dto);
+                .Error(ex, "Error registering user {dto}", JsonSerializer.Serialize(dto));
             return Ok(ApiResponse<AuthResponseDto>.Fail("Something went wrong!"));
         }
         
@@ -115,7 +115,7 @@ public class AuthController(
             Log
                 .ForContext("UserName", CurrentUser)
                 .ForContext("Path", RequestPath)
-                .Error(ex, "Error login user {dto}", dto);
+                .Error(ex, "Error login user {dto}", JsonSerializer.Serialize(dto));
             return Ok(ApiResponse<AuthResponseDto>.Fail("Something went wrong!"));
         }
     }
@@ -171,7 +171,7 @@ public class AuthController(
             Log
                 .ForContext("UserName", CurrentUser)
                 .ForContext("Path", RequestPath)
-                .Error(ex, "Error generating token {dto}", dto);
+                .Error(ex, "Error generating token {dto}", JsonSerializer.Serialize(dto));
             return Ok(ApiResponse<AuthResponseDto>.Fail("Something went wrong!"));
         }
     }

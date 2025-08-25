@@ -10,7 +10,7 @@ namespace Infrastructure.Repositories.BusinessDomains.Lead;
 /// Author: Md. Sakibur Rahman
 /// </summary>
 
-public sealed class BusinessInfoRepo(LeadContext context) : IBusinessInfoRepo
+public sealed class BusinessInfoRepo(LeadContext context) : IBusinessInfoRepo, IAsyncDisposable
 {
     private readonly LeadContext _context = context;
     public async Task AddAsync(AspNetBusinessInfoDto businessInfo)
@@ -50,9 +50,16 @@ public sealed class BusinessInfoRepo(LeadContext context) : IBusinessInfoRepo
             throw;
         }
     }
+
     public async Task UpdateAsync(AspNetBusinessInfo aspNetBusinessInfo)
     {
         _context.Update(aspNetBusinessInfo);
         await _context.SaveChangesAsync();
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        await _context.DisposeAsync();
+        GC.SuppressFinalize(this);
     }
 }

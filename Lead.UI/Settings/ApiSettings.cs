@@ -99,4 +99,6 @@ public class UtilityEndpoints
 {
     public string GetDropdown { get; set; } = default!;
     public string GetUserDropdown { get; set; } = default!;
+    public string GetSystemLogs { get; set; } = default!;
+    public string GetSystemLogById { get; set; } = default!;
 }

@@ -14,7 +14,6 @@ namespace Lead.UI.Controllers.Lead;
 
 public class FormDetailsController(IHttpService httpService, IOptions<ApiSettings> apiSetting) : BaseController(httpService, apiSetting)
 {
-    private string UtilityVersion => $"{_apiSettings.Controllers.Utility}";
     private string VersionedController => $"{_apiSettings.Controllers.FormDetails}";
 
     private void SetToken() => _httpService.SetBearerToken(AccessToken);
@@ -39,7 +38,7 @@ public class FormDetailsController(IHttpService httpService, IOptions<ApiSetting
         SetToken();
 
         GetParam.Clear();
-        GetParam.Add("Id", ((int)DropdownEnum.DataTypes).ToString());
+        GetParam.Add("id", ((int)DropdownEnum.DataTypes).ToString());
         var viewBagResponse = await _httpService.GetAsync<ApiResponse<IList<DropdownDto>>>(
              UtilityVersion, _apiSettings.Endpoints.Utility.GetDropdown, GetParam);
 
@@ -77,13 +76,13 @@ public class FormDetailsController(IHttpService httpService, IOptions<ApiSetting
         SetToken();
 
         GetParam.Clear();
-        GetParam.Add("Id", id.ToString()!);
+        GetParam.Add("id", id.ToString()!);
         var getDetailTask = _httpService.GetAsync<ApiResponse<FormDetails>>(
             VersionedController, 
             _apiSettings.Endpoints.CommonEndPoints.GetById, GetParam);
 
         GetParam.Clear();
-        GetParam.Add("Id", ((int)DropdownEnum.DataTypes).ToString());
+        GetParam.Add("id", ((int)DropdownEnum.DataTypes).ToString());
         var getTypeTask = _httpService.GetAsync<ApiResponse<IList<DropdownDto>>>(
              UtilityVersion, _apiSettings.Endpoints.Utility.GetDropdown, GetParam);
 

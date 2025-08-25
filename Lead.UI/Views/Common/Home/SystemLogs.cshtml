@@ -1,0 +1,55 @@
+﻿@model IEnumerable<Core.Models.Common.Logs>
+
+@{
+    ViewData["Title"] = "Logs";
+}
+
+<div class="card shadow-lg border-0 rounded-3">
+    <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
+        <h4 class="mb-0">System Logs</h4>
+    </div>
+
+    <div class="card-body table-responsive">
+        <table class="table table-hover align-middle" id="dataTableDesc">
+            <thead class="table-light">
+                <tr>
+                    <th>Id</th>
+                    <th>Level</th>
+                    <th>Message</th>
+                    <th>User</th>
+                    <th>TimeStamp</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var log in Model.OrderByDescending(l => l.TimeStamp))
+                {
+                    string levelClass = log.Level?.ToLower() switch
+                    {
+                        "error" => "badge bg-danger",
+                        "warning" => "badge bg-warning text-dark",
+                        "info" => "badge bg-info text-dark",
+                        _ => "badge bg-secondary"
+                    };
+
+                    <tr>
+                        <td>@log.Id</td>
+                        <td><span class="@levelClass">@log.Level</span></td>
+                        <td>
+                            <div class="text-truncate" style="max-width: 300px;" title="@log.Message">
+                                @log.Message
+                            </div>
+                        </td>
+                        <td>@log.UserName</td>
+                        <td>@log.TimeStamp?.ToString("yyyy-MM-dd HH:mm:ss")</td>
+                        <td>
+                            <a asp-action="SystemLogDetail" asp-route-id="@log.Id" class="btn btn-sm btn-outline-primary">
+                                View
+                            </a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
