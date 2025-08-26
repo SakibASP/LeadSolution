@@ -26,7 +26,7 @@ BEGIN
         IF ISJSON(@JsonObject) = 1 AND LEN(@JsonObject) > 0
         BEGIN
             -- MERGE UPSERT logic
-            MERGE INTO dbo.BusinessSupportedFormIds AS TARGET
+            MERGE INTO dbo.BusinessSupportedFormId AS TARGET
             USING (
                 SELECT 
                     B.FormDetailId AS FormId,

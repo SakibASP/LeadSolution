@@ -7,8 +7,20 @@
     font-size: 1rem;
 }
 
-/*Toast style start*/
 
+.form-check {
+    padding-left: 2.5rem; /* or whatever matches your input padding */
+}
+
+
+.theme-active {
+    box-shadow: 0 0 0 3px #007bff inset;
+    transform: translateY(-1px);
+}
+
+/* -----------------------------
+   Toast message
+----------------------------- */
 .toast-bar {
     position: fixed;
     top: 20px;
@@ -68,8 +80,14 @@
 }
 
 
-/*Toast style end*/
+/* -----------------------------
+   Global button hover for project
+----------------------------- */
+button, .btn {
+    transition: all 0.3s ease; /* smooth transition */
+}
 
-.form-check {
-    padding-left: 2.5rem; /* or whatever matches your input padding */
+button:hover, .btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
 }

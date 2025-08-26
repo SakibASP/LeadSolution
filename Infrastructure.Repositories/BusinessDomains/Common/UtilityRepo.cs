@@ -74,7 +74,6 @@ public sealed class UtilityRepo(LeadContext context, IDapperContext dapper) : IU
             .Take(10000)
             .ToListAsync();
     }
-
     public async Task<Logs> GetLogsByIdAsync(int id)
     {
         var result = await _context.Logs.FindAsync(id);

@@ -3,8 +3,35 @@ const businessId = document.getElementById('BusinessId');
 const txtApiKey = document.getElementById("txtApiKey");
 const apiKey = document.getElementById("ApiKey");
 const embedCode = document.getElementById("EmbedCode");
+const dynamicForm = document.getElementById('dynamicForm');
+const btnGenerateCode = document.getElementById('btnGenerateCode');
 
 document.addEventListener('DOMContentLoaded', function () {
+    onGenerateCodeClick();
+    populateBusinessIdAndApiKey();
+});
+
+// ============ on page load and button click events start =============
+const onGenerateCodeClick = () => {
+    btnGenerateCode.addEventListener('click', function () {
+        const formContainer = document.querySelector('.form-container');
+        if (!formContainer || getComputedStyle(formContainer).display === 'none') {
+            // Form is hidden, show SweetAlert
+            Swal.fire({
+                icon: 'warning',
+                title: '⚠️ No theme selected',
+                text: 'Please select a theme to display it first.',
+                confirmButtonText: 'OK'
+            });
+            return; // prevent modal
+        }
+        // If form is visible, open modal manually
+        const modal = new bootstrap.Modal(document.getElementById('embedCodeModal'));
+        modal.show();
+    });
+}
+
+const populateBusinessIdAndApiKey = () => {
     if (drpBusinessId && businessId) {
         // On page load, set hidden input value
         businessId.value = drpBusinessId.value;
@@ -15,8 +42,55 @@ document.addEventListener('DOMContentLoaded', function () {
             this.form.submit();
         });
     }
-});
+}
 
+const setFormTheme = (themeClass, btn) => {
+    // Remove existing theme classes
+    dynamicForm.classList.remove('dark-theme', 'white-theme', 'transparent-theme');
+
+    // Add the selected theme
+    dynamicForm.classList.add(themeClass);
+
+    // Make form visible (if it was hidden)
+    dynamicForm.style.display = 'block';
+    // Highlight active button
+    document.querySelectorAll('.theme-btn').forEach(b => b.classList.remove('theme-active'));
+    btn.classList.add('theme-active');
+}
+
+const copyEmbedCode = () => {
+    embedCode.select();
+    embedCode.setSelectionRange(0, 99999); // Mobile
+
+    navigator.clipboard.writeText(embedCode.value)
+        .then(() => {
+            successCopy();
+        })
+        .catch(() => {
+            failedCopy();
+        });
+}
+
+const copyApiKey = () => {
+    txtApiKey.select();
+    txtApiKey.setSelectionRange(0, 99999); // For mobile
+    navigator.clipboard.writeText(txtApiKey.value)
+        .then(() => {
+            successCopy();
+        })
+        .catch(() => {
+            failedCopy();
+        });
+}
+
+const clearEmbedCode = () => {
+    embedCode.value = "";
+}
+// ============ on page load and button click events end ===============
+
+
+
+// ============ fetch api calls start ===========
 const updateFormSettings = async () => {
     if (!businessId || businessId.value == '') {
         businessNotFound();
@@ -61,7 +135,6 @@ const updateFormSettings = async () => {
         });
     }
 };
-
 
 const generateNewApiKey = async () => {
     if (!businessId || businessId.value == '') {
@@ -108,37 +181,11 @@ const generateNewApiKey = async () => {
         });
     }
 };
+// ============ fetch api calls end =============
 
 
-const copyEmbedCode = () => {
-    embedCode.select();
-    embedCode.setSelectionRange(0, 99999); // Mobile
 
-    navigator.clipboard.writeText(embedCode.value)
-        .then(() => {
-            successCopy();
-        })
-        .catch(() => {
-            failedCopy();
-        });
-}
-
-const copyApiKey = () => {
-    txtApiKey.select();
-    txtApiKey.setSelectionRange(0, 99999); // For mobile
-    navigator.clipboard.writeText(txtApiKey.value)
-        .then(() => {
-            successCopy();
-        })
-        .catch(() => {
-            failedCopy();
-        });
-}
-
-const clearEmbedCode = () => {
-    embedCode.value = "";
-}
-
+// ============ sweet alerts start ================
 const successCopy = () => {
     Swal.fire({
         icon: 'success',
@@ -180,7 +227,11 @@ const apiKeyNotFound = () => {
         allowEscapeKey: false
     });
 }
+// ============ sweet alerts end ==================
 
+
+
+//================ Generate Embeddable Form Code =================
 const generateEmbeddableForm = () => {
     if (!businessId || businessId.value == '') {
         businessNotFound();
@@ -191,8 +242,7 @@ const generateEmbeddableForm = () => {
         return;
     }
 
-    const form = document.getElementById('dynamicForm');
-    const clonedForm = form.cloneNode(true);
+    const clonedForm = dynamicForm.cloneNode(true);
 
     // Remove validation attributes
     clonedForm.removeAttribute('asp-action');
@@ -232,6 +282,12 @@ const generateEmbeddableForm = () => {
     // Set ID for submission handler
     clonedForm.id = 'embeddedForm';
 
+    //CSS for form design
+    const cssDesign = `
+        <link href="https://localhost:7131/css/lead/formvalues/dynamic-form.css" rel="stylesheet" />
+        <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet" />
+    `.trim();
+
     // Script for submitting to your API endpoint
     const script = `
         <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -268,7 +324,7 @@ const generateEmbeddableForm = () => {
                         headers: {
                             'Content-Type': 'application/json',
                             'X-Api-Key': apiKey,
-                            'X-Business-Id': businessId  // string here
+                            'X-Business-Id': businessId
                         },
                         body: JSON.stringify(payload)
                     });
@@ -281,7 +337,7 @@ const generateEmbeddableForm = () => {
                                 errorMessage = errorData.message;
                             }
                         } catch {
-                            // ignore JSON parsing errors
+       
                         }
                         console.error('API error:', errorMessage);
                         await Swal.fire({
@@ -312,23 +368,19 @@ const generateEmbeddableForm = () => {
         </script>
 `.trim();
 
-
-
     // Final embeddable HTML
     let fullHtml = `
         <!-- Start Embedded Contact Form -->
-        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
-            <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet" />
-        <style>
-            body { font-family: sans-serif; padding: 20px; background: #f9f9f9; }
-            form { max-width: 600px; margin: 0 auto; }
-        </style>
-        ${clonedForm.outerHTML}
+        ${cssDesign}
+        <div id="myDynamicFormWrapper">
+            ${clonedForm.outerHTML}
+        </div>
         ${script}
         <!-- End Embedded Contact Form -->
         `.trim();
 
-    //fullHtml = fullHtml.replace(/>\s+</g, '><').replace(/\s+/g, ' ').trim();
+    // making minimum version of HTML
+    fullHtml = fullHtml.replace(/>\s+</g, '><').replace(/\s+/g, ' ').trim();
 
     // Output to textarea
     embedCode.value = fullHtml;

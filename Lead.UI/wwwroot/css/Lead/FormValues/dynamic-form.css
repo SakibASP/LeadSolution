@@ -1,0 +1,254 @@
+﻿/* ==========================================
+   My Dynamic Form Wrapper
+   Scoped to #myDynamicFormWrapper for no conflicts
+========================================== */
+#myDynamicFormWrapper {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* -----------------------------
+Form container
+----------------------------- */
+#myDynamicFormWrapper .form-container {
+    max-width: 600px;
+    margin: 30px auto;
+    padding: 30px 40px;
+    border-radius: 15px;
+    display: none; /* hide initially */
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    transition: all 0.4s ease;
+}
+
+/* Labels */
+#myDynamicFormWrapper .form-container label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    font-size: 0.95rem;
+}
+
+/* Inputs, selects, textarea */
+#myDynamicFormWrapper .form-container input,
+#myDynamicFormWrapper .form-container select,
+#myDynamicFormWrapper .form-container textarea {
+    width: 100%;
+    padding: 10px 12px;
+    margin-bottom: 18px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    box-sizing: border-box;
+    font-size: 0.95rem;
+    transition: all 0.3s ease;
+}
+
+#myDynamicFormWrapper .form-container input:focus,
+#myDynamicFormWrapper .form-container select:focus,
+#myDynamicFormWrapper .form-container textarea:focus {
+    border-color: #007bff;
+    outline: none;
+    box-shadow: 0 0 8px rgba(0,123,255,0.2);
+}
+
+/* Submit button */
+#myDynamicFormWrapper .form-container button {
+    width: 100%;
+    padding: 12px;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    font-weight: 700;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+}
+
+#myDynamicFormWrapper .form-container button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+}
+
+/* -----------------------------
+   Themes
+----------------------------- */
+/* Dark Theme */
+#myDynamicFormWrapper .dark-theme {
+    background: linear-gradient(145deg, #222, #111);
+    color: #fff;
+}
+
+#myDynamicFormWrapper .dark-theme input,
+#myDynamicFormWrapper .dark-theme select,
+#myDynamicFormWrapper .dark-theme textarea {
+    background: #333;
+    color: #fff;
+    border: 1px solid #555;
+}
+
+#myDynamicFormWrapper .dark-theme button {
+    background: #28a745;
+    color: #fff;
+}
+
+/* White Theme */
+#myDynamicFormWrapper .white-theme {
+    background: #fff;
+    color: #000;
+    border: 1px solid #ddd;
+}
+
+#myDynamicFormWrapper .white-theme input,
+#myDynamicFormWrapper .white-theme select,
+#myDynamicFormWrapper .white-theme textarea {
+    background: #fff;
+    color: #000;
+    border: 1px solid #ccc;
+}
+
+#myDynamicFormWrapper .white-theme button {
+    background: linear-gradient(90deg, #007bff, #0056b3);
+    color: #fff;
+}
+
+/* Transparent Theme */
+#myDynamicFormWrapper .transparent-theme {
+    background: rgba(255,255,255,0.05);
+    color: #000;
+    border: 2px dashed #aaa;
+    backdrop-filter: blur(6px);
+}
+
+#myDynamicFormWrapper .transparent-theme input,
+#myDynamicFormWrapper .transparent-theme select,
+#myDynamicFormWrapper .transparent-theme textarea {
+    background: rgba(255,255,255,0.1);
+    border: 1px solid #aaa;
+    color: #000;
+}
+
+#myDynamicFormWrapper .transparent-theme button {
+    background: #ff5722;
+    color: #fff;
+}
+
+/* -----------------------------
+Button Table
+----------------------------- */
+#myDynamicFormWrapper table {
+    margin: 20px auto 30px auto;
+    border-collapse: collapse;
+    text-align: center;
+}
+
+#myDynamicFormWrapper table td {
+    padding: 10px;
+}
+
+#myDynamicFormWrapper table button {
+    padding: 10px 22px;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+#myDynamicFormWrapper table button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.15);
+}
+
+/* Individual button styles */
+#myDynamicFormWrapper .btn-dark {
+    background: #222;
+    color: #fff;
+    border: 1px solid #444;
+}
+
+#myDynamicFormWrapper .btn-white {
+    background: #fff;
+    color: #000;
+    border: 1px solid #ddd;
+}
+
+#myDynamicFormWrapper .btn-transparent {
+    background: transparent;
+    border: 2px solid #aaa;
+    color: #000;
+}
+
+/* -----------------------------
+   Responsive: Tablets
+----------------------------- */
+@media (max-width: 768px) {
+    #myDynamicFormWrapper .form-container {
+        padding: 20px 25px;
+        max-width: 90%;
+    }
+
+    #myDynamicFormWrapper .form-container input,
+    #myDynamicFormWrapper .form-container select,
+    #myDynamicFormWrapper .form-container textarea {
+        font-size: 0.9rem;
+        padding: 8px 10px;
+    }
+
+    #myDynamicFormWrapper .form-container button {
+        font-size: 0.95rem;
+        padding: 10px;
+    }
+
+    #myDynamicFormWrapper table button {
+        padding: 8px 16px;
+        font-size: 0.9rem;
+    }
+}
+
+/* -----------------------------
+   Responsive: Mobile
+----------------------------- */
+@media (max-width: 480px) {
+    #myDynamicFormWrapper .form-container {
+        padding: 15px 15px;
+        border-radius: 12px;
+        max-width: 95%;
+    }
+
+    #myDynamicFormWrapper .form-container input,
+    #myDynamicFormWrapper .form-container select,
+    #myDynamicFormWrapper .form-container textarea {
+        font-size: 0.85rem;
+        padding: 6px 8px;
+    }
+
+    #myDynamicFormWrapper .form-container button {
+        font-size: 0.9rem;
+        padding: 8px;
+    }
+
+    #myDynamicFormWrapper table {
+        width: 100%;
+    }
+
+    #myDynamicFormWrapper table td {
+        display: block;
+        margin-bottom: 10px;
+        text-align: center;
+    }
+
+    #myDynamicFormWrapper table button {
+        width: 100%;
+        padding: 10px 0;
+    }
+
+    /* Slightly smaller hover shadow for mobile */
+    #myDynamicFormWrapper .form-container button:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 3px 10px rgba(0,0,0,0.15);
+    }
+
+    #myDynamicFormWrapper table button:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+    }
+}
+
+

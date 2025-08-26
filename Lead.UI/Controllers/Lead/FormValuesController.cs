@@ -37,7 +37,10 @@ public class FormValuesController(IHttpService httpService, IOptions<ApiSettings
             GetParam);
 
         if (response?.IsSuccess != true)
+        {
             TempData[Constants.Error] = response?.Message;
+            return RedirectToAction("Index", "Home");
+        }
 
         var rows = JsonSerializer.Deserialize<List<Dictionary<string, object>>>(response?.Data);
         ViewBag.DynamicRows = rows;

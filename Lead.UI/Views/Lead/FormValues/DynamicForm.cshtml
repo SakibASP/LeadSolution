@@ -5,6 +5,8 @@
     ViewData["Title"] = "Create";
 }
 
+<link href="~/css/lead/formvalues/dynamic-form.css" rel="stylesheet" />
+
 <div class="py-1">
     <div>
         <!-- API Key Section -->
@@ -64,11 +66,11 @@
                             <button type="button" class="btn btn-primary" onclick="updateFormSettings()">Save</button>
 
                             <!-- New button to open modal -->
-                            <button type="button" class="btn btn-outline-secondary" data-toggle="modal" data-target="#embedCodeModal">
+                            @* <button type="button" class="btn btn-outline-secondary" data-toggle="modal" data-target="#embedCodeModal">
                                 Generate Embeddable Form Code
-                            </button>
+                            </button> *@
                         </div>
-                   </form>
+                    </form>
                 </div>
             </div>
         </div>
@@ -79,72 +81,77 @@
                     <h4 class="mb-0">Lead Form</h4>
                 </div>
                 <div class="card-body">
-                    <form id="dynamicForm" asp-action="DynamicForm" method="post" novalidate>
-                        <input type="hidden" asp-for="BusinessId" id="BusinessId" />
-                        <input type="hidden" id="ApiKey" name="ApiKey" />
-                        @if (Model.Inputs?.Where(x => x.IsActive).Count() > 0)
-                        {
-                            <div class="row">
-                                @for (int i = 0; i < Model.Inputs.Count; i++)
-                                {
-                                    @if (Model.Inputs[i].IsActive)
+                    <div id="myDynamicFormWrapper">
+                        <!-- Toggle Buttons -->
+                        <table>
+                            <tr>
+                                <td colspan="3" class="text-center">
+                                    <!-- New button to open modal -->
+                                    <button type="button" id="btnGenerateCode" class="btn btn-outline-secondary" data-toggle="modal">
+                                        <i class="fas fa-code"></i> Generate Code
+                                    </button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><button class="theme-btn btn-dark" onclick="setFormTheme('dark-theme', this)">Dark</button></td>
+                                <td><button class="theme-btn btn-white" onclick="setFormTheme('white-theme', this)">White</button></td>
+                                <td><button class="theme-btn btn-transparent" onclick="setFormTheme('transparent-theme', this)">Transparent</button></td>
+                            </tr>
+
+                        </table>
+                        <!-- Dynamic Form -->
+                        <form id="dynamicForm" class="form-container dark-theme" asp-action="DynamicForm" method="post" novalidate>
+                            <input type="hidden" asp-for="BusinessId" id="BusinessId" />
+                            <input type="hidden" id="ApiKey" name="ApiKey" />
+                            @if (Model.Inputs?.Where(x => x.IsActive).Count() > 0)
+                            {
+                                <div class="row">
+                                    @for (int i = 0; i < Model.Inputs.Count; i++)
                                     {
-                                        if (Model.Inputs[i].IsSelectInput)
+                                        @if (Model.Inputs[i].IsActive)
                                         {
-                                            <div class="col-md-12 mb-2">
-                                                <label asp-for="Inputs[@i].Value" class="form-label fw-semibold">
-                                                    @Model.Inputs[i].Label
-                                                </label>
-                                                <select asp-for="Inputs[@i].Value" class="form-select" aria-label="@Model.Inputs[i].Label">
-                                                    <option value="">-- Select --</option>
-                                                    <option>Option 1</option>
-                                                    <option>Option 2</option>
-                                                </select>
-                                                <span asp-validation-for="Inputs[@i].Value" class="text-danger small"></span>
-                                            </div>
-                                        }
-                                        else if (Model.Inputs[i].InputType!.Equals("textarea", StringComparison.CurrentCultureIgnoreCase))
-                                        {
-                                            <div class="col-md-12 mb-2">
-                                                <label asp-for="Inputs[@i].Value" class="form-label fw-semibold">
-                                                    @Model.Inputs[i].Label
-                                                </label>
-                                                <textarea asp-for="Inputs[@i].Value" rows="5" cols="5" class="form-control" placeholder="@Model.Inputs[i].Label"></textarea>
-                                                <span asp-validation-for="Inputs[@i].Value" class="text-danger small"></span>
-                                            </div>
-                                        }
-                                        else
-                                        {
-                                            <div class="col-md-12 mb-2">
-                                                <label asp-for="Inputs[@i].Value" class="form-label fw-semibold">
-                                                    @Model.Inputs[i].Label
-                                                </label>
-                                                <input asp-for="Inputs[@i].Value" type="@Model.Inputs[i].InputType" class="form-control" placeholder="@Model.Inputs[i].Label" />
-                                                <span asp-validation-for="Inputs[@i].Value" class="text-danger small"></span>
-                                            </div>
-                                        }
+                                            if (Model.Inputs[i].IsSelectInput)
+                                            {
+                                                <div class="col-md-12 mb-2">
+                                                    <label asp-for="Inputs[@i].Value">@Model.Inputs[i].Label</label>
+                                                    <select asp-for="Inputs[@i].Value" aria-label="@Model.Inputs[i].Label">
+                                                        <option value="">-- Select --</option>
+                                                        <option>Option 1</option>
+                                                        <option>Option 2</option>
+                                                    </select>
+                                                    <span asp-validation-for="Inputs[@i].Value" class="text-danger small"></span>
+                                                </div>
+                                            }
+                                            else if (Model.Inputs[i].InputType!.Equals("textarea", StringComparison.CurrentCultureIgnoreCase))
+                                            {
+                                                <div class="col-md-12 mb-2">
+                                                    <label asp-for="Inputs[@i].Value">@Model.Inputs[i].Label</label>
+                                                    <textarea asp-for="Inputs[@i].Value" rows="5" cols="5" placeholder="@Model.Inputs[i].Label"></textarea>
+                                                    <span asp-validation-for="Inputs[@i].Value" class="text-danger small"></span>
+                                                </div>
+                                            }
+                                            else
+                                            {
+                                                <div class="col-md-12 mb-2">
+                                                    <label asp-for="Inputs[@i].Value">@Model.Inputs[i].Label</label>
+                                                    <input asp-for="Inputs[@i].Value" type="@Model.Inputs[i].InputType" placeholder="@Model.Inputs[i].Label" />
+                                                    <span asp-validation-for="Inputs[@i].Value" class="text-danger small"></span>
+                                                </div>
+                                            }
 
-
-                                        @* Hidden fields *@
-                                        <input type="hidden" asp-for="Inputs[@i].FormDetailId" />
-                                        @*  <input type="hidden" asp-for="Inputs[@i].Label" />
-                                            <input type="hidden" asp-for="Inputs[@i].InputType" />
-                                            <input type="hidden" asp-for="Inputs[@i].IsSelectInput" /> *@
+                                            <input type="hidden" asp-for="Inputs[@i].FormDetailId" />
+                                        }
                                     }
+                                </div>
 
-                                }
-                            </div>
-
-                            <div class="d-grid mt-4">
-                                <button type="submit" class="btn btn-success btn-lg fw-bold">
-                                    <i class="bi bi-check-circle me-2"></i> Submit
-                                </button>
-                            </div>
-                        }
-                    </form>
-
-
-
+                                <div class="d-grid mt-4">
+                                    <button type="submit">
+                                        Submit
+                                    </button>
+                                </div>
+                            }
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>
