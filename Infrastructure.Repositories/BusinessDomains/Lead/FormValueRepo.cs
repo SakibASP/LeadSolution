@@ -29,10 +29,12 @@ public sealed class FormValueRepo(LeadContext context, IDapperContext dapper) : 
             .ToListAsync();
     }
 
-    public async Task<dynamic> GetMessagesByBusinessAsync(int businessId)
+    public async Task<dynamic> GetMessagesByBusinessAsync(GetFormValueRequest request)
     {
         var parameters = new DynamicParameters();
-        parameters.Add("@BusinessId", businessId, DbType.Int32);
+        parameters.Add("@BusinessId", request.BusinessId);
+        parameters.Add("@FromDate", request.FromDate.Date);
+        parameters.Add("@ToDate", request.ToDate.Date);
 
         using var connection = _dapper.CreateConnection();
         var result = await connection.QueryAsync<dynamic>(

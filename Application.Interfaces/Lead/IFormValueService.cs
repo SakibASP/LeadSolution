@@ -8,7 +8,7 @@ namespace Application.Interfaces.Lead;
 public interface IFormValueService
 {
     Task<ApiResponse<IList<FormValues>>> GetAllAsync(dynamic? param = null);
-    Task<ApiResponse<dynamic>> GetMessagesByBusinessAsync(int businessId);
+    Task<ApiResponse<dynamic>> GetMessagesByBusinessAsync(GetFormValueRequest request);
     Task<ApiResponse<DynamicFormViewModel>> GetDynamicFormAsync(int? businessId);
     Task<ApiResponse<dynamic>> AddAsync(DynamicFormViewModel formValues);
     Task<ApiResponse<dynamic>> UpdateFormSettingsAsync(UpdateFormSettingsRequest request);

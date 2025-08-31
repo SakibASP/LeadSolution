@@ -88,7 +88,6 @@ public class FormDetailService(IGenericRepo<FormDetails> repo, IFormDetailRepo d
         }
     }
 
-
     public async Task<ApiResponse<dynamic>> UpdateAsync(FormDetails formDetails)
     {
         try

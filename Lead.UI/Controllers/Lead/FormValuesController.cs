@@ -1,4 +1,5 @@
-﻿using Common.Utils.Constant;
+﻿using Common.Extentions;
+using Common.Utils.Constant;
 using Common.Utils.Enums;
 using Core.Models.Lead;
 using Core.ViewModels.Dto.Common;
@@ -23,14 +24,18 @@ public class FormValuesController(IHttpService httpService, IOptions<ApiSettings
     private void SetToken() => _httpService.SetBearerToken(AccessToken);
     private readonly Dictionary<string, string> GetParam = [];
 
-    public async Task<IActionResult> Index(int? businessId)
+    public async Task<IActionResult> Index(int? businessId, DateTime? fromDate, DateTime? toDate)
     {
         SetToken();
 
         var selectedId = businessId ?? UserBusinessList?.FirstOrDefault()?.Id ?? 0;
+        fromDate ??= DateTime.Now.ToBangladeshTime().AddDays(-7);
+        toDate ??= DateTime.Now.ToBangladeshTime();
 
         GetParam.Clear();
-        GetParam.Add("businessId", selectedId.ToString());
+        GetParam.Add("BusinessId", selectedId.ToString());
+        GetParam.Add("FromDate", fromDate.ToString() ?? string.Empty);
+        GetParam.Add("ToDate", toDate.ToString() ?? string.Empty);
         var response = await _httpService.GetAsync<ApiResponse<dynamic>>(
             Version, 
             CommonEndpoints.GetAll, 
@@ -44,7 +49,7 @@ public class FormValuesController(IHttpService httpService, IOptions<ApiSettings
 
         var rows = JsonSerializer.Deserialize<List<Dictionary<string, object>>>(response?.Data);
         ViewBag.DynamicRows = rows;
-
+        ViewBag.BusinessId = new SelectList(UserBusinessList, "Id", "Name", selectedId);
         return View();
     }
 

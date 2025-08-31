@@ -10,14 +10,19 @@ GO
 Author : Md. Sakibur Rahman
 Created Date : 2025-08-10 
 
-EXEC usp_GetDynamicPivotedFormValues @BusinessId = 4
+EXEC usp_GetDynamicPivotedFormValues 
+@BusinessId = 4
+,@FromDate = '2025-08-25'
+,@ToDate = '2025-08-27'
 
 =================================
 */
 
 
 ALTER   PROCEDURE [dbo].[usp_GetDynamicPivotedFormValues]
-    @BusinessId INT
+    @BusinessId INT,
+    @FromDate DATE,
+    @ToDate DATE
 AS
 BEGIN
     SET NOCOUNT ON;
@@ -29,7 +34,7 @@ BEGIN
     FROM (
         SELECT DISTINCT fd.Name
         FROM FormDetails fd
-        JOIN BusinessSupportedFormIds bsf ON fd.Id = bsf.FormId AND bsf.IsActive = 1
+        JOIN BusinessSupportedFormId bsf ON fd.Id = bsf.FormId AND bsf.IsActive = 1
         WHERE bsf.BusinessId = @BusinessId
     ) AS x;
 
@@ -44,6 +49,7 @@ BEGIN
     SELECT
         pvt.SubmissionId,
         pvt.BusinessId,
+        pvt.CreatedDate [Created Date],
         --pvt.BusinessName,
         ' + @cols + '
     FROM
@@ -53,12 +59,15 @@ BEGIN
             fv.BusinessId,
             bi.BusinessName,
             fd.Name AS FieldName,
-            fv.FormValue
+            fv.FormValue,
+            FORMAT(fv.CreatedDate, ''yyyy-MM-dd hh:mm tt'') CreatedDate
         FROM FormValues fv
-        JOIN FormDetails fd ON fv.FormId = fd.Id
-        JOIN AspNetBusinessInfo bi ON fv.BusinessId = bi.Id
-        JOIN BusinessSupportedFormIds bsf ON fv.FormId = bsf.FormId AND bsf.IsActive = 1
-        WHERE bsf.BusinessId = @BusinessId
+        INNER JOIN FormDetails fd ON fv.FormId = fd.Id
+        INNER JOIN AspNetBusinessInfo bi ON fv.BusinessId = bi.Id
+        INNER JOIN BusinessSupportedFormId bsf ON fv.FormId = bsf.FormId AND bsf.IsActive = 1 AND fv.BusinessId = bsf.BusinessId
+        WHERE 
+            bsf.BusinessId = @BusinessId 
+            AND CAST(fv.CreatedDate AS DATE) BETWEEN @FromDate AND @ToDate
     ) src
     PIVOT
     (
@@ -69,5 +78,5 @@ BEGIN
     ';
 
     -- Execute with parameter to avoid SQL injection
-    EXEC sp_executesql @query, N'@BusinessId INT', @BusinessId;
+    EXEC sp_executesql @query, N'@BusinessId INT, @FromDate DATE, @ToDate DATE', @BusinessId, @FromDate, @ToDate;
 END

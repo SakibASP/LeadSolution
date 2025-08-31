@@ -8,4 +8,5 @@
             console.log(`Business ID: ${businessId}\nSubmission ID: ${submissionId}`);
         });
     });
+
 });

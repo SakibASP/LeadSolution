@@ -12,7 +12,7 @@ namespace Application.Services.Lead;
 
 public class FormValueService(IFormValueRepo repo, IHttpContextAccessor httpContext) : IFormValueService
 {
-    private readonly IFormValueRepo _iRepo = repo;
+    private readonly IFormValueRepo _iFormValue = repo;
     private readonly IHttpContextAccessor _httpContext = httpContext;
 
     private string RequestPath => _httpContext.HttpContext?.Request.Path.Value ?? "N/A";
@@ -22,7 +22,7 @@ public class FormValueService(IFormValueRepo repo, IHttpContextAccessor httpCont
     {
         try
         {
-            await _iRepo.AddAsync(viewModel);
+            await _iFormValue.AddAsync(viewModel);
             return ApiResponse<dynamic>.Success(true, "Messages added successfully!");
         }
         catch (Exception ex)
@@ -39,7 +39,7 @@ public class FormValueService(IFormValueRepo repo, IHttpContextAccessor httpCont
     {
         try
         {
-            var result = await _iRepo.GetAllAsync(param);
+            var result = await _iFormValue.GetAllAsync(param);
             return ApiResponse<IList<FormValues>>.Success(result, "Messages retrieved successfully!");
         }
         catch (Exception ex)
@@ -56,7 +56,7 @@ public class FormValueService(IFormValueRepo repo, IHttpContextAccessor httpCont
     {
         try
         {
-            var result = await _iRepo.GetDynamicFormAsync(businessId);
+            var result = await _iFormValue.GetDynamicFormAsync(businessId);
             return ApiResponse<DynamicFormViewModel>.Success(result, "Form values retrieved successfully!");
         }
         catch (Exception ex)
@@ -69,11 +69,11 @@ public class FormValueService(IFormValueRepo repo, IHttpContextAccessor httpCont
         }
     }
 
-    public async Task<ApiResponse<dynamic>> GetMessagesByBusinessAsync(int businessId)
+    public async Task<ApiResponse<dynamic>> GetMessagesByBusinessAsync(GetFormValueRequest request)
     {
         try
         {
-            var result = await _iRepo.GetMessagesByBusinessAsync(businessId);
+            var result = await _iFormValue.GetMessagesByBusinessAsync(request);
             return ApiResponse<dynamic>.Success(result, "Messages retrieved successfully!");
         }
         catch (Exception ex)
@@ -81,7 +81,7 @@ public class FormValueService(IFormValueRepo repo, IHttpContextAccessor httpCont
             Log
                 .ForContext("UserName", CurrentUser)
                 .ForContext("Path", RequestPath)
-                .Error(ex, "Error retrieving messages for BusinessId: {BusinessId}", businessId);
+                .Error(ex, "Error retrieving messages for GetFormValueRequest: {request}", JsonSerializer.Serialize(request));
             return ApiResponse<dynamic>.Fail("Something went wrong!");
         }
     }
@@ -91,7 +91,7 @@ public class FormValueService(IFormValueRepo repo, IHttpContextAccessor httpCont
         try
         {
             request.Username = CurrentUser;
-            await _iRepo.UpdateFormSettingsAsync(request);
+            await _iFormValue.UpdateFormSettingsAsync(request);
             return ApiResponse<dynamic>.Success(true, "Form updated successfully!");
         }
         catch (Exception ex)

@@ -29,9 +29,15 @@
 
     // Select item from dropdown
     $(document).on("click", ".custom-dropdown-item", function () {
-        $("#drpSearch").text($(this).text());
-        $("#BusinessId").val($(this).data("value")); // keep value in hidden field if needed
+        const submitForm = document.getElementById("submitForm");
+        // Update dropdown button text
+        $("#customDropdown").text($(this).text());
+        // Update hidden field with selected value
+        $("#businessId").val($(this).data("value"));
+        // Submit the form if needed
+        if (submitForm) submitForm.submit();
     });
+
 
     // ========= Toast alerts auto-hide =========
     hideTempMessage();

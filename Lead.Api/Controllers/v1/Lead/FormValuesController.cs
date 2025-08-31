@@ -20,7 +20,7 @@ public class FormValuesController(IFormValueService formValue) : Controller
     private readonly IFormValueService _iFormValue = formValue;
 
     [HttpGet("get-all")]
-    public async Task<IActionResult> GetAll([FromQuery] int businessId) => Ok(await _iFormValue.GetMessagesByBusinessAsync(businessId));
+    public async Task<IActionResult> GetAll([FromQuery] GetFormValueRequest request) => Ok(await _iFormValue.GetMessagesByBusinessAsync(request));
 
     [HttpGet("get-dynamic-form")]
     public async Task<IActionResult> GetDynamicForm([FromQuery] int? businessId) => Ok(await _iFormValue.GetDynamicFormAsync(businessId));
