@@ -95,11 +95,11 @@ public class UtilityService(IUtilityRepo repo, IHttpClientFactory factory, IHttp
 
     }
 
-    public async Task<ApiResponse<IList<Logs>>> GetLogsAsync()
+    public async Task<ApiResponse<IList<Logs>>> GetSystemLogsAsync()
     {
         try
         {
-            var result = await _iUtilityRepo.GetLogsAsync();
+            var result = await _iUtilityRepo.GetSystemLogsAsync();
             return ApiResponse<IList<Logs>>.Success(result, string.Empty);
         }
         catch (Exception ex)
@@ -107,16 +107,16 @@ public class UtilityService(IUtilityRepo repo, IHttpClientFactory factory, IHttp
             Log
                 .ForContext("UserName", CurrentUser)
                 .ForContext("Path", RequestPath)
-                .Error(ex, "Error getting logs");
+                .Error(ex, "Error getting system logs");
             return ApiResponse<IList<Logs>>.Fail("Something went wrong!");
         }
     }
 
-    public async Task<ApiResponse<Logs>> GetLogsByIdAsync(int id)
+    public async Task<ApiResponse<Logs>> GetSystemLogByIdAsync(int id)
     {
         try
         {
-            var result = await _iUtilityRepo.GetLogsByIdAsync(id);
+            var result = await _iUtilityRepo.GetSystemLogByIdAsync(id);
             return ApiResponse<Logs>.Success(result, string.Empty);
         }
         catch (Exception ex)
@@ -124,8 +124,42 @@ public class UtilityService(IUtilityRepo repo, IHttpClientFactory factory, IHttp
             Log
                 .ForContext("UserName", CurrentUser)
                 .ForContext("Path", RequestPath)
-                .Error(ex, "Error getting log detail {id}", id);
+                .Error(ex, "Error getting system log detail {id}", id);
             return ApiResponse<Logs>.Fail("Something went wrong!");
+        }
+    }
+
+    public async Task<ApiResponse<IList<RequestLogs>>> GetApiLogsAsync()
+    {
+        try
+        {
+            var result = await _iUtilityRepo.GetApiLogsAsync();
+            return ApiResponse<IList<RequestLogs>>.Success(result, string.Empty);
+        }
+        catch (Exception ex)
+        {
+            Log
+                .ForContext("UserName", CurrentUser)
+                .ForContext("Path", RequestPath)
+                .Error(ex, "Error getting api logs");
+            return ApiResponse<IList<RequestLogs>>.Fail("Something went wrong!");
+        }
+    }
+
+    public async Task<ApiResponse<RequestLogs>> GetApiLogByIdAsync(int id)
+    {
+        try
+        {
+            var result = await _iUtilityRepo.GetApiLogByIdAsync(id);
+            return ApiResponse<RequestLogs>.Success(result, string.Empty);
+        }
+        catch (Exception ex)
+        {
+            Log
+                .ForContext("UserName", CurrentUser)
+                .ForContext("Path", RequestPath)
+                .Error(ex, "Error getting api log detail {id}", id);
+            return ApiResponse<RequestLogs>.Fail("Something went wrong!");
         }
     }
 }

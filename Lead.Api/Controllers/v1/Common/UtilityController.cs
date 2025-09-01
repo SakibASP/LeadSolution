@@ -29,10 +29,18 @@ public class UtilityController(IUtilityService utilityService) : Controller
 
     [HttpGet("get-system-logs")]
     [Authorize(Roles = Constants.SuperAdmin)]
-    public async Task<IActionResult> GetLogs() => Ok(await _iUtilityService.GetLogsAsync());
+    public async Task<IActionResult> GetSystemLogs() => Ok(await _iUtilityService.GetSystemLogsAsync());
 
     [HttpGet("get-system-log-by-id")]
     [Authorize(Roles = Constants.SuperAdmin)]
-    public async Task<IActionResult> GetLogById([FromQuery] int id) => Ok(await _iUtilityService.GetLogsByIdAsync(id));
+    public async Task<IActionResult> GetSystemLogById([FromQuery] int id) => Ok(await _iUtilityService.GetSystemLogByIdAsync(id));
+
+    [HttpGet("get-api-logs")]
+    [Authorize(Roles = Constants.SuperAdmin)]
+    public async Task<IActionResult> GetApiLogs() => Ok(await _iUtilityService.GetApiLogsAsync());
+
+    [HttpGet("get-api-log-by-id")]
+    [Authorize(Roles = Constants.SuperAdmin)]
+    public async Task<IActionResult> GetApiLogById([FromQuery] int id) => Ok(await _iUtilityService.GetApiLogByIdAsync(id));
 
 }

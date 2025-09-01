@@ -1,10 +1,13 @@
-﻿using Common.Utils.Constant;
+﻿using Common.Extentions;
+using Common.Utils.Constant;
 using Core.Models.Common;
 using Core.ViewModels.Request.Common;
 using Dapper;
 using Infrastructure.Interfaces.Common;
 using Infrastructure.Repositories.Data;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
+using Serilog;
 using System.Data;
 
 namespace Infrastructure.Repositories.BusinessDomains.Common;
@@ -14,10 +17,21 @@ namespace Infrastructure.Repositories.BusinessDomains.Common;
 /// Author: Md. Sakibur Rahman
 /// </summary>
 
-public sealed class UtilityRepo(LeadContext context, IDapperContext dapper) : IUtilityRepo, IAsyncDisposable
+public sealed class UtilityRepo(LeadContext context, IDapperContext dapper, IHttpContextAccessor httpContext) : IUtilityRepo, IAsyncDisposable
 {
     private readonly LeadContext _context = context;
     private readonly IDapperContext _dapper = dapper;
+    private readonly IHttpContextAccessor _httpContext = httpContext;
+
+    private string CurrentUser => _httpContext.HttpContext?.User?.Identity?.Name ?? "N/A";
+    private string RequestPath => _httpContext.HttpContext?.Request.Path.Value ?? "N/A";
+
+    private static readonly Lock _lock = new();
+    private readonly DateTime OneMonthAgo = DateTime.Now.ToBangladeshTime().AddMonths(-1);
+
+    private static DateTime _lastSystemLogCleanup = DateTime.MinValue;
+    private static DateTime _lastApiLogCleanup = DateTime.MinValue;
+
 
     public async Task<IList<T>> GetDropdownListAsync<T>(DropdownRequest request)
     {
@@ -36,6 +50,7 @@ public sealed class UtilityRepo(LeadContext context, IDapperContext dapper) : IU
 
         return [.. result];
     }
+
     public async Task UpdateCountriesAsync(IList<RestCountry>? restCountries)
     {
         if (restCountries == null || restCountries.Count == 0) return; // No countries to update
@@ -66,17 +81,113 @@ public sealed class UtilityRepo(LeadContext context, IDapperContext dapper) : IU
         }
 
     }
-    public async Task<IList<Logs>> GetLogsAsync()
+
+    public async Task<IList<Logs>> GetSystemLogsAsync()
     {
+        #region - Delete old logs in other thread if last cleanup was more than 1 hour ago -
+        var now = DateTime.Now.ToBangladeshTime();
+        if ((now - _lastSystemLogCleanup).TotalHours >= 1)
+        {
+            lock (_lock)
+            {
+                if ((now - _lastSystemLogCleanup).TotalHours >= 1)
+                {
+                    _lastSystemLogCleanup = now;
+
+                    Thread th = new(() =>
+                    {
+                        try
+                        {
+                            using var db = new LeadContext(); // create a fresh DbContext
+
+                            db.Logs
+                              .Where(l => l.TimeStamp < OneMonthAgo)
+                              .ExecuteDelete();
+                        }
+                        catch (Exception ex)
+                        {
+                            Log
+                                .ForContext("UserName", CurrentUser)
+                                .ForContext("Path", RequestPath)
+                                .Error(ex, "Error bulk removing old system logs");
+                        }
+                    })
+                    {
+                        IsBackground = true
+                    };
+                    th.Start();
+                }
+            }
+        }
+        #endregion
+
+        // Return the latest 1000 logs
         return await _context.Logs
             .AsNoTracking()
+            .Where(x => x.TimeStamp > OneMonthAgo)
             .OrderByDescending(l => l.Id)
-            .Take(10000)
+            .Take(1000)
             .ToListAsync();
     }
-    public async Task<Logs> GetLogsByIdAsync(int id)
+
+    public async Task<Logs> GetSystemLogByIdAsync(int id)
     {
         var result = await _context.Logs.FindAsync(id);
+        return result is null ? throw new KeyNotFoundException($"Log with ID {id} not found.") : result;
+    }
+
+    public async Task<IList<RequestLogs>> GetApiLogsAsync()
+    {
+        #region - Delete old logs in other thread if last cleanup was more than 1 hour ago -
+        var now = DateTime.Now.ToBangladeshTime();
+        if ((now - _lastApiLogCleanup).TotalHours >= 1)
+        {
+            lock (_lock)
+            {
+                if ((now - _lastApiLogCleanup).TotalHours >= 1)
+                {
+                    _lastApiLogCleanup = now;
+
+                    Thread th = new(() =>
+                    {
+                        try
+                        {
+                            using var db = new LeadContext(); // create a fresh DbContext
+
+                            db.RequestLogs
+                              .Where(l => l.CreatedDate < OneMonthAgo)
+                              .ExecuteDelete();
+                        }
+                        catch (Exception ex)
+                        {
+                            Log
+                                .ForContext("UserName", CurrentUser)
+                                .ForContext("Path", RequestPath)
+                                .Error(ex, "Error bulk removing old api logs");
+                        }
+                    })
+                    {
+                        IsBackground = true
+                    };
+                    th.Start();
+                }
+            }
+        }
+        #endregion
+
+        // Return the latest 1000 logs
+        return await _context.RequestLogs
+                   .AsNoTracking()
+                   .Where(x => x.CreatedDate > OneMonthAgo)
+                   .OrderByDescending(l => l.Id)
+                   .Take(1000)
+                   .ToListAsync();
+    }
+
+    public async Task<RequestLogs> GetApiLogByIdAsync(int id)
+    {
+        var result = await _context.RequestLogs.FindAsync(id);
+        if (result is not null) result.UserId = _context.Users.Find(result.UserId)?.UserName ?? "Unauthorized";
         return result is null ? throw new KeyNotFoundException($"Log with ID {id} not found.") : result;
     }
 
@@ -193,4 +304,5 @@ public sealed class UtilityRepo(LeadContext context, IDapperContext dapper) : IU
         await _context.DisposeAsync();
         GC.SuppressFinalize(this);
     }
+
 }

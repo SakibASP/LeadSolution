@@ -1,10 +1,8 @@
 using Common.Extentions;
 using Common.Utils.Constant;
-using Common.Utils.Enums;
 using Common.Utils.Helper;
 using Core.Models.Common;
 using Core.ViewModels.Dto.Auth.Auth;
-using Core.ViewModels.Dto.Common;
 using Core.ViewModels.Response;
 using Lead.UI.Interfaces;
 using Lead.UI.Models;
@@ -13,7 +11,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.Extensions.Options;
 using System.Diagnostics;
-using System.Threading.Tasks;
 
 namespace Lead.UI.Controllers.Common;
 
@@ -29,6 +26,7 @@ public class HomeController(IHttpService httpService, IOptions<ApiSettings> apiS
         return View();
     }
 
+    #region - logs -
     public async Task<IActionResult> SystemLogs()
     {
         SetToken();
@@ -60,6 +58,39 @@ public class HomeController(IHttpService httpService, IOptions<ApiSettings> apiS
         ViewBag.Properties = ParseHelper.ParseXmlToDictionary(response?.Data?.Properties);
         return View(response?.Data);
     }
+
+    public async Task<IActionResult> ApiLogs()
+    {
+        SetToken();
+        var response = await _httpService.GetAsync<ApiResponse<IList<RequestLogs>>>(
+            UtilityVersion, _apiSettings.Endpoints.Utility.GetApiLogs);
+        if (response?.IsSuccess is not true)
+        {
+            TempData[Constants.Error] = response?.Message;
+            return RedirectToAction(nameof(Index));
+        }
+        return View(response?.Data);
+    }
+
+    public async Task<IActionResult> ApiLogDetail(int id)
+    {
+        SetToken();
+        GetParam.Clear();
+        GetParam.Add("id", id.ToString());
+        var response = await _httpService.GetAsync<ApiResponse<RequestLogs>>(
+            UtilityVersion, 
+            _apiSettings.Endpoints.Utility.GetApiLogById,
+            GetParam);
+        if (response?.IsSuccess is not true)
+        {
+            TempData[Constants.Error] = response?.Message;
+            return RedirectToAction(nameof(SystemLogs));
+        }
+
+        return View(response?.Data);
+    }
+
+    #endregion
 
     public IActionResult Privacy()
     {

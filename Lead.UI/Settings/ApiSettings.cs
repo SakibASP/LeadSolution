@@ -101,4 +101,6 @@ public class UtilityEndpoints
     public string GetUserDropdown { get; set; } = default!;
     public string GetSystemLogs { get; set; } = default!;
     public string GetSystemLogById { get; set; } = default!;
+    public string GetApiLogs { get; set; } = default!;
+    public string GetApiLogById { get; set; } = default!;
 }

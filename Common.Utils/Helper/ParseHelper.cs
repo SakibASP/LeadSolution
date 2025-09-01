@@ -6,7 +6,7 @@ public static class ParseHelper
 {
     public static Dictionary<string, string> ParseXmlToDictionary(string? xml)
     {
-        if (string.IsNullOrWhiteSpace(xml)) return new();
+        if (string.IsNullOrWhiteSpace(xml)) return [];
 
         try
         {

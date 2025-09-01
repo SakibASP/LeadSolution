@@ -1,5 +1,6 @@
 ﻿using Core.Models.Common;
 using Core.ViewModels.Request.Common;
+using Core.ViewModels.Response;
 
 namespace Infrastructure.Interfaces.Common;
 
@@ -7,6 +8,8 @@ public interface IUtilityRepo
 {
     Task<IList<T>> GetDropdownListAsync<T>(DropdownRequest request);
     Task UpdateCountriesAsync(IList<RestCountry>? restCountries);
-    Task<IList<Logs>> GetLogsAsync();
-    Task<Logs> GetLogsByIdAsync(int id);
+    Task<IList<Logs>> GetSystemLogsAsync();
+    Task<Logs> GetSystemLogByIdAsync(int id);
+    Task<IList<RequestLogs>> GetApiLogsAsync();
+    Task<RequestLogs> GetApiLogByIdAsync(int id);
 }

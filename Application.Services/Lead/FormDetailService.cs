@@ -84,6 +84,7 @@ public class FormDetailService(IGenericRepo<FormDetails> repo, IFormDetailRepo d
                 .ForContext("UserName", CurrentUser)
                 .ForContext("Path", RequestPath)
                 .Error(ex, "Error removing FormDetails by Id: {Id}", id);
+
             return ApiResponse<dynamic>.Fail("Something went wrong!");
         }
     }

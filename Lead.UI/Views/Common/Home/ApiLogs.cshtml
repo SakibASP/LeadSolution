@@ -1,0 +1,41 @@
+﻿@model IEnumerable<Core.Models.Common.RequestLogs>
+@{
+    ViewData["Title"] = "Request Logs";
+}
+
+<div class="card shadow-lg border-0 rounded-3">
+    <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
+        <h4 class="mb-0">Request/Response Logs</h4>
+    </div>
+
+    <div class="card-body table-responsive">
+        <table class="table table-hover align-middle" id="dataTableDesc">
+            <thead class="table-light">
+                <tr>
+                    <th>Method</th>
+                    <th>Path</th>
+                    <th>Status Code</th>
+                    <th>Created Date</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var log in Model)
+                {
+                    <tr>
+
+                        <td>@log.Method</td>
+                        <td>@log.Path</td>
+                        <td><span class="badge @(log.StatusCode >= 200 && log.StatusCode < 300 ? "bg-success" : "bg-danger")">@log.StatusCode</span></td>
+                        <td>@log.CreatedDate.ToString("yyyy-MM-dd HH:mm:ss")</td>
+                        <td>
+                            <a asp-action="ApiLogDetail" asp-route-id="@log.Id" class="btn btn-sm btn-outline-primary">
+                                View
+                            </a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

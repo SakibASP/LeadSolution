@@ -85,6 +85,7 @@ public class DataTypeService(IGenericRepo<DataTypes> repo, IHttpContextAccessor 
                 .ForContext("UserName", CurrentUser)
                 .ForContext("Path", RequestPath)
                 .Error(ex, "Error removing DataType Id={Id}", id);
+
             return ApiResponse<dynamic>.Fail("Something went wrong!");
         }
     }

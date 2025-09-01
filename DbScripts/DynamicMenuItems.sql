@@ -10,7 +10,7 @@ INSERT INTO MenuItem([MenuId],[MenuName],[MenuUrl],[MenuParentId],[Active],[FaIc
 INSERT INTO MenuItem([MenuId],[MenuName],[MenuUrl],[MenuParentId],[Active],[FaIcon]) VALUES (100,N'SuperAdmin',N'#',null,1,'fas fa-user-tie')
 SET IDENTITY_INSERT [MenuItem] OFF
 
-------------------------------------- Paren 1 -------------------------------------
+------------------------------------- Parent 1 -------------------------------------
 SET IDENTITY_INSERT [MenuItem] ON
 INSERT INTO MenuItem([MenuId],[MenuName],[MenuUrl],[MenuParentId],[Active],[FaIcon]) VALUES (101,N'User Rights',N'/AdminRights/Index',1,1,null)
 INSERT INTO MenuItem([MenuId],[MenuName],[MenuUrl],[MenuParentId],[Active],[FaIcon]) VALUES (102,N'Manage Users',N'/Auth/UserList',1,1,null)
@@ -18,7 +18,7 @@ INSERT INTO MenuItem([MenuId],[MenuName],[MenuUrl],[MenuParentId],[Active],[FaIc
 SET IDENTITY_INSERT [MenuItem] OFF
 
 
-------------------------------------- Paren 2 and 3 -------------------------------------
+------------------------------------- Parent 2 and 3 -------------------------------------
 SET IDENTITY_INSERT [MenuItem] ON
 INSERT INTO MenuItem([MenuId],[MenuName],[MenuUrl],[MenuParentId],[Active],[FaIcon]) VALUES (201,N'Data Types Config',N'/DataTypes/Index',3,1,null)
 INSERT INTO MenuItem([MenuId],[MenuName],[MenuUrl],[MenuParentId],[Active],[FaIcon]) VALUES (202,N'Form Config',N'/FormDetails/Index',3,1,null)
@@ -28,9 +28,11 @@ INSERT INTO MenuItem([MenuId],[MenuName],[MenuUrl],[MenuParentId],[Active],[FaIc
 SET IDENTITY_INSERT [MenuItem] OFF
 
 
-------------------------------------- Paren 100 -------------------------------------
+------------------------------------- Parent 100 -------------------------------------
 SET IDENTITY_INSERT [MenuItem] ON
 INSERT INTO MenuItem([MenuId],[MenuName],[MenuUrl],[MenuParentId],[Active],[FaIcon]) VALUES (301,N'System Logs',N'/Home/SystemLogs',100,1,null)
-INSERT INTO MenuItem([MenuId],[MenuName],[MenuUrl],[MenuParentId],[Active],[FaIcon]) VALUES (302,N'Menu',N'#',100,1,null)
+INSERT INTO MenuItem([MenuId],[MenuName],[MenuUrl],[MenuParentId],[Active],[FaIcon]) VALUES (302,N'Api Logs',N'/Home/ApiLogs',100,1,null)
+INSERT INTO MenuItem([MenuId],[MenuName],[MenuUrl],[MenuParentId],[Active],[FaIcon]) VALUES (303,N'Menu',N'#',100,1,null)
 SET IDENTITY_INSERT [MenuItem] OFF
+
 

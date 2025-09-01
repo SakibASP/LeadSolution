@@ -10,6 +10,8 @@ public interface IUtilityService
     Task<ApiResponse<IList<DropdownDto>>> GetDropdownListAsync(DropdownRequest request);
     Task<ApiResponse<IList<UserDropdownDto>>> GetUserDropdownListAsync(DropdownRequest request);
     Task<ApiResponse<bool>> UpdateCountriesAsync();
-    Task<ApiResponse<IList<Logs>>> GetLogsAsync();
-    Task<ApiResponse<Logs>> GetLogsByIdAsync(int id);
+    Task<ApiResponse<IList<Logs>>> GetSystemLogsAsync();
+    Task<ApiResponse<Logs>> GetSystemLogByIdAsync(int id);
+    Task<ApiResponse<IList<RequestLogs>>> GetApiLogsAsync();
+    Task<ApiResponse<RequestLogs>> GetApiLogByIdAsync(int id);
 }
