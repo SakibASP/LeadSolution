@@ -94,10 +94,14 @@
                         {
                             <tr>
                                 <!-- Hidden IDs -->
-                                <td style="display:none;">
-                                    <input type="hidden" class="business-id" value="@row["BusinessId"]" />
-                                    <input type="hidden" class="submission-id" value="@row["SubmissionId"]" />
-                                </td>
+                                @if (row.ContainsKey("BusinessId") && row.ContainsKey("SubmissionId") )
+                                {
+                                    <td style="display:none;">
+                                        <input type="hidden" class="business-id" value="@row["BusinessId"]" />
+                                        <input type="hidden" class="submission-id" value="@row["SubmissionId"]" />
+                                    </td>
+                                }
+
 
                                 <!-- Visible Columns -->
                                 @foreach (var col in row.Keys.Where(c => !hiddenCols.Contains(c)))

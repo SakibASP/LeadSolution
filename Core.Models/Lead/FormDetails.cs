@@ -9,7 +9,7 @@ public class FormDetails : BaseModel
     public string? Name { get; set; }
 
     [DisplayName("Type")]
-    public int? TypeId { get; set; }
+    public int? DataTypeId { get; set; }
 
     [DisplayName("Select Input")]
     public bool IsSelectInput { get; set; } = false;
@@ -17,6 +17,6 @@ public class FormDetails : BaseModel
     [DisplayName("Active")]
     public bool IsActive { get; set; } = true;
 
-    [ForeignKey(nameof(TypeId))]
+    [ForeignKey(nameof(DataTypeId))]
     public DataTypes? DataTypes { get; set; }
 }

@@ -9,6 +9,8 @@ using Lead.UI.Settings;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.Options;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 
 namespace Lead.UI.Controllers.Common;
 
@@ -18,6 +20,7 @@ namespace Lead.UI.Controllers.Common;
 public class BaseController(IHttpService httpService, IOptions<ApiSettings> apiSetting) : Controller
 {
     private readonly Dictionary<string, string> GetParam = [];
+
     /// <summary>
     /// HTTP service for making API requests.
     /// </summary>
@@ -29,34 +32,34 @@ public class BaseController(IHttpService httpService, IOptions<ApiSettings> apiS
     protected readonly ApiSettings _apiSettings = apiSetting.Value;
 
     /// <summary>
-    /// Access token for the current session.
+    /// Current User's Information
     /// </summary>
-    protected string AccessToken { get; private set; } = string.Empty;
+    protected UserInfoViewModel UserInfo { get; private set; } = default!;
+
 
     /// <summary>
     /// Current Bangladesh Time
     /// </summary>
     protected DateTime CurrentBdTime { get; private set; } = DateTime.Now.ToBangladeshTime();
 
-    /// <summary>
-    /// Get logged users business List
-    /// </summary>
-    protected IList<DropdownDto>? UserBusinessList { get; private set; }
 
     /// <summary>
     /// Gets the utility controller endpoint from the API settings.
     /// </summary>
     protected string UtilityVersion => _apiSettings.Controllers.Utility;
 
+
     /// <summary>
     /// Gets the utility endpoints configuration for the API.
     /// </summary>
     protected UtilityEndpoints UtilityEndpoints => _apiSettings.Endpoints.Utility;
 
+
     /// <summary>
     /// Gets the common endpoints configuration used by the API.
     /// </summary>
     protected CommonEndpoints CommonEndpoints => _apiSettings.Endpoints.CommonEndPoints;
+
 
     /// <summary>
     /// Checks authentication and refreshes token if expired before executing an action.
@@ -77,7 +80,6 @@ public class BaseController(IHttpService httpService, IOptions<ApiSettings> apiS
         // Check if the token has been expired
         if (sessionAuth?.Expiration <= CurrentBdTime)
         {
-            // Prepare token DTO for refresh request
             TokenDto tokenDto = new()
             {
                 AccessToken = sessionAuth.Token,
@@ -88,41 +90,60 @@ public class BaseController(IHttpService httpService, IOptions<ApiSettings> apiS
             var response = await _httpService.PostAsync<ApiResponse<AuthResponseDto>?>(_apiSettings.Controllers.Auth, _apiSettings.Endpoints.Auth.RefreshToken, tokenDto);
 
             // Check response status, if not success then redirect to login page
-            if (!(response?.IsSuccess ?? false))
+            if (response?.IsSuccess is not true)
             {
-                // Redirect to login page if token refresh fails
                 HttpContext.Response.Redirect(Constants.RedirectToLogin);
                 return;
             }
 
-            // Store the refreshed authentication data in session
             sessionAuth = response?.Data;
             HttpContext.Session.Set(Constants.AuthResponseDto, sessionAuth);
         }
 
-        // Set the access token for the current request
-        AccessToken = sessionAuth?.Token ?? string.Empty;
-
-        // Pass authentication data to the view
-        ViewBag.Username = sessionAuth?.UserName ?? "";
-
-        //Populating up user's businesslist variable
-        var businessList = HttpContext.Session.Get<IList<DropdownDto>>(Constants.UserBusinessList);
-        if (businessList is null)
+        //populate user info
+        var userInfo = HttpContext.Session.Get<UserInfoViewModel>(Constants.UserInfo);
+        if (userInfo is null)
         {
-            GetParam.Clear();
-            GetParam.Add("Id", ((int)DropdownEnum.UserWiseBusinesses).ToString());
-            _httpService.SetBearerToken(AccessToken);
-            var businessListResponse = await _httpService.GetAsync<ApiResponse<IList<DropdownDto>>>(
-                 UtilityVersion, UtilityEndpoints.GetDropdown, GetParam);
-            UserBusinessList = businessListResponse?.Data;
-            HttpContext.Session.Set(Constants.UserBusinessList, UserBusinessList);
+            if (!string.IsNullOrEmpty(sessionAuth?.Token))
+            {
+                JwtSecurityTokenHandler handler = new();
+                UserInfo = new UserInfoViewModel
+                {
+                    AccessToken = sessionAuth.Token
+                };
+                var jsonToken = handler.ReadToken(UserInfo.AccessToken) as JwtSecurityToken;
+
+                UserInfo.UserName = jsonToken?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Name)?.Value;
+                UserInfo.UserId = jsonToken?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+                UserInfo.Email = jsonToken?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
+                UserInfo.UserRoles = jsonToken?.Claims
+                                     .Where(c => c.Type == ClaimTypes.Role)
+                                     .Select(c => c.Value)
+                                     .ToList();
+                GetParam.Clear();
+                GetParam.Add("Id", ((int)DropdownEnum.UserWiseBusinesses).ToString());
+                _httpService.SetBearerToken(UserInfo.AccessToken);
+                var businessListResponse = await _httpService.GetAsync<ApiResponse<IList<DropdownDto>>>(
+                     UtilityVersion, UtilityEndpoints.GetDropdown, GetParam);
+
+                UserInfo.UserBusinessList = businessListResponse?.Data;
+                HttpContext.Session.Set(Constants.UserInfo, UserInfo);
+            }
         }
         else
         {
-            UserBusinessList = businessList;
+            UserInfo = userInfo;
         }
 
+
+        // Redirect to business create page if no business found
+        if (UserInfo.UserBusinessList?.Count <= 0 && UserInfo.UserRoles!.Contains(Constants.Client))
+            if (!HttpContext.Request.Path.Equals(Constants.RedirectToBusinessCreate, StringComparison.OrdinalIgnoreCase))
+                HttpContext.Response.Redirect(Constants.RedirectToBusinessCreate);
+
+
+        // Pass authentication data to the view
+        ViewBag.Username = UserInfo.UserName;
         // Proceed with the action execution
         await next();
     }

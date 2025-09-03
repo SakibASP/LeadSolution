@@ -16,7 +16,7 @@ namespace Lead.UI.Controllers.Lead;
 public class BusinessInfoController(IHttpService httpService, IOptions<ApiSettings> apiSetting) : BaseController(httpService, apiSetting)
 {
     private string VersionedController => $"{_apiSettings.Controllers.BusinessInfo}";
-    private void SetToken() => _httpService.SetBearerToken(AccessToken);
+    private void SetToken() => _httpService.SetBearerToken(UserInfo.AccessToken);
 
     private readonly Dictionary<string, string> GetParam = [];
 

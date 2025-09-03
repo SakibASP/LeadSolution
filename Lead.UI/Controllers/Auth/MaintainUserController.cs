@@ -1,5 +1,4 @@
-﻿using Azure.Core;
-using Common.Utils.Constant;
+﻿using Common.Utils.Constant;
 using Core.Models.Auth;
 using Core.ViewModels.Dto.Auth.Auth;
 using Core.ViewModels.Dto.Auth.Roles;
@@ -10,14 +9,13 @@ using Lead.UI.Interfaces;
 using Lead.UI.Settings;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
-using System.Threading.Tasks;
 
 namespace Lead.UI.Controllers.Auth;
 
 public class MaintainUserController(IHttpService httpService, IOptions<ApiSettings> apiSetting) : BaseController(httpService, apiSetting)
 {
     private string VersionedController => _apiSettings.Controllers.MaintainUser;
-    private void SetToken() => _httpService.SetBearerToken(AccessToken);
+    private void SetToken() => _httpService.SetBearerToken(UserInfo.AccessToken);
 
     public async Task<IActionResult> UserList()
     {

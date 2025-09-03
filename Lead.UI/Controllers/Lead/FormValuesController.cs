@@ -11,6 +11,7 @@ using Lead.UI.Interfaces;
 using Lead.UI.Settings;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.AspNetCore.SignalR.Protocol;
 using Microsoft.Extensions.Options;
 using System.Text.Json;
 
@@ -21,14 +22,14 @@ public class FormValuesController(IHttpService httpService, IOptions<ApiSettings
     private string Version => _apiSettings.Controllers.FormValues;
     private FormValuesEndpoints Endpoints => _apiSettings.Endpoints.FormValues;
 
-    private void SetToken() => _httpService.SetBearerToken(AccessToken);
+    private void SetToken() => _httpService.SetBearerToken(UserInfo.AccessToken);
     private readonly Dictionary<string, string> GetParam = [];
 
     public async Task<IActionResult> Index(int? businessId, DateTime? fromDate, DateTime? toDate)
     {
         SetToken();
 
-        var selectedId = businessId ?? UserBusinessList?.FirstOrDefault()?.Id ?? 0;
+        var selectedId = businessId ?? UserInfo.UserBusinessList?.FirstOrDefault()?.Id ?? 0;
         fromDate ??= DateTime.Now.ToBangladeshTime().AddDays(-7);
         toDate ??= DateTime.Now.ToBangladeshTime();
 
@@ -46,10 +47,10 @@ public class FormValuesController(IHttpService httpService, IOptions<ApiSettings
             TempData[Constants.Error] = response?.Message;
             return RedirectToAction("Index", "Home");
         }
-
+        var messages = JsonSerializer.Deserialize<dynamic>(response?.Data);
         var rows = JsonSerializer.Deserialize<List<Dictionary<string, object>>>(response?.Data);
         ViewBag.DynamicRows = rows;
-        ViewBag.BusinessId = new SelectList(UserBusinessList, "Id", "Name", selectedId);
+        ViewBag.BusinessId = new SelectList(UserInfo.UserBusinessList, "Id", "Name", selectedId);
         return View();
     }
 
@@ -58,7 +59,7 @@ public class FormValuesController(IHttpService httpService, IOptions<ApiSettings
     {
         SetToken();
 
-        var selectedId = businessId ?? UserBusinessList?.FirstOrDefault()?.Id ?? 0;
+        var selectedId = businessId ?? UserInfo.UserBusinessList?.FirstOrDefault()?.Id ?? 0;
 
         GetParam.Clear();
         GetParam.Add("businessId", selectedId.ToString());
@@ -74,7 +75,7 @@ public class FormValuesController(IHttpService httpService, IOptions<ApiSettings
         }
 
         ViewBag.ApiKey = await GetActiveApiKey(selectedId);
-        ViewBag.BusinessId = new SelectList(UserBusinessList, "Id", "Name", selectedId);
+        ViewBag.BusinessId = new SelectList(UserInfo.UserBusinessList, "Id", "Name", selectedId);
         return View(response?.Data);
     }
 

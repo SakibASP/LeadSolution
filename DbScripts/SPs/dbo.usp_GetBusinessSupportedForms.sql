@@ -23,7 +23,7 @@ BEGIN
         FD.IsSelectInput,
         ISNULL(BSF.IsActive, 0) AS IsActive
     FROM dbo.FormDetails FD
-    INNER JOIN dbo.DataTypes DT ON FD.TypeId = DT.Id
+    INNER JOIN dbo.DataTypes DT ON FD.DataTypeId = DT.Id
     LEFT JOIN dbo.BusinessSupportedFormId BSF ON FD.Id = BSF.FormId AND BSF.BusinessId = @BusinessId AND BSF.IsActive = 1
     WHERE FD.IsActive = 1
 

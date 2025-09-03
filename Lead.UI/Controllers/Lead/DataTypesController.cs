@@ -13,7 +13,7 @@ public class DataTypesController(IHttpService httpService, IOptions<ApiSettings>
 {
     private string VersionedController => $"{_apiSettings.Controllers.DataTypes}";
 
-    private void SetToken() => _httpService.SetBearerToken(AccessToken);
+    private void SetToken() => _httpService.SetBearerToken(UserInfo.AccessToken);
 
     public async Task<IActionResult> Index()
     {

@@ -96,18 +96,18 @@ public class AuthController(
                 Expires = _bdTime.AddDays(_jwtOptions.RefreshTokenValidityInDays)
             };
 
-            var encryptedToken = EncryptionHelper.Encrypt(JsonSerializer.Serialize(tokenDto));
-            await _userManager.SetAuthenticationTokenAsync(user, "Default", "RefreshToken", encryptedToken);
+            var encryptedRefreshToken = EncryptionHelper.Encrypt(JsonSerializer.Serialize(tokenDto));
+            await _userManager.SetAuthenticationTokenAsync(user, "Default", "RefreshToken", encryptedRefreshToken);
 
             // Wrap auth response inside ApiResponse<AuthResponseDto>
             var response = new AuthResponseDto
             {
                 Token = token,
                 RefreshToken = refreshToken,
-                UserName = user.UserName,
                 Expiration = _bdTime.AddMinutes(_jwtOptions.TokenValidityInMinutes)
             };
 
+            await _userManager.SetAuthenticationTokenAsync(user, "Default", "AccessToken", EncryptionHelper.Encrypt(response.Token));
             return Ok(ApiResponse<AuthResponseDto>.Success(response, "Login successful!"));
         }
         catch (Exception ex)
@@ -164,6 +164,8 @@ public class AuthController(
                 RefreshToken = tokenData.RefreshToken,
                 Expiration = _bdTime.AddMinutes(_jwtOptions.TokenValidityInMinutes)
             };
+
+            await _userManager.SetAuthenticationTokenAsync(user, "Default", "AccessToken", EncryptionHelper.Encrypt(response.Token));
             return Ok(ApiResponse<AuthResponseDto>.Success(response, "Token refreshed successful!"));
         }
         catch (Exception ex)

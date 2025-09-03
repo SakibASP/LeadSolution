@@ -16,13 +16,13 @@ namespace Lead.UI.Controllers.Common;
 
 public class HomeController(IHttpService httpService, IOptions<ApiSettings> apiSetting) : BaseController(httpService, apiSetting)
 {
-    private void SetToken() => _httpService.SetBearerToken(AccessToken);
+    private void SetToken() => _httpService.SetBearerToken(UserInfo.AccessToken);
     private readonly Dictionary<string, string> GetParam = [];
 
     public IActionResult Index(int? businessId)
     {
-        var selectedId = businessId ?? UserBusinessList?.FirstOrDefault()?.Id ?? 0;
-        ViewBag.BusinessId = new SelectList(UserBusinessList, "Id", "Name", selectedId);
+        var selectedId = businessId ?? UserInfo.UserBusinessList?.FirstOrDefault()?.Id ?? 0;
+        ViewBag.BusinessId = new SelectList(UserInfo.UserBusinessList, "Id", "Name", selectedId);
         return View();
     }
 

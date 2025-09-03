@@ -16,7 +16,7 @@ public class FormDetailsController(IHttpService httpService, IOptions<ApiSetting
 {
     private string VersionedController => $"{_apiSettings.Controllers.FormDetails}";
 
-    private void SetToken() => _httpService.SetBearerToken(AccessToken);
+    private void SetToken() => _httpService.SetBearerToken(UserInfo.AccessToken);
 
     private readonly Dictionary<string, string> GetParam = [];
 
@@ -93,7 +93,7 @@ public class FormDetailsController(IHttpService httpService, IOptions<ApiSetting
 
         if (viewBagResponse?.IsSuccess is not true) TempData[Constants.Error] = viewBagResponse?.Message;
 
-        ViewBag.TypeId = new SelectList(viewBagResponse?.Data, "Id", "Name", response?.Data?.TypeId);
+        ViewBag.TypeId = new SelectList(viewBagResponse?.Data, "Id", "Name", response?.Data?.DataTypeId);
         return response?.Data is null ? NotFound() : View(response.Data);
     }
 

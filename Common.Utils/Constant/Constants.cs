@@ -5,15 +5,19 @@ public static class Constants
     //Session keys
     public const string AuthResponseDto = "AuthResponseDto";
     public const string Menu = "Menu"; 
-    public const string UserBusinessList = "UserBusinessList"; 
+    public const string UserInfo = "UserInfo"; 
 
     //Redirections
     public const string RedirectToLogin = "/Auth/Login";
+    public const string RedirectToBusinessCreate = "/BusinessInfo/Create";
 
     //Roles
     public const string AdminAuthRoles = "Admin, Super Admin"; 
     public const string Admin = "Admin"; 
     public const string SuperAdmin = "Super Admin"; 
+    public const string Client = "Client"; 
+    public const string Moderator = "Moderator"; 
+    public const string IT = "IT"; 
 
 
     //TempMessage keys

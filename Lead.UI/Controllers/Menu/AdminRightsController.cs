@@ -16,7 +16,7 @@ namespace Lead.UI.Controllers.Menu;
 
 public class AdminRightsController(IHttpService httpService, IOptions<ApiSettings> apiSetting) : BaseController(httpService, apiSetting)
 {
-    private void SetToken() => _httpService.SetBearerToken(AccessToken);
+    private void SetToken() => _httpService.SetBearerToken(UserInfo.AccessToken);
     private string VersionedAdminRights => _apiSettings.Controllers.AdminRights;
     private string VersionedRoles => _apiSettings.Controllers.Roles;
 

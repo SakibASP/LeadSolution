@@ -13,7 +13,7 @@ namespace Lead.UI.Controllers.Auth;
 public class RolesController(IHttpService httpService, IOptions<ApiSettings> apiSetting) : BaseController(httpService, apiSetting)
 {
     private string VersionedController => _apiSettings.Controllers.Roles;
-    private void SetToken() => _httpService.SetBearerToken(AccessToken);
+    private void SetToken() => _httpService.SetBearerToken(UserInfo.AccessToken);
     public async Task<IActionResult> RoleList()
     {
         SetToken();
