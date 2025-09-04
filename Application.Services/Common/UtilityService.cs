@@ -1,7 +1,9 @@
 ﻿using Application.Interfaces.Common;
 using Azure.Core;
+using Common.Utils.Constant;
 using Common.Utils.Enums;
 using Core.Models.Common;
+using Core.ViewModels.Dto.Auth.Auth;
 using Core.ViewModels.Dto.Common;
 using Core.ViewModels.Request.Common;
 using Core.ViewModels.Response;
@@ -25,15 +27,31 @@ public class UtilityService(IUtilityRepo repo, IHttpClientFactory factory, IHttp
     private readonly HttpClient _httpClient = factory.CreateClient();
     private readonly IHttpContextAccessor _httpContext = httpContext;
 
-    private string CurrentUser => _httpContext.HttpContext?.User?.Identity?.Name ?? "N/A";
     private string RequestPath => _httpContext.HttpContext?.Request.Path.Value ?? "N/A";
+
+    public UserInfoViewModel UserInfo()
+    {
+        return new()
+        {
+            UserId = _httpContext.HttpContext?.User.FindFirstValue(ClaimTypes.NameIdentifier),
+            UserName = _httpContext.HttpContext?.User.Identity?.Name,
+            Email = _httpContext.HttpContext?.User.FindFirstValue(ClaimTypes.Email),
+            UserRoles = _httpContext.HttpContext?.User
+                .FindAll(ClaimTypes.Role)
+                .Select(r => r.Value)
+                .ToList() ?? [],
+            UserBusinessList = [],
+            AccessToken = ""
+        };
+    }
 
     public async Task<ApiResponse<IList<DropdownDto>>> GetDropdownListAsync(DropdownRequest request)
     {
         try
         {
+            bool IsAdmin = UserInfo().UserRoles?.Contains(Constants.Admin) is true || UserInfo().UserRoles?.Contains(Constants.SuperAdmin) is true;
             // if the dropdown is 'user wise business' then it takes the related dropdown using the user id
-            if (request.Id == (int)DropdownEnum.UserWiseBusinesses)
+            if (request.Id == (int)DropdownEnum.UserWiseBusinesses && !IsAdmin)
                 request.Param1 = _httpContext.HttpContext?.User.FindFirstValue(ClaimTypes.NameIdentifier);
             var result = await _iUtilityRepo.GetDropdownListAsync<DropdownDto>(request);
             return ApiResponse<IList<DropdownDto>>.Success(result, string.Empty);
@@ -41,7 +59,7 @@ public class UtilityService(IUtilityRepo repo, IHttpClientFactory factory, IHttp
         catch (Exception ex)
         {
             Log
-                .ForContext("UserName", CurrentUser)
+                .ForContext("UserName", UserInfo().UserName)
                 .ForContext("Path", RequestPath)
                 .Error(ex, "Error getting dropdown: {@request}", JsonSerializer.Serialize(request));
             return ApiResponse<IList<DropdownDto>>.Fail("Something went wrong!");
@@ -52,19 +70,23 @@ public class UtilityService(IUtilityRepo repo, IHttpClientFactory factory, IHttp
     {
         try
         {
+            bool IsAdmin = UserInfo().UserRoles?.Contains(Constants.Admin) is true || UserInfo().UserRoles?.Contains(Constants.SuperAdmin) is true;
+            if (!IsAdmin)
+                request.Param1 = _httpContext.HttpContext?.User.FindFirstValue(ClaimTypes.NameIdentifier);
             var result = await _iUtilityRepo.GetDropdownListAsync<UserDropdownDto>(request);
             return ApiResponse<IList<UserDropdownDto>>.Success(result, string.Empty);
         }
         catch (Exception ex)
         {
             Log
-                .ForContext("UserName", CurrentUser)
+                .ForContext("UserName", UserInfo().UserName)
                 .ForContext("Path", RequestPath)
                 .Error(ex, "Error getting dropdown: {@request}", JsonSerializer.Serialize(request));
             return ApiResponse<IList<UserDropdownDto>>.Fail("Something went wrong!");
         }
     }
 
+    #region - country api -
     public async Task<ApiResponse<bool>> UpdateCountriesAsync()
     {
         string response = string.Empty;
@@ -87,14 +109,16 @@ public class UtilityService(IUtilityRepo repo, IHttpClientFactory factory, IHttp
         catch (Exception ex)
         {
             Log
-                .ForContext("UserName", CurrentUser)
+                .ForContext("UserName", UserInfo().UserName)
                 .ForContext("Path", RequestPath)
                 .Error(ex, "Error getting country data: {@response}", response);
             return ApiResponse<bool>.Fail("Country refreshed failed");
         }
 
     }
+    #endregion
 
+    #region - logs -
     public async Task<ApiResponse<IList<Logs>>> GetSystemLogsAsync()
     {
         try
@@ -105,7 +129,7 @@ public class UtilityService(IUtilityRepo repo, IHttpClientFactory factory, IHttp
         catch (Exception ex)
         {
             Log
-                .ForContext("UserName", CurrentUser)
+                .ForContext("UserName", UserInfo().UserName)
                 .ForContext("Path", RequestPath)
                 .Error(ex, "Error getting system logs");
             return ApiResponse<IList<Logs>>.Fail("Something went wrong!");
@@ -122,7 +146,7 @@ public class UtilityService(IUtilityRepo repo, IHttpClientFactory factory, IHttp
         catch (Exception ex)
         {
             Log
-                .ForContext("UserName", CurrentUser)
+                .ForContext("UserName", UserInfo().UserName)
                 .ForContext("Path", RequestPath)
                 .Error(ex, "Error getting system log detail {id}", id);
             return ApiResponse<Logs>.Fail("Something went wrong!");
@@ -139,7 +163,7 @@ public class UtilityService(IUtilityRepo repo, IHttpClientFactory factory, IHttp
         catch (Exception ex)
         {
             Log
-                .ForContext("UserName", CurrentUser)
+                .ForContext("UserName", UserInfo().UserName)
                 .ForContext("Path", RequestPath)
                 .Error(ex, "Error getting api logs");
             return ApiResponse<IList<RequestLogs>>.Fail("Something went wrong!");
@@ -156,10 +180,11 @@ public class UtilityService(IUtilityRepo repo, IHttpClientFactory factory, IHttp
         catch (Exception ex)
         {
             Log
-                .ForContext("UserName", CurrentUser)
+                .ForContext("UserName", UserInfo().UserName)
                 .ForContext("Path", RequestPath)
                 .Error(ex, "Error getting api log detail {id}", id);
             return ApiResponse<RequestLogs>.Fail("Something went wrong!");
         }
     }
+    #endregion
 }

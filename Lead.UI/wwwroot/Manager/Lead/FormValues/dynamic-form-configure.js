@@ -380,7 +380,7 @@ const generateEmbeddableForm = () => {
         `.trim();
 
     // making minimum version of HTML
-    fullHtml = fullHtml.replace(/>\s+</g, '><').replace(/\s+/g, ' ').trim();
+    //fullHtml = fullHtml.replace(/>\s+</g, '><').replace(/\s+/g, ' ').trim();
 
     // Output to textarea
     embedCode.value = fullHtml;

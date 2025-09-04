@@ -18,9 +18,10 @@
                         <input type="hidden" asp-for="CreatedDate" />
 
                         <div class="mb-3">
-                            <label class="form-label">Users</label>
-                            <select asp-items="ViewBag.UserId" class="form-select"></select>
+                            <label class="form-label">User</label>
+                            <input type="text" class="form-control" value="@ViewBag.SelectedUserName" readonly />
                         </div>
+
                         <div class="mb-3">
                             <label asp-for="ServiceId" class="form-label"></label>
                             <select asp-for="ServiceId" asp-items="ViewBag.ServiceId" class="form-select"></select>

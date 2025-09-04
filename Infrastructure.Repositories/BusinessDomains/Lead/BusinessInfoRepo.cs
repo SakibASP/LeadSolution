@@ -1,7 +1,10 @@
-﻿using Core.Models.Auth;
+﻿using Common.Utils.Constant;
+using Core.Models.Auth;
+using Core.ViewModels.Dto.Auth.Auth;
 using Core.ViewModels.Dto.Lead;
 using Infrastructure.Interfaces.Lead;
 using Infrastructure.Repositories.Data;
+using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Repositories.BusinessDomains.Lead;
 
@@ -13,6 +16,32 @@ namespace Infrastructure.Repositories.BusinessDomains.Lead;
 public sealed class BusinessInfoRepo(LeadContext context) : IBusinessInfoRepo, IAsyncDisposable
 {
     private readonly LeadContext _context = context;
+
+    public async Task<IList<AspNetBusinessInfo>> GetAsync(UserInfoViewModel parameter)
+    {
+        if (parameter.UserRoles?.Contains(Constants.Admin) is true
+            || parameter.UserRoles?.Contains(Constants.SuperAdmin) is true)
+        {
+            return await _context.AspNetBusinessInfo
+                .AsNoTracking()
+                .ToListAsync();
+        }
+        else
+        {
+            string? userId = parameter.UserId;
+            var supportedBusinessIds = await _context.AspNetUserBusinessInfo
+                .AsNoTracking()
+                .Where(ub => ub.UserId == userId)
+                .Select(ub => ub.BusinessId)
+                .ToListAsync();
+            return await _context.AspNetBusinessInfo
+                .AsNoTracking()
+                .Where(b => supportedBusinessIds.Contains(b.Id))
+                .ToListAsync();
+        }
+    }
+
+
     public async Task AddAsync(AspNetBusinessInfoDto businessInfo)
     {
         using var transaction = await _context.Database.BeginTransactionAsync();
@@ -51,15 +80,10 @@ public sealed class BusinessInfoRepo(LeadContext context) : IBusinessInfoRepo, I
         }
     }
 
-    public async Task UpdateAsync(AspNetBusinessInfo aspNetBusinessInfo)
-    {
-        _context.Update(aspNetBusinessInfo);
-        await _context.SaveChangesAsync();
-    }
-
     public async ValueTask DisposeAsync()
     {
         await _context.DisposeAsync();
         GC.SuppressFinalize(this);
     }
+
 }

@@ -6,7 +6,7 @@ namespace Application.Interfaces.Lead;
 
 public interface IBusinessInfoService
 {
-    Task<ApiResponse<IList<AspNetBusinessInfo>>> GetAllAsync(dynamic? parameter);
+    Task<ApiResponse<IList<AspNetBusinessInfo>>> GetAllAsync();
     Task<ApiResponse<AspNetBusinessInfo>> GetByIdAsync(int id);
     Task<ApiResponse<dynamic>> AddAsync(AspNetBusinessInfoDto businessInfo);
     Task<ApiResponse<dynamic>> UpdateAsync(AspNetBusinessInfo businessInfo);

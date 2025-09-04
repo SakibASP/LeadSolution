@@ -27,7 +27,7 @@ public sealed class UtilityRepo(LeadContext context, IDapperContext dapper, IHtt
     private string RequestPath => _httpContext.HttpContext?.Request.Path.Value ?? "N/A";
 
     private static readonly Lock _lock = new();
-    private readonly DateTime OneMonthAgo = DateTime.Now.ToBangladeshTime().AddMonths(-1);
+    private readonly DateTime DaysAgo = DateTime.Now.ToBangladeshTime().AddDays(-15);
 
     private static DateTime _lastSystemLogCleanup = DateTime.MinValue;
     private static DateTime _lastApiLogCleanup = DateTime.MinValue;
@@ -82,6 +82,7 @@ public sealed class UtilityRepo(LeadContext context, IDapperContext dapper, IHtt
 
     }
 
+    #region - logs -
     public async Task<IList<Logs>> GetSystemLogsAsync()
     {
         #region - Delete old logs in other thread if last cleanup was more than 1 hour ago -
@@ -101,7 +102,7 @@ public sealed class UtilityRepo(LeadContext context, IDapperContext dapper, IHtt
                             using var db = new LeadContext(); // create a fresh DbContext
 
                             db.Logs
-                              .Where(l => l.TimeStamp < OneMonthAgo)
+                              .Where(l => l.TimeStamp < DaysAgo)
                               .ExecuteDelete();
                         }
                         catch (Exception ex)
@@ -124,7 +125,7 @@ public sealed class UtilityRepo(LeadContext context, IDapperContext dapper, IHtt
         // Return the latest 1000 logs
         return await _context.Logs
             .AsNoTracking()
-            .Where(x => x.TimeStamp > OneMonthAgo)
+            .Where(x => x.TimeStamp > DaysAgo)
             .OrderByDescending(l => l.Id)
             .Take(1000)
             .ToListAsync();
@@ -155,7 +156,7 @@ public sealed class UtilityRepo(LeadContext context, IDapperContext dapper, IHtt
                             using var db = new LeadContext(); // create a fresh DbContext
 
                             db.RequestLogs
-                              .Where(l => l.CreatedDate < OneMonthAgo)
+                              .Where(l => l.CreatedDate < DaysAgo)
                               .ExecuteDelete();
                         }
                         catch (Exception ex)
@@ -178,7 +179,7 @@ public sealed class UtilityRepo(LeadContext context, IDapperContext dapper, IHtt
         // Return the latest 1000 logs
         return await _context.RequestLogs
                    .AsNoTracking()
-                   .Where(x => x.CreatedDate > OneMonthAgo)
+                   .Where(x => x.CreatedDate > DaysAgo)
                    .OrderByDescending(l => l.Id)
                    .Take(1000)
                    .ToListAsync();
@@ -190,6 +191,7 @@ public sealed class UtilityRepo(LeadContext context, IDapperContext dapper, IHtt
         if (result is not null) result.UserId = _context.Users.Find(result.UserId)?.UserName ?? "Unauthorized";
         return result is null ? throw new KeyNotFoundException($"Log with ID {id} not found.") : result;
     }
+    #endregion
 
     #region - private methods for country upsert -
     private async Task UpsertCountryCurrencyAsync(RestCountry c, Countries dbCountry)

@@ -40,6 +40,7 @@ public class BaseController(IHttpService httpService, IOptions<ApiSettings> apiS
     /// <summary>
     /// Current Bangladesh Time
     /// </summary>
+    /// 
     protected DateTime CurrentBdTime { get; private set; } = DateTime.Now.ToBangladeshTime();
 
 

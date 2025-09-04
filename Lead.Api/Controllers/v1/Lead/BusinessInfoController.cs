@@ -18,7 +18,7 @@ public class BusinessInfoController(IBusinessInfoService businessInfoService) : 
     private readonly IBusinessInfoService _iBusinessInfo = businessInfoService;
 
     [HttpGet("get-all")]
-    public async Task<IActionResult> GetAll([FromQuery] dynamic? parameter) => Ok(await _iBusinessInfo.GetAllAsync(parameter));
+    public async Task<IActionResult> GetAll() => Ok(await _iBusinessInfo.GetAllAsync());
 
     [HttpGet("get-by-id")]
     public async Task<IActionResult> GetById([FromQuery] int id) => Ok(await _iBusinessInfo.GetByIdAsync(id));

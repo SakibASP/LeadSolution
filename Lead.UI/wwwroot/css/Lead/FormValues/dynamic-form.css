@@ -133,7 +133,7 @@ Form container
 Button Table
 ----------------------------- */
 #myDynamicFormWrapper table {
-    margin: 20px auto 30px auto;
+    margin: 10px auto 30px auto;
     border-collapse: collapse;
     text-align: center;
 }

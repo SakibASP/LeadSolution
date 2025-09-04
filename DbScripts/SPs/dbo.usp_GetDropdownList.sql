@@ -19,6 +19,7 @@ AS
 BEGIN
 
 SET TRANSACTION ISOLATION LEVEL READ UNCOMMITTED;
+SET NOCOUNT ON;
 
 IF(@Id = 1) -- Service Types
 	BEGIN
@@ -56,7 +57,7 @@ ELSE IF(@Id = 5) -- User Wise Businesses
 		FROM  AspNetUserBusinessInfo ub
 		INNER JOIN dbo.AspNetUsers u ON ub.UserId = u.Id
 		INNER JOIN AspNetBusinessInfo b ON ub.BusinessId = b.Id
-		WHERE u.Id = @Param1;
+		WHERE (u.Id = @Param1 OR @Param1 IS NULL);
 	END
 
 

@@ -2,6 +2,7 @@
 
 @{
     ViewData["Title"] = "Create Business Info";
+    bool IsAdmin = (bool)ViewBag.Admin;
 }
 
 <div class="container py-1">
@@ -18,7 +19,10 @@
                         <div class="mb-3">
                             <label asp-for="UserId" class="form-label fw-bold"></label>
                             <select asp-for="UserId" asp-items="ViewBag.UserId" class="form-select">
-                                <option disabled selected>-- Select User --</option>
+                                @if (IsAdmin)
+                                {
+                                    <option disabled selected>-- Select User --</option>
+                                }
                             </select>
                             <span asp-validation-for="UserId" class="text-danger"></span>
                         </div>
