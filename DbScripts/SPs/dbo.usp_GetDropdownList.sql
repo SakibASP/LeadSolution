@@ -40,7 +40,7 @@ ELSE IF(@Id = 3) -- Users
 		SELECT 
 			Id,UserName Name
 		FROM dbo.AspNetUsers
-		WHERE (Id LIKE @Param1 OR @Param1 IS NULL);
+		WHERE (Id = @Param1 OR @Param1 IS NULL);
 	END
 ELSE IF(@Id = 4) -- Business Wise Users
 	BEGIN
