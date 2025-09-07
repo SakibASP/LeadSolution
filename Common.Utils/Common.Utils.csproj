@@ -11,13 +11,17 @@
   </ItemGroup>
 
 	<ItemGroup>
+		<PackageReference Include="AspNetCore.HealthChecks.SqlServer" Version="9.0.0" />
+		<PackageReference Include="AspNetCore.HealthChecks.UI" Version="9.0.0" />
+		<PackageReference Include="AspNetCore.HealthChecks.UI.SqlServer.Storage" Version="9.0.0" />
 		<PackageReference Include="ClosedXML" Version="0.105.0" />
+		<PackageReference Include="Microsoft.Extensions.Diagnostics.HealthChecks" Version="9.0.8" />
 		<PackageReference Include="Serilog.AspNetCore" Version="9.0.0" />
 		<PackageReference Include="Serilog.Sinks.MSSqlServer" Version="8.2.2" />
 	</ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.Data.SqlClient" Version="6.1.0" />
+    <PackageReference Include="Microsoft.Data.SqlClient" Version="6.1.1" />
   </ItemGroup>
 
 </Project>

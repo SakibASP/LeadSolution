@@ -38,6 +38,8 @@ public class LeadContext : IdentityDbContext<ApplicationUser>
     {
         base.OnModelCreating(modelBuilder);
         RegisterAutoIncludes(modelBuilder);
+        RegisterLogsSchema(modelBuilder);
+        RegisterGenSchema(modelBuilder);
     }
 
     #region - User, Menu and Roles -
@@ -67,9 +69,10 @@ public class LeadContext : IdentityDbContext<ApplicationUser>
     #region - Audit & Logs -
     public virtual DbSet<Logs> Logs { get; set; } = default!;
     public virtual DbSet<RequestLogs> RequestLogs { get; set; } = default!;
-    public virtual DbSet<Audit> Audit { get; set; } = default!;
+    public virtual DbSet<Audits> Audit { get; set; } = default!;
+
     private AuditTrailFactory? auditFactory = null;
-    private readonly List<Audit> auditList = [];
+    private readonly List<Audits> auditList = [];
     #endregion
 
     /// <summary>
@@ -85,7 +88,7 @@ public class LeadContext : IdentityDbContext<ApplicationUser>
         var entityList = ChangeTracker.Entries().Where(p => p.State == EntityState.Deleted || p.State == EntityState.Modified);  //p.State == EntityState.Added || for insert statement
         foreach (var entity in entityList)
         {
-            Audit? audit = await auditFactory.GetAudit(entity);
+            Audits? audit = await auditFactory.GetAudit(entity);
             bool isValid = true;
 
             var tableName = audit?.TableName ?? string.Empty;
@@ -118,11 +121,7 @@ public class LeadContext : IdentityDbContext<ApplicationUser>
         return retVal;
     }
 
-
-    /// <summary>
-    /// Md. Sakibur Rahman
-    /// 21 Jun 2035
-    /// </summary>
+    #region - register settings -
     private static void RegisterAutoIncludes(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<AspNetBusinessInfo>()
@@ -162,4 +161,22 @@ public class LeadContext : IdentityDbContext<ApplicationUser>
             .Navigation(m => m.State)
             .AutoInclude();
     }
+    private static void RegisterLogsSchema(ModelBuilder modelBuilder)
+    {
+        const string logsSchema = "logs";
+        modelBuilder.Entity<Logs>().ToTable("Logs", schema: logsSchema);
+        modelBuilder.Entity<RequestLogs>().ToTable("RequestLogs", schema: logsSchema);
+        modelBuilder.Entity<Audits>().ToTable("Audits", schema: logsSchema);
+    }
+    private static void RegisterGenSchema(ModelBuilder modelBuilder)
+    {
+        const string genSchema = "gen";
+        modelBuilder.Entity<Countries>().ToTable("Countries", schema: genSchema);
+        modelBuilder.Entity<CountryNativeNames>().ToTable("CountryNativeNames", schema: genSchema);
+        modelBuilder.Entity<Currencies>().ToTable("Currencies", schema: genSchema);
+        modelBuilder.Entity<States>().ToTable("States", schema: genSchema);
+        modelBuilder.Entity<Cities>().ToTable("Cities", schema: genSchema);
+
+    }
+    #endregion
 }

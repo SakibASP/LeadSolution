@@ -4,6 +4,7 @@ using Core.ViewModels.Dto.Auth.Auth;
 using Infrastructure.Repositories.Data;
 using Lead.Api.Middlewares;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -12,11 +13,12 @@ using Serilog;
 using Serilog.Events;
 using Serilog.Sinks.MSSqlServer;
 using System.Text;
+using System.Text.Json;
 
 
 var builder = WebApplication.CreateBuilder(args);
 
-
+#region - serilog configuration -
 // Configure Serilog to log only to SQL Server
 var columnOptions = new ColumnOptions
 {
@@ -30,6 +32,7 @@ var columnOptions = new ColumnOptions
 var sinkOptions = new MSSqlServerSinkOptions
 {
     TableName = "Logs",
+    SchemaName = "logs",
     AutoCreateSqlTable = true,
     // Optionally adjust batching:
     BatchPostingLimit = 100,
@@ -54,13 +57,16 @@ Log.Logger = new LoggerConfiguration()
     .CreateLogger();
 
 builder.Host.UseSerilog();
-
+#endregion
 
 try
 {
+    string connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
+
+    #region - identity dbcontext setup -
     // Add services to the container.
     builder.Services.AddDbContext<LeadContext>(options =>
-        options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+        options.UseSqlServer(connectionString));
 
     //  For code first approach
     //  ->Specify where migrations will live
@@ -93,8 +99,9 @@ try
             "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+";
         options.User.RequireUniqueEmail = true;
     });
+    #endregion
 
-
+    #region - jwt auth setup -
     // Configure JWT Authentication
     builder.Services.Configure<JwtOptions>(builder.Configuration.GetSection("JWT"));
     builder.Services.AddAuthentication(options =>
@@ -119,7 +126,9 @@ try
             ClockSkew = TimeSpan.Zero
         };
     });
+    #endregion
 
+    #region - swagger setup -
     builder.Services.AddSwaggerGen(c =>
     {
         c.SwaggerDoc("v1", new OpenApiInfo { Title = "LeadSolution", Version = "v1" });
@@ -151,12 +160,34 @@ try
             }
         });
     });
+    #endregion
+
+    #region - health check setup -
+    // ------------------------------
+    // Add Health Checks
+    // ------------------------------
+    builder.Services.AddHealthChecks()
+        .AddSqlServer(
+            connectionString,
+            name: "SQL Server",
+            failureStatus: Microsoft.Extensions.Diagnostics.HealthChecks.HealthStatus.Unhealthy,
+            tags: ["db", "sql"]
+            )// Optional quick test query)
+        .AddCheck("API Self", () =>
+            Microsoft.Extensions.Diagnostics.HealthChecks.HealthCheckResult.Healthy("API is working"));
 
 
-    builder.Services.AddHttpContextAccessor();
-    builder.Services.AddAuthorization();
+    // ------------------------------
+    // Add HealthChecks UI
+    // ------------------------------
+    builder.Services.AddHealthChecksUI()
+          .AddSqlServerStorage(connectionString);
+    #endregion
 
+    #region - cors setup -
+    // ------------------------------
     // Add CORS policy
+    // ------------------------------
     //var allowedOrigins = new[] { "https://localhost:7131", "http://localhost:5186" };
 
     //builder.Services.AddCors(options =>
@@ -173,15 +204,16 @@ try
                   .AllowAnyMethod()   // ✅ Allow all HTTP methods
                   .AllowAnyHeader()); // ✅ Allow all headers
     });
+    #endregion
 
+    builder.Services.AddHttpContextAccessor();
+    builder.Services.AddAuthorization();
     builder.Services.AddControllers();
-
     builder.Services.AddHttpClient();
-
     builder.Services.AddEndpointsApiExplorer();
-    // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
     //builder.Services.AddOpenApi();
     builder.Services.AddScopedAppServices();
+
     var app = builder.Build();
 
     // Seed roles on startup
@@ -203,20 +235,59 @@ try
         app.UseSwaggerUI();
     }
 
-
-    // Use the CORS policy
-    app.UseCors("AllowAll");
-    //app.UseCors("AllowSpecificOrigins");
-
     // Register your middleware before routing
     app.UseMiddleware<RequestLoggingMiddleware>();
 
     app.UseHttpsRedirection();
+    // Use the CORS policy
+    app.UseCors("AllowAll");
     app.UseAuthentication();
     app.UseAuthorization();
 
 
     app.MapControllers();
+
+    #region - health setup endpoints -
+    // ------------------------------
+    // Map Health Check Endpoints
+    // ------------------------------
+    app.MapHealthChecks("/health", new HealthCheckOptions
+    {
+        Predicate = _ => true
+    });
+
+    app.MapHealthChecks("/health/details", new HealthCheckOptions
+    {
+        ResponseWriter = async (context, report) =>
+        {
+            context.Response.ContentType = "application/json";
+            var result = JsonSerializer.Serialize(new
+            {
+                status = report.Status.ToString(),
+                checks = report.Entries.Select(e => new
+                {
+                    name = e.Key,
+                    status = e.Value.Status.ToString(),
+                    description = e.Value.Description
+                })
+            });
+            await context.Response.WriteAsync(result);
+        }
+    });
+
+
+    // ------------------------------
+    // HealthChecks UI Dashboard
+    // ------------------------------
+    app.MapHealthChecksUI(options =>
+    {
+        options.UIPath = "/health-ui";   // UI endpoint
+        options.ApiPath = "/health-api"; // JSON API for UI
+    });
+    #endregion
+
+    // Add a simple endpoint to test if the app is running
+    app.MapGet("/", () => "API is running!");
 
     app.Run();
 }

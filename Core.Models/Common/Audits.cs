@@ -1,6 +1,6 @@
 ﻿namespace Core.Models.Common;
 
-public class Audit
+public class Audits
 {
     public long Id { get; set; }
     public string? TableName { get; set; }

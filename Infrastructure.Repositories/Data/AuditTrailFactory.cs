@@ -23,9 +23,9 @@ public sealed class AuditTrailFactory(IHttpContextAccessor httpContext)
     /// </summary>
     /// <param name="entry">The EntityEntry representing the entity change.</param>
     /// <returns>An Audit object with relevant audit information, or null if not applicable.</returns>
-    public async Task<Audit?> GetAudit(EntityEntry entry)
+    public async Task<Audits?> GetAudit(EntityEntry entry)
     {
-        Audit? audit = new();
+        Audits? audit = new();
         try
         {
             string tableName = entry.Entity.GetType().Name;

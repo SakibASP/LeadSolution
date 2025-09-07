@@ -6,7 +6,6 @@ using Application.Services.Auth;
 using Application.Services.Common;
 using Application.Services.Lead;
 using Application.Services.Menu;
-using Core.Models.Lead;
 using Infrastructure.Interfaces.Auth;
 using Infrastructure.Interfaces.Common;
 using Infrastructure.Interfaces.Lead;
