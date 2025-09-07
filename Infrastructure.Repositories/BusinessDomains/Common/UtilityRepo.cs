@@ -17,7 +17,9 @@ namespace Infrastructure.Repositories.BusinessDomains.Common;
 /// Author: Md. Sakibur Rahman
 /// </summary>
 
-public sealed class UtilityRepo(LeadContext context, IDapperContext dapper, IHttpContextAccessor httpContext) : IUtilityRepo, IAsyncDisposable
+public sealed class UtilityRepo(LeadContext context,
+    IDapperContext dapper, 
+    IHttpContextAccessor httpContext) : IUtilityRepo, IAsyncDisposable
 {
     private readonly LeadContext _context = context;
     private readonly IDapperContext _dapper = dapper;
@@ -181,7 +183,7 @@ public sealed class UtilityRepo(LeadContext context, IDapperContext dapper, IHtt
                    .AsNoTracking()
                    .Where(x => x.CreatedDate > DaysAgo)
                    .OrderByDescending(l => l.Id)
-                   .Take(1000)
+                   .Take(500)
                    .ToListAsync();
     }
 
@@ -307,4 +309,13 @@ public sealed class UtilityRepo(LeadContext context, IDapperContext dapper, IHtt
         GC.SuppressFinalize(this);
     }
 
+    public async Task<int> GetDropdownIdByFormId(int formId)
+    {
+        var result = await _context.FormWiseDropdowns
+            .AsNoTracking()
+            .Where(f => f.FormId == formId)
+            .Select(f => f.DropdownId)
+            .FirstOrDefaultAsync();
+        return result;
+    }
 }

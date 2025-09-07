@@ -1,6 +1,7 @@
 ﻿using Application.Interfaces.Common;
 using Common.Utils.Constant;
 using Core.ViewModels.Request.Common;
+using Lead.Api.Attributes;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -23,6 +24,11 @@ public class UtilityController(IUtilityService utilityService) : Controller
 
     [HttpGet("get-user-dropdown")]
     public async Task<IActionResult> GetUserDropdown([FromQuery] DropdownRequest request) => Ok(await _iUtilityService.GetUserDropdownListAsync(request));
+
+    [AllowAnonymous]
+    [ApiKeyAuth]
+    [HttpGet("get-client-dropdown")]
+    public async Task<IActionResult> GetClientDropdown([FromQuery] DropdownRequest request) => Ok(await _iUtilityService.GetClientDropdownListAsync(request));
     
     [HttpPost("update-country-data")]
     public async Task<IActionResult> UpdateCountry() => Ok(await _iUtilityService.UpdateCountriesAsync());

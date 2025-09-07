@@ -86,6 +86,24 @@ public class UtilityService(IUtilityRepo repo, IHttpClientFactory factory, IHttp
         }
     }
 
+    public async Task<ApiResponse<IList<DropdownDto>>> GetClientDropdownListAsync(DropdownRequest request)
+    {
+        try
+        {
+            request.Id = await _iUtilityRepo.GetDropdownIdByFormId(request.Id);
+            var result = await _iUtilityRepo.GetDropdownListAsync<DropdownDto>(request);
+            return ApiResponse<IList<DropdownDto>>.Success(result, string.Empty);
+        }
+        catch (Exception ex)
+        {
+            Log
+                .ForContext("UserName", UserInfo().UserName)
+                .ForContext("Path", RequestPath)
+                .Error(ex, "Error getting dropdown: {@formId}", JsonSerializer.Serialize(request));
+            return ApiResponse<IList<DropdownDto>>.Fail("Something went wrong!");
+        }
+    }
+
     #region - country api -
     public async Task<ApiResponse<bool>> UpdateCountriesAsync()
     {

@@ -90,7 +90,7 @@ const clearEmbedCode = () => {
 
 
 
-// ============ fetch api calls start ===========
+// ============ api calls start ===========
 const updateFormSettings = async () => {
     if (!businessId || businessId.value == '') {
         businessNotFound();
@@ -181,7 +181,7 @@ const generateNewApiKey = async () => {
         });
     }
 };
-// ============ fetch api calls end =============
+// ============ api calls end =============
 
 
 
@@ -272,13 +272,6 @@ const generateEmbeddableForm = () => {
     const businessSelectWrapper = clonedForm.querySelector('.form-group.mb-3');
     if (businessSelectWrapper) businessSelectWrapper.remove();
 
-    // Insert BusinessId as hidden input at top of form
-    //const hiddenInput = document.createElement('input');
-    //hiddenInput.type = 'hidden';
-    //hiddenInput.name = 'BusinessId';
-    //hiddenInput.value = businessId.value;
-    //clonedForm.prepend(hiddenInput);
-
     // Set ID for submission handler
     clonedForm.id = 'embeddedForm';
 
@@ -288,85 +281,199 @@ const generateEmbeddableForm = () => {
         <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet" />
     `.trim();
 
+    //dropdown load
+    let dropdownScript = `
+        function initDropdowns() {
+            document.querySelectorAll('#myDynamicFormWrapper .dropdown .btn').forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    const dropdown = btn.parentElement;
+                    const isShown = dropdown.classList.contains('show');
+
+                    document.querySelectorAll('#myDynamicFormWrapper .dropdown').forEach(d => d.classList.remove('show'));
+                    if (!isShown) dropdown.classList.add('show');
+                });
+            });
+
+            document.addEventListener('click', function(e) {
+                if (!(e.target.tagName === 'INPUT' && e.target.id.startsWith('drpSearch_'))) {
+                    document.querySelectorAll('#myDynamicFormWrapper .dropdown').forEach(d => d.classList.remove('show'));
+                }
+            });
+        }
+
+        async function populateDropdown(index, formDetailId, param1 = null) {
+            try {
+                const businessId = document.getElementById("BusinessId").value;
+                const apiKey = document.getElementById("ApiKey").value;
+
+                const res = await fetch(\`https://localhost:44306/api/v1/utility/get-client-dropdown?Id=\${formDetailId}&param1=\${param1 ?? ""}\`, {
+                    method: 'GET',
+                    headers: { 'X-Api-Key': apiKey, 'X-Business-Id': businessId },
+                });
+
+                if (!res.ok) return;
+                const result = await res.json();
+
+                const container = document.getElementById(\`dropdownItems_\${index}\`);
+                const selectedSpan = document.getElementById(\`selectedValue_\${index}\`);
+                const hiddenInput = document.getElementById(\`hiddenValue_\${index}\`);
+                if (!container || !selectedSpan || !hiddenInput) return;
+
+                container.innerHTML = "";
+
+                if (result.isSuccess && Array.isArray(result.data)) {
+                    result.data.forEach(item => {
+                        const div = document.createElement('div');
+                        div.className = 'dropdown-item';
+                        div.textContent = item.name;
+                        div.dataset.value = item.id;
+
+                        div.addEventListener('click', () => {
+                            selectedSpan.textContent = item.name;
+                            hiddenInput.value = item.id;
+                            container.parentElement.classList.remove('show');
+
+                            if (typeof onDropdownChange === 'function') {
+                                onDropdownChange(index, item.id);
+                            }
+                        });
+
+                        container.appendChild(div);
+                    });
+                }
+
+                const searchInput = document.getElementById(\`drpSearch_\${index}\`);
+                if (searchInput) {
+                    searchInput.addEventListener('input', function () {
+                        const filter = this.value.toLowerCase();
+                        container.querySelectorAll('.dropdown-item').forEach(div => {
+                            div.style.display = div.textContent.toLowerCase().includes(filter) ? '' : 'none';
+                        });
+                    });
+                }
+
+            } catch (err) {
+                console.error("Error fetching dropdown:", err);
+            }
+        }
+
+        function onDropdownChange(currentIndex, selectedValue) {
+            const nextIndex = currentIndex + 1;
+            const formDetailHidden = document.querySelector(\`input[name="Inputs[\${nextIndex}].FormDetailId"]\`);
+            if (formDetailHidden) populateDropdown(nextIndex, formDetailHidden.value, selectedValue);
+        }
+
+        document.addEventListener("DOMContentLoaded", () => {
+            initDropdowns();
+        `;
+    // dynamically generate populateDropdown calls for all hidden inputs
+    const processedIndexes = new Set();
+    clonedForm.querySelectorAll("input[type=hidden][name$='.FormDetailId']").forEach((hidden) => {
+        const match = hidden.name.match(/Inputs\[(\d+)\]/);
+        if (!match) return;
+
+        const index = match[1];
+
+        // Skip if this index is already processed
+        if (processedIndexes.has(index)) return;
+        processedIndexes.add(index);
+
+        const container = document.getElementById(`dropdownItems_${index}`);
+        const selectedSpan = document.getElementById(`selectedValue_${index}`);
+        const hiddenInput = document.getElementById(`hiddenValue_${index}`);
+
+        if (!container || !selectedSpan || !hiddenInput) return;
+
+        dropdownScript += `populateDropdown(${index}, ${hidden.value});\n`;
+    });
+    dropdownScript += "});".trim(); // close DOMContentLoaded
+
+    // form submit script 
+    const submitScript = `
+        document.getElementById('embeddedForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const formData = new FormData(this);
+            const businessId = formData.get("BusinessId");
+            const apiKey = formData.get("ApiKey");
+            const payload = {
+                BusinessId: parseInt(businessId) || 0,
+                Inputs: []
+            };
+            formData.forEach((value, key) => {
+                const matchValue = key.match(/^Inputs\\[(\\d+)\\]\\.Value$/);
+                const matchFormDetailId = key.match(/^Inputs\\[(\\d+)\\]\\.FormDetailId$/);
+                if (matchValue) {
+                    const index = parseInt(matchValue[1]);
+                    if (!payload.Inputs[index]) payload.Inputs[index] = {};
+                    payload.Inputs[index].Value = value;
+                }
+                if (matchFormDetailId) {
+                    const index = parseInt(matchFormDetailId[1]);
+                    if (!payload.Inputs[index]) payload.Inputs[index] = {};
+                    payload.Inputs[index].FormDetailId = parseInt(value) || null;
+                }
+            });
+
+            console.log("Payload to send:", payload);
+
+            try {
+                const res = await fetch('https://localhost:44306/api/v1/FormValues/add', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Api-Key': apiKey,
+                        'X-Business-Id': businessId
+                    },
+                    body: JSON.stringify(payload)
+                });
+
+                if (!res.ok) {
+                    let errorMessage = \`Submission failed. Status: \${res.status}\`;
+                    try {
+                        const errorData = await res.json();
+                        if (errorData && errorData.message) {
+                            errorMessage = errorData.message;
+                        }
+                    } catch {
+
+                    }
+                    console.error('API error:', errorMessage);
+                    await Swal.fire({
+                        icon: 'error',
+                        title: '❌ Submission failed.',
+                        text: errorMessage,
+                        confirmButtonText: 'OK'
+                    });
+                    return;
+                }
+
+                await Swal.fire({
+                    icon: 'success',
+                    title: '✅ Submitted successfully!',
+                    confirmButtonText: 'OK'
+                });
+
+            } catch (err) {
+                console.error('Network or unexpected error:', err);
+                await Swal.fire({
+                    icon: 'error',
+                    title: '❌ Submission failed.',
+                    text: 'A network or unexpected error occurred. Please try again.',
+                    confirmButtonText: 'OK'
+                });
+            }
+        });`
+        .trim();
+
     // Script for submitting to your API endpoint
     const script = `
         <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
         <script>
-            document.getElementById('embeddedForm').addEventListener('submit', async function(e) {
-                e.preventDefault();
-                const formData = new FormData(this);
-                const businessId = formData.get("BusinessId");
-                const apiKey = formData.get("ApiKey");
-                const payload = {
-                    BusinessId: parseInt(businessId) || 0,
-                    Inputs: []
-                };
-                formData.forEach((value, key) => {
-                    const matchValue = key.match(/^Inputs\\[(\\d+)\\]\\.Value$/);
-                    const matchFormDetailId = key.match(/^Inputs\\[(\\d+)\\]\\.FormDetailId$/);
-                    if (matchValue) {
-                        const index = parseInt(matchValue[1]);
-                        if (!payload.Inputs[index]) payload.Inputs[index] = {};
-                        payload.Inputs[index].Value = value;
-                    }
-                    if (matchFormDetailId) {
-                        const index = parseInt(matchFormDetailId[1]);
-                        if (!payload.Inputs[index]) payload.Inputs[index] = {};
-                        payload.Inputs[index].FormDetailId = parseInt(value) || null;
-                    }
-                });
-
-                console.log("Payload to send:", payload);
-
-                try {
-                    const res = await fetch('https://localhost:44306/api/v1/FormValues/add', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-Api-Key': apiKey,
-                            'X-Business-Id': businessId
-                        },
-                        body: JSON.stringify(payload)
-                    });
-
-                    if (!res.ok) {
-                        let errorMessage = \`Submission failed. Status: \${res.status}\`;
-                        try {
-                            const errorData = await res.json();
-                            if (errorData && errorData.message) {
-                                errorMessage = errorData.message;
-                            }
-                        } catch {
-       
-                        }
-                        console.error('API error:', errorMessage);
-                        await Swal.fire({
-                            icon: 'error',
-                            title: '❌ Submission failed.',
-                            text: errorMessage,
-                            confirmButtonText: 'OK'
-                        });
-                        return;
-                    }
-
-                    await Swal.fire({
-                        icon: 'success',
-                        title: '✅ Submitted successfully!',
-                        confirmButtonText: 'OK'
-                    });
-
-                } catch (err) {
-                    console.error('Network or unexpected error:', err);
-                    await Swal.fire({
-                        icon: 'error',
-                        title: '❌ Submission failed.',
-                        text: 'A network or unexpected error occurred. Please try again.',
-                        confirmButtonText: 'OK'
-                    });
-                }
-            });
+            ${submitScript}
+            ${dropdownScript}
         </script>
-`.trim();
+        `.trim();
 
     // Final embeddable HTML
     let fullHtml = `
@@ -380,7 +487,7 @@ const generateEmbeddableForm = () => {
         `.trim();
 
     // making minimum version of HTML
-    //fullHtml = fullHtml.replace(/>\s+</g, '><').replace(/\s+/g, ' ').trim();
+    fullHtml = fullHtml.replace(/>\s+</g, '><').replace(/\s+/g, ' ').trim();
 
     // Output to textarea
     embedCode.value = fullHtml;

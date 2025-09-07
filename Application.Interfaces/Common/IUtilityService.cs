@@ -11,6 +11,7 @@ public interface IUtilityService
     UserInfoViewModel UserInfo();
     Task<ApiResponse<IList<DropdownDto>>> GetDropdownListAsync(DropdownRequest request);
     Task<ApiResponse<IList<UserDropdownDto>>> GetUserDropdownListAsync(DropdownRequest request);
+    Task<ApiResponse<IList<DropdownDto>>> GetClientDropdownListAsync(DropdownRequest request);
     Task<ApiResponse<bool>> UpdateCountriesAsync();
     Task<ApiResponse<IList<Logs>>> GetSystemLogsAsync();
     Task<ApiResponse<Logs>> GetSystemLogByIdAsync(int id);

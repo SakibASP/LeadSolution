@@ -1,6 +1,5 @@
 ﻿using Core.Models.Common;
 using Core.ViewModels.Request.Common;
-using Core.ViewModels.Response;
 
 namespace Infrastructure.Interfaces.Common;
 
@@ -12,4 +11,5 @@ public interface IUtilityRepo
     Task<Logs> GetSystemLogByIdAsync(int id);
     Task<IList<RequestLogs>> GetApiLogsAsync();
     Task<RequestLogs> GetApiLogByIdAsync(int id);
+    Task<int> GetDropdownIdByFormId(int formId);
 }

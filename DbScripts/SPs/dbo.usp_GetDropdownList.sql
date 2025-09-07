@@ -3,7 +3,7 @@
 Author : Md. Sakibur Rahman
 Created Date : 2025-07-30 
 
-EXEC usp_GetDropdownList @Id = 1
+EXEC usp_GetDropdownList @Id = 6
 
 =================================
 */
@@ -58,6 +58,30 @@ ELSE IF(@Id = 5) -- User Wise Businesses
 		INNER JOIN dbo.AspNetUsers u ON ub.UserId = u.Id
 		INNER JOIN AspNetBusinessInfo b ON ub.BusinessId = b.Id
 		WHERE (u.Id = @Param1 OR @Param1 IS NULL);
+	END
+ELSE IF(@Id = 6) -- Country List
+	BEGIN
+		SELECT 
+			c.Id,c.CommonName Name
+		FROM  gen.Countries c;
+	END
+ELSE IF(@Id = 7) -- State List
+	BEGIN
+		SELECT 
+			TOP 100 s.Id,s.Name 
+		FROM  gen.States s 
+		WHERE 
+			-- 147 stands for Bangladesh
+			(s.CountryId = (SELECT TOP 1 Id FROM gen.Countries WHERE Id = CONVERT(int,@Param1)) OR s.CountryId = 147)
+			AND (s.Name like '%'+@Param2+'%' OR @Param2 IS NULL);
+	END
+ELSE IF(@Id = 8) -- City List
+	BEGIN
+		SELECT 
+			TOP 100 c.Id,c.Name 
+		FROM  gen.Cities c 
+		WHERE c.StateId = (SELECT TOP 1 Id FROM gen.States WHERE Id = CONVERT(int,@Param1))
+			AND (c.Name like '%'+@Param2+'%' OR @Param2 IS NULL);
 	END
 
 

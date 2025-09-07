@@ -218,7 +218,7 @@ public class RequestLoggingMiddleware(RequestDelegate next, IServiceScopeFactory
 
     private static bool IsLoggablePath(string path)
     {
-        Span<string> avoidUrls = [ "/api/v1/menu/get-menu-by-user", "" ];
+        Span<string> avoidUrls = [ "/api/v1/menu/get-menu-by-user", "/health/details"];
         return !avoidUrls.Contains(path);
     }
 

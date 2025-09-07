@@ -114,21 +114,44 @@
                                             if (Model.Inputs[i].IsSelectInput)
                                             {
                                                 <div class="col-md-12 mb-2">
-                                                    <label asp-for="Inputs[@i].Value">@Model.Inputs[i].Label</label>
-                                                    <select asp-for="Inputs[@i].Value" aria-label="@Model.Inputs[i].Label">
-                                                        <option value="">-- Select --</option>
-                                                        <option>Option 1</option>
-                                                        <option>Option 2</option>
-                                                    </select>
-                                                    <span asp-validation-for="Inputs[@i].Value" class="text-danger small"></span>
+                                                    <label>@Model.Inputs[@i].Label</label>
+
+                                                    <div class="dropdown">
+                                                        <button class="btn"
+                                                                type="button"
+                                                                id="customDropdown_@i"
+                                                                data-toggle="dropdown"
+                                                                aria-haspopup="true"
+                                                                aria-expanded="false">
+                                                            <span id="selectedValue_@i">🔍 Select @Model.Inputs[@i].Label</span>
+                                                        </button>
+
+                                                        <div class="dropdown-menu"
+                                                             aria-labelledby="customDropdown_@i"
+                                                             style="max-height: 350px; overflow-y: auto;">
+
+                                                            <!-- Search box -->
+                                                            <div class="mb-2">
+                                                                <input type="text" class="form-control"
+                                                                       id="drpSearch_@i" placeholder="Type to search..." />
+                                                            </div>
+
+                                                            <!-- Dropdown items will be dynamically populated here -->
+                                                            <div id="dropdownItems_@i"></div>
+                                                        </div>
+                                                    </div>
+
+                                                    <!-- Hidden input to bind value on form submit -->
+                                                    <input type="hidden" name="Inputs[@i].Value" id="hiddenValue_@i" />
+                                                    <input type="hidden" name="Inputs[@i].FormDetailId" value="@Model.Inputs[@i].FormDetailId" />
                                                 </div>
+
                                             }
                                             else if (Model.Inputs[i].InputType!.Equals("textarea", StringComparison.CurrentCultureIgnoreCase))
                                             {
                                                 <div class="col-md-12 mb-2">
                                                     <label asp-for="Inputs[@i].Value">@Model.Inputs[i].Label</label>
                                                     <textarea asp-for="Inputs[@i].Value" rows="5" cols="5" placeholder="@Model.Inputs[i].Label"></textarea>
-                                                    <span asp-validation-for="Inputs[@i].Value" class="text-danger small"></span>
                                                 </div>
                                             }
                                             else
@@ -136,7 +159,6 @@
                                                 <div class="col-md-12 mb-2">
                                                     <label asp-for="Inputs[@i].Value">@Model.Inputs[i].Label</label>
                                                     <input asp-for="Inputs[@i].Value" type="@Model.Inputs[i].InputType" placeholder="@Model.Inputs[i].Label" />
-                                                    <span asp-validation-for="Inputs[@i].Value" class="text-danger small"></span>
                                                 </div>
                                             }
 
@@ -146,7 +168,7 @@
                                 </div>
 
                                 <div class="d-grid mt-4">
-                                    <button type="submit">
+                                    <button type="submit" class="submitBtn">
                                         Submit
                                     </button>
                                 </div>

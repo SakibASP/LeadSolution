@@ -64,6 +64,7 @@ public class LeadContext : IdentityDbContext<ApplicationUser>
     public virtual DbSet<FormDetails> FormDetails { get; set; } = default!;
     public virtual DbSet<FormValues> FormValues { get; set; } = default!;
     public virtual DbSet<BusinessSupportedFormId> BusinessSupportedFormId { get; set; } = default!;
+    public virtual DbSet<FormWiseDropdowns> FormWiseDropdowns { get; set; } = default!;
     #endregion
 
     #region - Audit & Logs -
