@@ -8,4 +8,5 @@ public class DynamicFormViewModel
 
     [DisplayName("Business Name")]
     public int BusinessId { get; set; }
+    public string IpAddress { get; set; } = string.Empty;
 }

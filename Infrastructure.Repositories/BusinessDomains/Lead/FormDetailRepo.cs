@@ -15,11 +15,11 @@ public class FormDetailRepo(LeadContext context) : IFormDetailRepo, IAsyncDispos
             // Delete dependent records
             var supportedForms =  _context.BusinessSupportedFormId
                 .Where(x => x.FormId == id);
-            var messages = _context.FormValues
+            var messages = _context.FormValueDetails
                 .Where(x => x.FormId == id);
 
             if (await supportedForms.AnyAsync()) _context.BusinessSupportedFormId.RemoveRange(supportedForms);
-            if (await messages.AnyAsync()) _context.FormValues.RemoveRange(messages);
+            if (await messages.AnyAsync()) _context.FormValueDetails.RemoveRange(messages);
 
             // Delete the main record
             var formDetail = await _context.FormDetails.FindAsync(id);

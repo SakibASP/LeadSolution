@@ -30,8 +30,8 @@ public sealed class AuditTrailFactory(IHttpContextAccessor httpContext)
         {
             string tableName = entry.Entity.GetType().Name;
             // Determine if the entity should be audited based on its table name
-            bool shouldAudit = !tableName.Contains("AspNet", StringComparison.CurrentCultureIgnoreCase) && !tableName.Contains("RequestCount", StringComparison.CurrentCultureIgnoreCase)
-                && !tableName.Contains("ApplicationUser", StringComparison.CurrentCultureIgnoreCase) && !tableName.Contains("IdentityUser", StringComparison.CurrentCultureIgnoreCase)
+            bool shouldAudit =  !tableName.Contains("ApplicationUser", StringComparison.CurrentCultureIgnoreCase)
+                && !tableName.Contains("IdentityUser", StringComparison.CurrentCultureIgnoreCase)
                 && !string.IsNullOrEmpty(tableName) && !tableName.Contains("IdentityRole", StringComparison.CurrentCultureIgnoreCase);
 
             if (shouldAudit)
@@ -61,7 +61,7 @@ public sealed class AuditTrailFactory(IHttpContextAccessor httpContext)
                 if (_httpContext.HttpContext is not null)
                 {
                     // User's IP address
-                    string? ipAddress = _httpContext.HttpContext.Connection.RemoteIpAddress?.ToString();
+                    string? ipAddress = IpAddressHelper.GetClientIpAddress(_httpContext.HttpContext);
                     // User's ID from claims, fallback to default if not found
                     audit.UserId = _httpContext.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier) ?? "TakeSakibsIdAsNullUser";
                     // Model class name based on database table

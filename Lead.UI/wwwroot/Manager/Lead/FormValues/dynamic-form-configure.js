@@ -441,18 +441,46 @@ const generateEmbeddableForm = () => {
                     console.error('API error:', errorMessage);
                     await Swal.fire({
                         icon: 'error',
-                        title: '❌ Submission failed.',
+                        title: '❌ Failed.',
                         text: errorMessage,
                         confirmButtonText: 'OK'
                     });
                     return;
                 }
 
-                await Swal.fire({
-                    icon: 'success',
-                    title: '✅ Submitted successfully!',
-                    confirmButtonText: 'OK'
-                });
+                let responseData = null;
+                try {
+                    responseData = await res.json();
+                } catch {
+                     console.log(res);
+                     await Swal.fire({
+                        icon: 'error',
+                        title: '❌ Failed.',
+                        text: "No response found.",
+                        confirmButtonText: 'OK'
+                    });
+                    return;
+                }
+
+                if (responseData && responseData.isSuccess) {
+                    console.log('API success:', responseData);
+                    await Swal.fire({
+                        icon: "success",
+                        title: "✅ Success!",
+                        text: responseData.message || "Your request was successful.",
+                        confirmButtonText: "OK"
+                    });
+                    return;
+                } else {
+                    console.log('API error:', responseData);
+                    await Swal.fire({
+                        icon: "error",
+                        title: "❌ Failed.",
+                        text: (responseData && responseData.message) || "Something went wrong.",
+                        confirmButtonText: "OK"
+                    });
+                    return;
+                }
 
             } catch (err) {
                 console.error('Network or unexpected error:', err);
@@ -487,7 +515,7 @@ const generateEmbeddableForm = () => {
         `.trim();
 
     // making minimum version of HTML
-    fullHtml = fullHtml.replace(/>\s+</g, '><').replace(/\s+/g, ' ').trim();
+    //fullHtml = fullHtml.replace(/>\s+</g, '><').replace(/\s+/g, ' ').trim();
 
     // Output to textarea
     embedCode.value = fullHtml;

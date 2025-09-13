@@ -6,9 +6,9 @@ namespace Infrastructure.Interfaces.Lead;
 
 public interface IFormValueRepo
 {
-    Task<IList<FormValues>> GetAllAsync(dynamic? param = null);
+    Task<IList<FormValueDetails>> GetAllAsync(dynamic? param = null);
     Task<dynamic> GetMessagesByBusinessAsync(GetFormValueRequest request);
     Task<DynamicFormViewModel> GetDynamicFormAsync(int? businessId);
-    Task AddAsync(DynamicFormViewModel formValues);
+    Task<bool> AddAsync(DynamicFormViewModel formValues);
     Task UpdateFormSettingsAsync(UpdateFormSettingsRequest request);
 }

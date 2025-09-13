@@ -22,9 +22,9 @@ public sealed class FormValueRepo(LeadContext context, IDapperContext dapper) : 
     private readonly LeadContext _context = context;
     private readonly IDapperContext _dapper = dapper;
 
-    public async Task<IList<FormValues>> GetAllAsync(dynamic? param = null)
+    public async Task<IList<FormValueDetails>> GetAllAsync(dynamic? param = null)
     {
-        return await _context.FormValues
+        return await _context.FormValueDetails
             .AsNoTracking()
             .ToListAsync();
     }
@@ -44,27 +44,56 @@ public sealed class FormValueRepo(LeadContext context, IDapperContext dapper) : 
         return result.ToList();
     }
 
-    public async Task AddAsync(DynamicFormViewModel model)
+    public async Task<bool> AddAsync(DynamicFormViewModel model)
     {
-        IList<FormValues> formValues = [];
-        if (model.Inputs == null) return;
-        var submissionId = (await _context.FormValues.MaxAsync(x => x.SubmissionId) ?? 0) + 1;
-        foreach (var input in model.Inputs)
+        using var transaction = await _context.Database.BeginTransactionAsync(IsolationLevel.ReadUncommitted);
+        try
         {
-            if (input == null) continue;
-            formValues.Add(new FormValues
+            IList<FormValueDetails> formValues = [];
+            if (model.Inputs == null || model.Inputs.Count == 0) return false;
+            // Get the next submission ID for the business
+            var submissionId = (await _context.FormValueMaster
+                .AsNoTracking()
+                .Where(x => x.BusinessId == model.BusinessId)
+                .MaxAsync(x => x.SubmissionId) ?? 0) + 1;
+            // Count non-null inputs
+            var totalInputs = model.Inputs.Where(x => x != null).Count();
+
+            // Create FormValueMaster entry
+            var formValueMaster = new FormValueMaster
             {
-                FormId = input.FormDetailId,
-                FormValue = input.Value,
                 BusinessId = model.BusinessId,
-                SubmissionId = submissionId
-            });
+                SubmissionId = submissionId,
+                TotalItems = totalInputs,
+                IpAddress = model.IpAddress
+            };
+            await _context.FormValueMaster.AddAsync(formValueMaster);
+            await _context.SaveChangesAsync();
+
+            // Prepare FormValueDetails entries
+            foreach (var input in model.Inputs)
+            {
+                if (input == null) continue;
+                formValues.Add(new FormValueDetails
+                {
+                    FormId = input.FormDetailId,
+                    FormValue = input.Value,
+                    FormMasterId = formValueMaster.Id
+                });
+            }
+
+            if (formValues.Count == 0) return false;
+
+            await _context.FormValueDetails.AddRangeAsync(formValues);
+            await _context.SaveChangesAsync();
+            await transaction.CommitAsync();
+            return true;
         }
-
-        if (formValues.Count == 0) return;
-
-        await _context.FormValues.AddRangeAsync(formValues);
-        await _context.SaveChangesAsync();
+        catch
+        {
+            await transaction.RollbackAsync();
+            return false;
+        }
     }
 
     public async Task<DynamicFormViewModel> GetDynamicFormAsync(int? businessId)

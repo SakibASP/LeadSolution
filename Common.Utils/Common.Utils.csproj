@@ -15,7 +15,9 @@
 		<PackageReference Include="AspNetCore.HealthChecks.UI" Version="9.0.0" />
 		<PackageReference Include="AspNetCore.HealthChecks.UI.SqlServer.Storage" Version="9.0.0" />
 		<PackageReference Include="ClosedXML" Version="0.105.0" />
+		<PackageReference Include="MailKit" Version="4.13.0" />
 		<PackageReference Include="Microsoft.Extensions.Diagnostics.HealthChecks" Version="9.0.8" />
+		<PackageReference Include="MimeKit" Version="4.13.0" />
 		<PackageReference Include="Serilog.AspNetCore" Version="9.0.0" />
 		<PackageReference Include="Serilog.Sinks.MSSqlServer" Version="8.2.2" />
 	</ItemGroup>

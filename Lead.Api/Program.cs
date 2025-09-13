@@ -1,6 +1,12 @@
-﻿using Common.DI;
+﻿using Application.Interfaces.BgQueue;
+using Application.Interfaces.Common;
+using Application.Services.BgQueue;
+using Application.Services.Common;
+using Common.DI;
 using Core.Models.Auth;
+using Core.Models.Common;
 using Core.ViewModels.Dto.Auth.Auth;
+using DocumentFormat.OpenXml.Office2016.Drawing.ChartDrawing;
 using Infrastructure.Repositories.Data;
 using Lead.Api.Middlewares;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -12,6 +18,7 @@ using Microsoft.OpenApi.Models;
 using Serilog;
 using Serilog.Events;
 using Serilog.Sinks.MSSqlServer;
+using System.Configuration;
 using System.Text;
 using System.Text.Json;
 
@@ -206,13 +213,19 @@ try
     });
     #endregion
 
+    builder.Services.Configure<SmtpSettings>(builder.Configuration.GetSection("SmtpSettings"));
     builder.Services.AddHttpContextAccessor();
     builder.Services.AddAuthorization();
     builder.Services.AddControllers();
     builder.Services.AddHttpClient();
     builder.Services.AddEndpointsApiExplorer();
     //builder.Services.AddOpenApi();
-    builder.Services.AddScopedAppServices();
+
+    //Add lead services
+    builder.Services.AddLeadTransientServices();
+    builder.Services.AddLeadScopedServices();
+    builder.Services.AddLeadSingletonServices();
+    builder.Services.AddLeadHostedServices();
 
     var app = builder.Build();
 

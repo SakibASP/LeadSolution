@@ -1,8 +1,5 @@
-﻿using Common.Utils.Constant;
-using Dapper;
-using Infrastructure.Interfaces.Common;
+﻿using Infrastructure.Interfaces.Common;
 using Microsoft.EntityFrameworkCore;
-using System.Data;
 
 namespace Infrastructure.Repositories.Data;
 

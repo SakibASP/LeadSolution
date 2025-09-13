@@ -21,7 +21,7 @@ namespace Common.DI;
 
 public static class ScopedServices
 {
-    public static IServiceCollection AddScopedAppServices(this IServiceCollection services)
+    public static IServiceCollection AddLeadScopedServices(this IServiceCollection services)
     {
         //Services
         services.AddScoped<ITokenService, TokenService>();

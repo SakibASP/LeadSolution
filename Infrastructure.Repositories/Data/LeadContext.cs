@@ -62,12 +62,14 @@ public class LeadContext : IdentityDbContext<ApplicationUser>
     #region - Lead -
     public virtual DbSet<DataTypes> DataTypes { get; set; } = default!;
     public virtual DbSet<FormDetails> FormDetails { get; set; } = default!;
-    public virtual DbSet<FormValues> FormValues { get; set; } = default!;
+    public virtual DbSet<FormValueMaster> FormValueMaster { get; set; } = default!;
+    public virtual DbSet<FormValueDetails> FormValueDetails { get; set; } = default!;
     public virtual DbSet<BusinessSupportedFormId> BusinessSupportedFormId { get; set; } = default!;
     public virtual DbSet<FormWiseDropdowns> FormWiseDropdowns { get; set; } = default!;
     #endregion
 
-    #region - Audit & Logs -
+    #region - Audit & Logs/Histories -
+    public virtual DbSet<EmailSendHistory> EmailSendHistory { get; set; } = default!;
     public virtual DbSet<Logs> Logs { get; set; } = default!;
     public virtual DbSet<RequestLogs> RequestLogs { get; set; } = default!;
     public virtual DbSet<Audits> Audit { get; set; } = default!;
@@ -102,10 +104,10 @@ public class LeadContext : IdentityDbContext<ApplicationUser>
             {
                 isValid = false;
             }
-            else if (tableName.Contains("RequestCount", StringComparison.CurrentCultureIgnoreCase) || tableName.Contains("AspNet", StringComparison.CurrentCultureIgnoreCase))
-            {
-                isValid = false;
-            }
+            //else if (tableName.Contains("RequestCount", StringComparison.CurrentCultureIgnoreCase) || tableName.Contains("AspNet", StringComparison.CurrentCultureIgnoreCase))
+            //{
+            //    isValid = false;
+            //}
 
             if (isValid)
             {
@@ -140,11 +142,11 @@ public class LeadContext : IdentityDbContext<ApplicationUser>
             .Navigation(m => m.DataTypes)
             .AutoInclude();
 
-        modelBuilder.Entity<FormValues>()
+        modelBuilder.Entity<FormValueDetails>()
             .Navigation(m => m.FormDetails)
             .AutoInclude();
-        modelBuilder.Entity<FormValues>()
-            .Navigation(m => m.AspNetBusinessInfo)
+        modelBuilder.Entity<FormValueDetails>()
+            .Navigation(m => m.FormValueMaster)
             .AutoInclude();
 
         modelBuilder.Entity<Currencies>()
