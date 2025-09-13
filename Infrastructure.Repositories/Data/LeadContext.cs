@@ -13,7 +13,6 @@ namespace Infrastructure.Repositories.Data;
 /// <summary>
 /// Author: Md. Sakibur Rahman
 /// </summary>
-
 public class LeadContext : IdentityDbContext<ApplicationUser>
 {
     public LeadContext() { }

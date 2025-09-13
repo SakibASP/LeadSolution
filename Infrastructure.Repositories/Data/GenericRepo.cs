@@ -7,8 +7,6 @@ namespace Infrastructure.Repositories.Data;
 /// <summary>
 /// Author: Md. Sakibur Rahman
 /// </summary>
-
-
 public sealed class GenericRepo<T>(LeadContext context, IDapperContext dapper) : IGenericRepo<T> where T : class
 {
     private readonly LeadContext _context = context;

@@ -10,7 +10,6 @@ namespace Infrastructure.Repositories.Data;
 /// Author: Md. Sakibur Rahman
 /// </summary>
 
-
 public sealed class DapperContext(IConfiguration configuration) : IDapperContext
 {
     private readonly string _connectionString = configuration.GetConnectionString("DefaultConnection")!;

@@ -36,28 +36,6 @@ public sealed class AuditTrailFactory(IHttpContextAccessor httpContext)
 
             if (shouldAudit)
             {
-                /*
-                // Example code for retrieving IP address and MAC address (not used in current implementation)
-                string ipAddress = HttpContext.Current.Request.ServerVariables["HTTP_X_FORWARDED_FOR"];
-                if ((String.IsNullOrEmpty(ipAddress)))
-                    ipAddress = HttpContext.Current.Request.ServerVariables["REMOTE_ADDR"];
-                if ((String.IsNullOrEmpty(ipAddress)))
-                    ipAddress = HttpContext.Current.Request.UserHostAddress;
-
-                // Getting Physical Mac Address of hosted device
-                HashSet<string> macSet = [];
-                NetworkInterface[] networkInterfaces = NetworkInterface.GetAllNetworkInterfaces();
-                foreach (NetworkInterface networkInterface in networkInterfaces)
-                {
-                    PhysicalAddress macAddress = networkInterface.GetPhysicalAddress();
-                    byte[] bytes = macAddress.GetAddressBytes();
-                    string macAddressString = BitConverter.ToString(bytes);
-                    macAddressString = macAddressString.Replace("-", ":");
-                    macSet.Add(macAddressString);
-                }
-                string physicalMac = string.Join(" || ", macSet);
-                */
-
                 if (_httpContext.HttpContext is not null)
                 {
                     // User's IP address
@@ -170,7 +148,7 @@ public sealed class AuditTrailFactory(IHttpContextAccessor httpContext)
     /// </summary>
     /// <param name="dbValues">Database property values.</param>
     /// <returns>Primary key value as long, or 0 if not found.</returns>
-    public static long? GetKeyValue(PropertyValues? dbValues)
+    private static long? GetKeyValue(PropertyValues? dbValues)
     {
         string _key = dbValues?.EntityType.FindPrimaryKey()?.Properties.FirstOrDefault()?.Name ?? "AutoId";
         object? keyValue = dbValues?[_key];
@@ -230,7 +208,7 @@ public sealed class AuditTrailFactory(IHttpContextAccessor httpContext)
 /// <summary>
 /// Enum representing possible audit actions.
 /// </summary>
-public enum AuditActions
+enum AuditActions
 {
     Update,
     Delete

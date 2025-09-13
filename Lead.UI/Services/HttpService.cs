@@ -40,9 +40,6 @@ public class HttpService(HttpClient httpClient) : IHttpService
         return await response.Content.ReadFromJsonAsync<T>();
     }
 
-
-
-
     public async Task<T?> GetAsync<T>(string version, string endpoint, Dictionary<string, string>? queryParams = null)
     {
         var query = queryParams is not null && queryParams.Any()
