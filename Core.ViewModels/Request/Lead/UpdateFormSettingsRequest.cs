@@ -14,4 +14,6 @@ public class FormSelectDetails
 {
     public int FormDetailId { get; set; }
     public bool IsChecked { get; set; }
+    public bool IsNull { get; set; } = true;
+    public int OrderId { get; set; }
 }

@@ -8,4 +8,6 @@ public class DynamicFormDto
     public string? Value { get; set; }
     public bool IsSelectInput { get; set; } = false;
     public bool IsActive { get; set; }
+    public bool IsNullSupported { get; set; } = true;
+    public int OrderId { get; set; } = 0;
 }

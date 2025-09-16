@@ -1,0 +1,35 @@
+﻿#sortableInputs {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+    #sortableInputs .sortable-item {
+        width: 100%;
+    }
+
+    #sortableInputs .sortable-card {
+        padding: 0.5rem 0.75rem;
+        border: 1px solid #e5e7eb;
+        border-radius: 0.5rem;
+        transition: all 0.2s ease;
+    }
+
+        #sortableInputs .sortable-card:hover {
+            border-color: #0d6efd;
+            background: #f8faff;
+        }
+
+    #sortableInputs .label-header {
+        font-size: 0.9rem;
+    }
+
+.form-check-input {
+    transform: scale(0.85);
+    cursor: pointer;
+}
+
+.form-check-label {
+    font-size: 0.8rem;
+    cursor: pointer;
+}

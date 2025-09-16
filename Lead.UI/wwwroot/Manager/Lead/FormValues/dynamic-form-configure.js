@@ -5,11 +5,62 @@ const apiKey = document.getElementById("ApiKey");
 const embedCode = document.getElementById("EmbedCode");
 const dynamicForm = document.getElementById('dynamicForm');
 const btnGenerateCode = document.getElementById('btnGenerateCode');
+const sortableContainer = document.getElementById("sortableInputs");
+let draggedItem = null;
 
 document.addEventListener('DOMContentLoaded', function () {
     onGenerateCodeClick();
     populateBusinessIdAndApiKey();
 });
+
+// ============ on drag check items events start =============
+sortableContainer.addEventListener("dragstart", function (e) {
+    draggedItem = e.target.closest(".sortable-item");
+    e.dataTransfer.effectAllowed = "move";
+    e.dataTransfer.setData("text/html", draggedItem.outerHTML);
+    setTimeout(() => draggedItem.classList.add("dragging"), 0);
+});
+
+sortableContainer.addEventListener("dragover", function (e) {
+    e.preventDefault();
+    const afterElement = getDragAfterElement(sortableContainer, e.clientY);
+    const dragging = document.querySelector(".dragging");
+    if (afterElement == null) {
+        sortableContainer.appendChild(dragging);
+    } else {
+        sortableContainer.insertBefore(dragging, afterElement);
+    }
+});
+
+sortableContainer.addEventListener("dragend", function () {
+    const dragging = document.querySelector(".dragging");
+    dragging.classList.remove("dragging");
+    updateOrderIds();
+});
+
+const getDragAfterElement = (container, y)=> {
+    const draggableElements = [...container.querySelectorAll(".sortable-item:not(.dragging)")];
+
+    return draggableElements.reduce((closest, child) => {
+        const box = child.getBoundingClientRect();
+        const offset = y - box.top - box.height / 2;
+        if (offset < 0 && offset > closest.offset) {
+            return { offset: offset, element: child };
+        } else {
+            return closest;
+        }
+    }, { offset: Number.NEGATIVE_INFINITY }).element;
+}
+
+const updateOrderIds = () => {
+    document.querySelectorAll("#sortableInputs .sortable-item").forEach((item, index) => {
+        const newOrder = index + 1;
+        item.dataset.order = newOrder;
+        item.querySelector(".order-field").value = newOrder;
+    });
+}
+// ============ on drag check items events end =============
+
 
 // ============ on page load and button click events start =============
 const onGenerateCodeClick = () => {
@@ -97,11 +148,29 @@ const updateFormSettings = async () => {
         return;
     }
 
-    // Collect all checkbox states
-    const formSelectDetails = Array.from(document.querySelectorAll('.form-check-input')).map(chk => ({
-        FormDetailId: parseInt(chk.id.replace("chk_", "")),
-        IsChecked: chk.checked
-    }));
+    // Collect all sortable items (each card)
+    const formSelectDetails = Array.from(document.querySelectorAll(".sortable-item")).map(item => {
+        const formDetailId = parseInt(item.dataset.id);
+
+        // Main checkbox
+        const chk = item.querySelector(`#chk_${formDetailId}`);
+        const isChecked = chk ? chk.checked : false;
+
+        // Null support checkbox
+        const isNullChk = item.querySelector(`#isnull_${formDetailId}`);
+        const isNull = isNullChk ? isNullChk.checked : false;
+
+        // Order (hidden field)
+        const orderField = item.querySelector(".order-field");
+        const orderId = orderField ? parseInt(orderField.value) : 0;
+
+        return {
+            FormDetailId: formDetailId,
+            IsChecked: isChecked,
+            IsNull: isNull,
+            OrderId: orderId
+        };
+    });
 
     // Prepare the payload
     const payload = {

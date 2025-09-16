@@ -5,10 +5,11 @@
     ViewData["Title"] = "Create";
 }
 
+<link href="~/css/lead/formvalues/dynamic-form-config.css" rel="stylesheet" />
 <link href="~/css/lead/formvalues/dynamic-form.css" rel="stylesheet" />
 
 <div class="py-1">
-    <div>
+    <div class="row">
         <!-- API Key Section -->
         <div class="form-group mb-3">
             <label class="form-label fw-bold">API Key</label>
@@ -25,7 +26,6 @@
                 </div>
             </div>
         </div>
-
     </div>
     <div class="row">
         <!-- Form Config Section -->
@@ -41,27 +41,64 @@
                             <select class="form-select" name="businessId" asp-items="ViewBag.BusinessId" id="drpBusinessId">
                             </select>
                         </div>
-                        <hr />
 
-                        <div class="row mt-3">
+                        <div class="row mt-3" id="sortableInputs">
                             @if (Model.Inputs?.Count > 0)
                             {
+                                var order = 1;
                                 foreach (var input in Model.Inputs)
                                 {
-                                    <div class="col-12 col-md-4 mb-3">
-                                        <div class="form-check p-3 shadow-sm rounded bg-white">
-                                            <input class="form-check-input"
-                                                   type="checkbox"
-                                                   id="@($"chk_{input.FormDetailId}")"
-                                                   @(input.IsActive ? "checked" : "") />
-                                            <label class="form-check-label" for="@($"chk_{input.FormDetailId}")">
-                                                @input.Label
-                                            </label>
+                                    <div class="col-12 col-md-12 sortable-item"
+                                         draggable="true"
+                                         data-id="@input.FormDetailId"
+                                         data-order="@order">
+
+                                        <div class="sortable-card bg-white border rounded-3 position-relative">
+
+                                            <!-- One slim row -->
+                                            <div class="d-flex align-items-center justify-content-between w-100 label-header">
+
+                                                <!-- Left: main toggle -->
+                                                <div class="form-check form-switch m-0">
+                                                    <input class="form-check-input"
+                                                           type="checkbox"
+                                                           id="chk_@input.FormDetailId"
+                                                           @(input.IsActive ? "checked" : "") />
+                                                </div>
+
+                                                <!-- Middle: icon + label -->
+                                                <div class="d-flex align-items-center flex-grow-1 justify-content-start">
+                                                    <label for="chk_@input.FormDetailId" class="fw-semibold text-primary m-0">
+                                                        @input.Label
+                                                    </label>
+                                                </div>
+
+                                                <!-- Right: Allow null -->
+                                                <div class="form-check form-switch m-0 small">
+                                                    <input class="form-check-input"
+                                                           name="IsNull_@input.FormDetailId"
+                                                           type="checkbox"
+                                                           id="isnull_@input.FormDetailId"
+                                                           @(input.IsNullSupported ? "checked" : "") />
+                                                    <label class="form-check-label text-muted ms-1" for="isnull@input.FormDetailId">
+                                                        Allow Null
+                                                    </label>
+                                                </div>
+                                            </div>
+
+                                            <!-- Hidden Order -->
+                                            <input type="hidden"
+                                                   name="OrderId_@input.FormDetailId"
+                                                   value="@order"
+                                                   class="order-field" />
                                         </div>
                                     </div>
+                                    order++;
                                 }
                             }
                         </div>
+
+
 
                         <div class="mt-4 d-flex gap-2">
                             <button type="button" class="btn btn-primary" onclick="updateFormSettings()">Save</button>

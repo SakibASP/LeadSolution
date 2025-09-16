@@ -30,14 +30,18 @@ BEGIN
             USING (
                 SELECT 
                     B.FormDetailId AS FormId,
-                    B.IsChecked AS IsActive
+                    B.IsChecked AS IsActive,
+                    B.[IsNull] AS IsNullSupported,
+                    B.OrderId AS OrderId
                 FROM OPENJSON(@JsonObject) WITH (
                     FormSelectDetails NVARCHAR(MAX) AS JSON
                 ) A
                 OUTER APPLY OPENJSON(A.FormSelectDetails)
                 WITH (
                     FormDetailId INT,
-                    IsChecked BIT
+                    IsChecked BIT,
+                    [IsNull] BIT,
+                    OrderId INT
                 ) B
             ) AS SOURCE
             ON TARGET.BusinessId = @BusinessId AND TARGET.FormId = SOURCE.FormId
@@ -45,12 +49,14 @@ BEGIN
             WHEN MATCHED THEN
                 UPDATE SET 
                     TARGET.IsActive = SOURCE.IsActive,
+                    TARGET.IsNullSupported = SOURCE.IsNullSupported,
+                    TARGET.OrderId = SOURCE.OrderId,
                     TARGET.ModifiedBy = @Username,
                     TARGET.ModifiedDate = @Now
 
             WHEN NOT MATCHED BY TARGET THEN
-                INSERT (BusinessId, FormId, IsActive, CreatedBy, CreatedDate)
-                VALUES (@BusinessId, SOURCE.FormId, SOURCE.IsActive, @Username, @Now)
+                INSERT (BusinessId, FormId, IsNullSupported, OrderId, IsActive, CreatedBy, CreatedDate)
+                VALUES (@BusinessId, SOURCE.FormId, SOURCE.IsNullSupported, SOURCE.OrderId, SOURCE.IsActive, @Username, @Now)
 
             WHEN NOT MATCHED BY SOURCE AND TARGET.BusinessId = @BusinessId THEN
                 DELETE;
