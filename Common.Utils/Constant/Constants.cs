@@ -31,4 +31,5 @@ public static class Sp
     public const string usp_GetBusinessSupportedForms = "dbo.usp_GetBusinessSupportedForms";
     public const string usp_InsertUpdateBusinessSupportedForms = "dbo.usp_InsertUpdateBusinessSupportedForms";
     public const string usp_GetDynamicPivotedFormValues = "dbo.usp_GetDynamicPivotedFormValues";
+    public const string usp_GetFormValuesByMasterId = "dbo.usp_GetFormValuesByMasterId";
 }

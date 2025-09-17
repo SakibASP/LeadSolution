@@ -86,6 +86,7 @@ public class AdminRightsEndpoints
 
 public class FormValuesEndpoints
 {
+    public string GetMessageDetailsById { get; set; } = default!;
     public string GetDynamicForm { get; set; } = default!;
     public string UpdateFormSettings { get; set; } = default!;
 }

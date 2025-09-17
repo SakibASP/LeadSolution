@@ -22,28 +22,49 @@ public sealed class FormValueRepo(LeadContext context, IDapperContext dapper) : 
     private readonly LeadContext _context = context;
     private readonly IDapperContext _dapper = dapper;
 
-    public async Task<IList<FormValueDetails>> GetAllAsync(dynamic? param = null)
+    //public async Task<dynamic> GetMessagesByBusinessAsync(GetFormValueRequest request)
+    //{
+    //    var parameters = new DynamicParameters();
+    //    parameters.Add("@BusinessId", request.BusinessId);
+    //    parameters.Add("@FromDate", request.FromDate.Date);
+    //    parameters.Add("@ToDate", request.ToDate.Date);
+
+    //    using var connection = _dapper.CreateConnection();
+    //    var result = await connection.QueryAsync<dynamic>(
+    //        Sp.usp_GetDynamicPivotedFormValues,
+    //        parameters,
+    //        commandType: CommandType.StoredProcedure);
+    //    return result.ToList();
+    //}
+
+    public async Task<IList<FormValueMaster>> GetMessagesByBusinessAsync(GetFormValueRequest request)
     {
-        return await _context.FormValueDetails
+        return await _context.FormValueMaster
+            .Where(x => x.BusinessId == request.BusinessId)
             .AsNoTracking()
+            .OrderByDescending(x => x.Id)
             .ToListAsync();
     }
 
-    public async Task<dynamic> GetMessagesByBusinessAsync(GetFormValueRequest request)
+    public async Task<IList<FormValueViewModel>> GetMessagesDetailsByMasterIdAsync(int masterId)
     {
         var parameters = new DynamicParameters();
-        parameters.Add("@BusinessId", request.BusinessId);
-        parameters.Add("@FromDate", request.FromDate.Date);
-        parameters.Add("@ToDate", request.ToDate.Date);
-
+        parameters.Add("@MasterId", masterId);
         using var connection = _dapper.CreateConnection();
-        var result = await connection.QueryAsync<dynamic>(
-            Sp.usp_GetDynamicPivotedFormValues,
+        var result = await connection.QueryAsync<FormValueViewModel>(
+            Sp.usp_GetFormValuesByMasterId,
             parameters,
             commandType: CommandType.StoredProcedure);
-        return result.ToList();
+        return [.. result];
     }
 
+
+
+    /// <summary>
+    /// Adding Messages to Database
+    /// </summary>
+    /// <param name="model"></param>
+    /// <returns></returns>
     public async Task<bool> AddAsync(DynamicFormViewModel model)
     {
         using var transaction = await _context.Database.BeginTransactionAsync(IsolationLevel.ReadUncommitted);
@@ -96,6 +117,7 @@ public sealed class FormValueRepo(LeadContext context, IDapperContext dapper) : 
         }
     }
 
+    #region - form settings -
     public async Task<DynamicFormViewModel> GetDynamicFormAsync(int? businessId)
     {
         var parameters = new DynamicParameters();
@@ -113,7 +135,6 @@ public sealed class FormValueRepo(LeadContext context, IDapperContext dapper) : 
             Inputs = [.. result],
         };
     }
-
     public async Task UpdateFormSettingsAsync(UpdateFormSettingsRequest request)
     {
         var parameters = new DynamicParameters();
@@ -134,7 +155,7 @@ public sealed class FormValueRepo(LeadContext context, IDapperContext dapper) : 
             parameters,
             commandType: CommandType.StoredProcedure);
     }
-
+    #endregion
     public async ValueTask DisposeAsync()
     {
         await _context.DisposeAsync();

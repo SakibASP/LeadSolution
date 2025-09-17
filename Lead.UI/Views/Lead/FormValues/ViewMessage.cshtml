@@ -1,0 +1,51 @@
+﻿@model IList<Core.ViewModels.Dto.Lead.FormValueViewModel>
+
+@{
+    ViewData["Title"] = "Messages Details";
+    var submissionId = Model?.Count > 0 ? Model.First().SubmissionId : 0;
+}
+
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow rounded-3">
+                <div class="card-header bg-primary text-white text-center">
+                    <h4 class="mb-0">Message Details #@submissionId</h4>
+                </div>
+                <div class="card-body p-0">
+                    <table class="table mb-0 w-100">
+                        <tbody>
+                            @if (Model?.Count > 0)
+                            {
+                                foreach (var item in Model)
+                                {
+                                    <tr>
+                                        <!-- Left side -->
+                                        <td class="font-weight-bold text-primary align-middle" style="width:30%; white-space:nowrap;">
+                                            <i class="fas fa-tag text-secondary mr-2"></i> @item.Name
+                                        </td>
+
+                                        <!-- Right side -->
+                                        <td class="align-middle" style="width:70%; word-break:break-word;">
+                                            <div class="p-2 border rounded bg-light">
+                                                <i class="fas fa-check-circle text-success mr-2"></i> @item.FormValue
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="text-center mt-3">
+                <a asp-action="Index" class="text-decoration-none">
+                    ← Back to List
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+

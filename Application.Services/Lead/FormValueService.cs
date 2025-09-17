@@ -32,6 +32,57 @@ public class FormValueService(IFormValueRepo repo,
     private string RequestPath => _httpContext.HttpContext?.Request.Path.Value ?? "N/A";
     private string CurrentUser => _httpContext.HttpContext?.User?.Identity?.Name ?? "N/A";
 
+    //public async Task<ApiResponse<dynamic>> GetMessagesByBusinessAsync(GetFormValueRequest request)
+    //{
+    //    try
+    //    {
+    //        var result = await _iFormValue.GetMessagesByBusinessAsync(request);
+    //        return ApiResponse<dynamic>.Success(result, "Messages retrieved successfully!");
+    //    }
+    //    catch (Exception ex)
+    //    {
+    //        Log
+    //            .ForContext("UserName", CurrentUser)
+    //            .ForContext("Path", RequestPath)
+    //            .Error(ex, "Error retrieving messages for GetFormValueRequest: {request}", JsonSerializer.Serialize(request));
+    //        return ApiResponse<dynamic>.Fail("Something went wrong!");
+    //    }
+    //}
+
+    public async Task<ApiResponse<IList<FormValueMaster>>> GetMessagesByBusinessAsync(GetFormValueRequest request)
+    {
+        try
+        {
+            var result = await _iFormValue.GetMessagesByBusinessAsync(request);
+            return ApiResponse<IList<FormValueMaster>>.Success(result, "Messages retrieved successfully!");
+        }
+        catch (Exception ex)
+        {
+            Log
+                .ForContext("UserName", CurrentUser)
+                .ForContext("Path", RequestPath)
+                .Error(ex, "Error retrieving messages for GetMessagesByBusinessAsync: {request}", JsonSerializer.Serialize(request));
+            return ApiResponse<IList<FormValueMaster>>.Fail("Something went wrong!");
+        }
+    }
+
+    public async Task<ApiResponse<IList<FormValueViewModel>>> GetMessagesDetailsByMasterIdAsync(int masterId)
+    {
+        try
+        {
+            var result = await _iFormValue.GetMessagesDetailsByMasterIdAsync(masterId);
+            return ApiResponse<IList<FormValueViewModel>>.Success(result, "Messages retrieved successfully!");
+        }
+        catch (Exception ex)
+        {
+            Log
+                .ForContext("UserName", CurrentUser)
+                .ForContext("Path", RequestPath)
+                .Error(ex, "Error retrieving messages for GetMessagesDetailsByMasterIdAsync: {masterId}", masterId);
+            return ApiResponse<IList<FormValueViewModel>>.Fail("Something went wrong!");
+        }
+    }
+
     public async Task<ApiResponse<dynamic>> AddAsync(DynamicFormViewModel viewModel)
     {
         try
@@ -80,23 +131,7 @@ public class FormValueService(IFormValueRepo repo,
         }
     }
 
-    public async Task<ApiResponse<IList<FormValueDetails>>> GetAllAsync(dynamic? param = null)
-    {
-        try
-        {
-            var result = await _iFormValue.GetAllAsync(param);
-            return ApiResponse<IList<FormValueDetails>>.Success(result, "Messages retrieved successfully!");
-        }
-        catch (Exception ex)
-        {
-            Log
-                .ForContext("UserName", CurrentUser)
-                .ForContext("Path", RequestPath)
-                .Error(ex, "Error retrieving messages with parameter: {@Param}", JsonSerializer.Serialize(param));
-            return ApiResponse<IList<FormValueDetails>>.Fail("Something went wrong!");
-        }
-    }
-
+    #region - form settings -
     public async Task<ApiResponse<DynamicFormViewModel>> GetDynamicFormAsync(int? businessId)
     {
         try
@@ -113,24 +148,6 @@ public class FormValueService(IFormValueRepo repo,
             return ApiResponse<DynamicFormViewModel>.Fail("Something went wrong!");
         }
     }
-
-    public async Task<ApiResponse<dynamic>> GetMessagesByBusinessAsync(GetFormValueRequest request)
-    {
-        try
-        {
-            var result = await _iFormValue.GetMessagesByBusinessAsync(request);
-            return ApiResponse<dynamic>.Success(result, "Messages retrieved successfully!");
-        }
-        catch (Exception ex)
-        {
-            Log
-                .ForContext("UserName", CurrentUser)
-                .ForContext("Path", RequestPath)
-                .Error(ex, "Error retrieving messages for GetFormValueRequest: {request}", JsonSerializer.Serialize(request));
-            return ApiResponse<dynamic>.Fail("Something went wrong!");
-        }
-    }
-
     public async Task<ApiResponse<dynamic>> UpdateFormSettingsAsync(UpdateFormSettingsRequest request)
     {
         try
@@ -148,6 +165,7 @@ public class FormValueService(IFormValueRepo repo,
             return ApiResponse<dynamic>.Fail("Something went wrong!");
         }
     }
+    #endregion
 
     #region - email body generation -
     private async Task<string> BuildHtmlBodyAsync(List<DynamicFormDto>? formData)

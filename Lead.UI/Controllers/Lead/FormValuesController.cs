@@ -25,7 +25,8 @@ public class FormValuesController(IHttpService httpService, IOptions<ApiSettings
     private void SetToken() => _httpService.SetBearerToken(UserInfo.AccessToken);
     private readonly Dictionary<string, string> GetParam = [];
 
-    public async Task<IActionResult> Index(int? businessId, DateTime? fromDate, DateTime? toDate)
+    #region - Get dynamic pivot messages -
+    public async Task<IActionResult> _Index(int? businessId, DateTime? fromDate, DateTime? toDate)
     {
         SetToken();
 
@@ -47,11 +48,56 @@ public class FormValuesController(IHttpService httpService, IOptions<ApiSettings
             TempData[Constants.Error] = response?.Message;
             return RedirectToAction("Index", "Home");
         }
-        var messages = JsonSerializer.Deserialize<dynamic>(response?.Data);
         var rows = JsonSerializer.Deserialize<List<Dictionary<string, object>>>(response?.Data);
         ViewBag.DynamicRows = rows;
         ViewBag.BusinessId = new SelectList(UserInfo.UserBusinessList, "Id", "Name", selectedId);
         return View();
+    }
+    #endregion
+
+    public async Task<IActionResult> Index(int? businessId, DateTime? fromDate, DateTime? toDate)
+    {
+        SetToken();
+
+        var selectedId = businessId ?? UserInfo.UserBusinessList?.FirstOrDefault()?.Id ?? 0;
+        fromDate ??= DateTime.Now.ToBangladeshTime().AddDays(-7);
+        toDate ??= DateTime.Now.ToBangladeshTime();
+
+        GetParam.Clear();
+        GetParam.Add("BusinessId", selectedId.ToString());
+        GetParam.Add("FromDate", fromDate.ToString() ?? string.Empty);
+        GetParam.Add("ToDate", toDate.ToString() ?? string.Empty);
+        var response = await _httpService.GetAsync<ApiResponse<IList<FormValueMaster>>>(
+            Version, 
+            CommonEndpoints.GetAll, 
+            GetParam);
+
+        if (response?.IsSuccess != true)
+        {
+            TempData[Constants.Error] = response?.Message;
+            return RedirectToAction("Index", "Home");
+        }
+
+        ViewBag.BusinessId = new SelectList(UserInfo.UserBusinessList, "Id", "Name", selectedId);
+        return View(response?.Data);
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> ViewMessage(int id)
+    {
+        SetToken();
+        GetParam.Clear();
+        GetParam.Add("masterId", id.ToString());
+        var response = await _httpService.GetAsync<ApiResponse<IList<FormValueViewModel>>>(
+            Version,
+            Endpoints.GetMessageDetailsById,
+            GetParam);
+        if (response?.IsSuccess is not true)
+        {
+            TempData[Constants.Error] = response?.Message;
+            return RedirectToAction(nameof(Index));
+        }
+        return View(response.Data);
     }
 
     [HttpGet]
@@ -79,6 +125,7 @@ public class FormValuesController(IHttpService httpService, IOptions<ApiSettings
         return View(response?.Data);
     }
 
+    #region - message sending test -
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> DynamicForm(DynamicFormViewModel formDetails)
@@ -94,14 +141,15 @@ public class FormValuesController(IHttpService httpService, IOptions<ApiSettings
             };
 
         var response = await _httpService.PostAsync<ApiResponse<dynamic>>(
-            Version, 
-            CommonEndpoints.Add, 
+            Version,
+            CommonEndpoints.Add,
             formDetails,
             headers);
 
         TempData[response?.IsSuccess == true ? Constants.Success : Constants.Error] = response?.Message;
         return RedirectToAction(nameof(Index));
     }
+    #endregion
 
     [HttpPost]
     public async Task<IActionResult> UpdateFormSettings([FromBody] UpdateFormSettingsRequest request)
