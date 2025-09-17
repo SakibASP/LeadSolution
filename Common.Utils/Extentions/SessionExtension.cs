@@ -2,7 +2,7 @@
 using System.Text;
 using System.Text.Json;
 
-namespace Common.Extentions;
+namespace Common.Utils.Extentions;
 
 public static class SessionExtension
 {

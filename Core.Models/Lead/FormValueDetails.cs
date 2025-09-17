@@ -1,4 +1,4 @@
-﻿using Common.Extentions;
+﻿using Common.Utils.Extentions;
 using Core.Models.Auth;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;

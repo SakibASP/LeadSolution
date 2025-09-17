@@ -1,4 +1,5 @@
-using Common.Extentions;
+using Common.Utils.Extentions;
+using Common.Utils.Extentions;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Lead.Api.Controllers;

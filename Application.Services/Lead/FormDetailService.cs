@@ -1,5 +1,6 @@
 ﻿using Application.Interfaces.Lead;
-using Common.Extentions;
+using Common.Utils.Extentions;
+using Common.Utils.Extentions;
 using Core.Models.Lead;
 using Core.ViewModels.Response;
 using Infrastructure.Interfaces.Common;

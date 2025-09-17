@@ -5,7 +5,7 @@ using System.Security.Claims;
 using System.Text;
 using Core.Models.Common;
 using Common.Utils.Helper;
-using Common.Extentions;
+using Common.Utils.Extentions;
 
 namespace Infrastructure.Repositories.Data;
 

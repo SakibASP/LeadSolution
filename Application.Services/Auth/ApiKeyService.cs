@@ -1,5 +1,6 @@
 ﻿using Application.Interfaces.Auth;
-using Common.Extentions;
+using Common.Utils.Extentions;
+using Common.Utils.Extentions;
 using Common.Utils.Helper;
 using Core.Models.Auth;
 using Core.ViewModels.Response;

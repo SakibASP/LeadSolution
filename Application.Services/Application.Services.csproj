@@ -6,9 +6,6 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
-	<ItemGroup>
-		<PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.13.0" />
-	</ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Application.Interfaces\Application.Interfaces.csproj" />
     <ProjectReference Include="..\Common.Utils\Common.Utils.csproj" />

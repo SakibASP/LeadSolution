@@ -1,4 +1,4 @@
-﻿using Common.Extentions;
+﻿using Common.Utils.Extentions;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Core.Models.Common;

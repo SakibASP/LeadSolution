@@ -1,6 +1,7 @@
 ﻿using Application.Interfaces.Lead;
 using Azure.Core;
-using Common.Extentions;
+using Common.Utils.Extentions;
+using Common.Utils.Extentions;
 using Common.Utils.Helper;
 using Core.Models.Lead;
 using Core.ViewModels.Response;

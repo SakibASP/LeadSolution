@@ -1,5 +1,6 @@
 ﻿using Application.Interfaces.BgQueue;
-using Common.Extentions;
+using Common.Utils.Extentions;
+using Common.Utils.Extentions;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Serilog;

@@ -1,4 +1,4 @@
-﻿using Common.Extentions;
+﻿using Common.Utils.Extentions;
 using Common.Utils.Constant;
 using Core.ViewModels.Dto.Auth.Auth;
 using Core.ViewModels.Response;

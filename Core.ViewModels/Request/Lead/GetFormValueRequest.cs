@@ -1,4 +1,4 @@
-﻿using Common.Extentions;
+﻿using Common.Utils.Extentions;
 
 namespace Core.ViewModels.Request.Lead;
 

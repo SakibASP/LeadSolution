@@ -11,6 +11,11 @@ using Serilog;
 
 namespace Application.Services.Common;
 
+/// <summary>
+/// Author: Md. Sakibur Rahman
+/// Created Date: 11 Sep, 2025
+/// </summary>
+
 public class EmailService(IOptions<SmtpSettings> options,
     IGenericRepo<EmailSendHistory> genericRepo,
     IHttpContextAccessor httpContext) : IEmailService
