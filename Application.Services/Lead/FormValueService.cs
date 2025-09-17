@@ -97,14 +97,13 @@ public class FormValueService(IFormValueRepo repo,
                 return ApiResponse<dynamic>.Fail("Business not found");
 
             #region - send email notification to business owner -
-            var subject = "Submission Receive Notification";
             var body = await BuildHtmlBodyAsync(viewModel.Inputs);
-
             if (!string.IsNullOrWhiteSpace(body))
             {
                 // Queue background email task
                 _iTaskQueue.QueueBackgroundWorkItem(async sp =>
                 {
+                    var subject = "Submission Receive Notification";
                     var emailService = sp.GetRequiredService<IEmailService>();
                     try
                     {

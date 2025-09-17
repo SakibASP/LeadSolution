@@ -78,7 +78,7 @@ public class DataTypesController(IHttpService httpService, IOptions<ApiSettings>
     public async Task<IActionResult> Remove(int id)
     {
         SetToken();
-        var response = await _httpService.PostAsync<ApiResponse<DataTypes>>(
+        var response = await _httpService.PostAsync<ApiResponse<dynamic>>(
             VersionedController, _apiSettings.Endpoints.CommonEndPoints.Remove, id);
 
         TempData[response?.IsSuccess == true ? Constants.Success : Constants.Error] = response?.Message;

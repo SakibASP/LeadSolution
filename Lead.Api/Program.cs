@@ -22,52 +22,9 @@ using System.Configuration;
 using System.Text;
 using System.Text.Json;
 
-
-var builder = WebApplication.CreateBuilder(args);
-
-#region - serilog configuration -
-// Configure Serilog to log only to SQL Server
-var columnOptions = new ColumnOptions
-{
-    AdditionalColumns =
-    [
-        new SqlColumn("UserName", System.Data.SqlDbType.NVarChar, dataLength: 256),
-        new SqlColumn("Path", System.Data.SqlDbType.NVarChar, dataLength: 256)
-    ]
-};
-
-var sinkOptions = new MSSqlServerSinkOptions
-{
-    TableName = "Logs",
-    SchemaName = "logs",
-    AutoCreateSqlTable = true,
-    // Optionally adjust batching:
-    BatchPostingLimit = 100,
-    BatchPeriod = TimeSpan.FromSeconds(5)
-};
-
-Log.Logger = new LoggerConfiguration()
-    .MinimumLevel.Information()
-    .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
-    .MinimumLevel.Override("System", LogEventLevel.Warning)
-    .MinimumLevel.Override("AspNetCore", LogEventLevel.Warning)
-    .WriteTo.MSSqlServer(
-        connectionString: builder.Configuration.GetConnectionString("DefaultConnection"),
-        sinkOptions: sinkOptions,
-        columnOptions: columnOptions,
-        restrictedToMinimumLevel: LogEventLevel.Information
-    )
-    .Filter.ByExcluding(e =>
-        e.Properties.ContainsKey("SourceContext") &&
-        (e.Properties["SourceContext"].ToString().Contains("Microsoft.EntityFrameworkCore") ||
-         e.MessageTemplate.Text.Contains("HTTP")))
-    .CreateLogger();
-
-builder.Host.UseSerilog();
-#endregion
-
 try
 {
+    var builder = WebApplication.CreateBuilder(args);
     string connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
 
     #region - identity dbcontext setup -
@@ -227,43 +184,61 @@ try
     builder.Services.AddLeadSingletonServices();
     builder.Services.AddLeadHostedServices();
 
+    //use serilog
+    builder.Host.UseSerilog();
+    
+    
     var app = builder.Build();
 
-    // Seed roles on startup
+    // ------------------------------
+    // Seed roles on startup (async-safe)
+    // ------------------------------
+    #region - seed basic user roles -
     using (var scope = app.Services.CreateScope())
     {
         var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
         var roles = new[] { "Admin", "User" };
 
         foreach (var role in roles)
+        {
             if (!await roleManager.RoleExistsAsync(role))
+            {
                 await roleManager.CreateAsync(new IdentityRole(role));
+            }
+        }
     }
+    #endregion
 
-    // Configure the HTTP request pipeline.
-    if (app.Environment.IsDevelopment())
-    {
-        //app.MapOpenApi();
-        app.UseSwagger();
-        app.UseSwaggerUI();
-    }
+    // ------------------------------
+    // Configure the HTTP request pipeline
+    // ------------------------------
 
-    // Register your middleware before routing
+    // Exception handling / email middleware goes first to catch all unhandled exceptions
+    // Exception Middleware here
+
+    // Request logging middleware
     app.UseMiddleware<RequestLoggingMiddleware>();
 
+    // Standard middlewares
     app.UseHttpsRedirection();
-    // Use the CORS policy
     app.UseCors("AllowAll");
     app.UseAuthentication();
     app.UseAuthorization();
 
+    // Swagger (development only)
+    if (app.Environment.IsDevelopment())
+    {
+        app.UseSwagger();
+        app.UseSwaggerUI();
+    }
 
+    // Map controllers
     app.MapControllers();
 
-    #region - health setup endpoints -
     // ------------------------------
-    // Map Health Check Endpoints
+    // Health check endpoints
     // ------------------------------
+    #region - health check configuration -
     app.MapHealthChecks("/health", new HealthCheckOptions
     {
         Predicate = _ => true
@@ -288,10 +263,7 @@ try
         }
     });
 
-
-    // ------------------------------
-    // HealthChecks UI Dashboard
-    // ------------------------------
+    // HealthChecks UI dashboard
     app.MapHealthChecksUI(options =>
     {
         options.UIPath = "/health-ui";   // UI endpoint
@@ -299,9 +271,56 @@ try
     });
     #endregion
 
-    // Add a simple endpoint to test if the app is running
+    // ------------------------------
+    // Configure Serilog
+    // ------------------------------
+    #region - serilog configuration -
+    // Configure Serilog to log only to SQL Server
+    var columnOptions = new ColumnOptions
+    {
+        AdditionalColumns =
+        [
+            new SqlColumn("UserName", System.Data.SqlDbType.NVarChar, dataLength: 256),
+        new SqlColumn("Path", System.Data.SqlDbType.NVarChar, dataLength: 256)
+        ]
+    };
+
+    var sinkOptions = new MSSqlServerSinkOptions
+    {
+        TableName = "Logs",
+        SchemaName = "logs",
+        AutoCreateSqlTable = true,
+        // Optionally adjust batching:
+        BatchPostingLimit = 100,
+        BatchPeriod = TimeSpan.FromSeconds(5)
+    };
+
+    Log.Logger = new LoggerConfiguration()
+        .MinimumLevel.Information()
+        .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
+        .MinimumLevel.Override("System", LogEventLevel.Warning)
+        .MinimumLevel.Override("AspNetCore", LogEventLevel.Warning)
+        .WriteTo.MSSqlServer(
+            connectionString: builder.Configuration.GetConnectionString("DefaultConnection"),
+            sinkOptions: sinkOptions,
+            columnOptions: columnOptions,
+            restrictedToMinimumLevel: LogEventLevel.Information
+        )
+        .WriteTo.Sink(new EmailOnErrorSink(
+            formatProvider: null,
+            taskQueue: app.Services.GetRequiredService<IBackgroundTaskQueue>()
+        ))
+        .Filter.ByExcluding(e =>
+            e.Properties.ContainsKey("SourceContext") &&
+            (e.Properties["SourceContext"].ToString().Contains("Microsoft.EntityFrameworkCore") ||
+             e.MessageTemplate.Text.Contains("HTTP")))
+        .CreateLogger();
+    #endregion
+
+    // Simple test endpoint
     app.MapGet("/", () => "API is running!");
 
+    // Run the application
     app.Run();
 }
 catch (Exception ex)
