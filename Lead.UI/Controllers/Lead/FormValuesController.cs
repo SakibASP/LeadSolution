@@ -1,8 +1,6 @@
 ﻿using Common.Extentions;
 using Common.Utils.Constant;
-using Common.Utils.Enums;
 using Core.Models.Lead;
-using Core.ViewModels.Dto.Common;
 using Core.ViewModels.Dto.Lead;
 using Core.ViewModels.Request.Lead;
 using Core.ViewModels.Response;
@@ -11,7 +9,6 @@ using Lead.UI.Interfaces;
 using Lead.UI.Settings;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.AspNetCore.SignalR.Protocol;
 using Microsoft.Extensions.Options;
 using System.Text.Json;
 
