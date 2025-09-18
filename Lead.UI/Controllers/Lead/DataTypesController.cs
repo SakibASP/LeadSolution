@@ -11,7 +11,7 @@ namespace Lead.UI.Controllers.Lead;
 
 public class DataTypesController(IHttpService httpService, IOptions<ApiSettings> apiSetting) : BaseController(httpService, apiSetting)
 {
-    private string VersionedController => $"{_apiSettings.Controllers.DataTypes}";
+    private string Version => _apiSettings.Controllers.DataTypes;
 
     private void SetToken() => _httpService.SetBearerToken(UserInfo.AccessToken);
 
@@ -19,7 +19,7 @@ public class DataTypesController(IHttpService httpService, IOptions<ApiSettings>
     {
         SetToken();
         var response = await _httpService.GetAsync<ApiResponse<IList<DataTypes>>>(
-            VersionedController, _apiSettings.Endpoints.CommonEndPoints.GetAll);
+            Version, _apiSettings.Endpoints.CommonEndPoints.GetAll);
 
         if (response?.IsSuccess != true)
             TempData[Constants.Error] = response?.Message;
@@ -38,7 +38,7 @@ public class DataTypesController(IHttpService httpService, IOptions<ApiSettings>
 
         SetToken();
         var response = await _httpService.PostAsync<ApiResponse<dynamic>>(
-            VersionedController, _apiSettings.Endpoints.CommonEndPoints.Add, dataTypes);
+            Version, _apiSettings.Endpoints.CommonEndPoints.Add, dataTypes);
 
         TempData[response?.IsSuccess == true ? Constants.Success : Constants.Error] = response?.Message;
         return RedirectToAction(nameof(Index));
@@ -51,7 +51,7 @@ public class DataTypesController(IHttpService httpService, IOptions<ApiSettings>
 
         SetToken();
         var response = await _httpService.GetAsync<ApiResponse<DataTypes>>(
-            VersionedController, _apiSettings.Endpoints.CommonEndPoints.GetById,
+            Version, _apiSettings.Endpoints.CommonEndPoints.GetById,
             new() { ["id"] = id.ToString()! });
 
         return response?.Data is null ? NotFound() : View(response.Data);
@@ -69,7 +69,7 @@ public class DataTypesController(IHttpService httpService, IOptions<ApiSettings>
 
         SetToken();
         var response = await _httpService.PostAsync<ApiResponse<dynamic>>(
-            VersionedController, _apiSettings.Endpoints.CommonEndPoints.Update, dataTypes);
+            Version, _apiSettings.Endpoints.CommonEndPoints.Update, dataTypes);
 
         TempData[response?.IsSuccess == true ? Constants.Success : Constants.Error] = response?.Message;
         return RedirectToAction(nameof(Index));
@@ -79,7 +79,7 @@ public class DataTypesController(IHttpService httpService, IOptions<ApiSettings>
     {
         SetToken();
         var response = await _httpService.PostAsync<ApiResponse<dynamic>>(
-            VersionedController, _apiSettings.Endpoints.CommonEndPoints.Remove, id);
+            Version, _apiSettings.Endpoints.CommonEndPoints.Remove, id);
 
         TempData[response?.IsSuccess == true ? Constants.Success : Constants.Error] = response?.Message;
         return RedirectToAction(nameof(Index));

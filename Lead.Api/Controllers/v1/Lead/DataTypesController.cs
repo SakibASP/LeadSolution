@@ -1,10 +1,7 @@
 ﻿using Application.Interfaces.Lead;
-using Common.Utils.Helper;
 using Core.Models.Lead;
-using Core.ViewModels.Response;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Serilog;
 
 namespace Lead.Api.Controllers.v1.Lead;
 

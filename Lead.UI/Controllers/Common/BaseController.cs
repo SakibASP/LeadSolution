@@ -1,12 +1,15 @@
-﻿using Common.Utils.Extentions;
-using Common.Utils.Constant;
+﻿using Common.Utils.Constant;
 using Common.Utils.Enums;
 using Common.Utils.Extentions;
+using Common.Utils.Extentions;
+using Core.Models.Auth;
 using Core.ViewModels.Dto.Auth.Auth;
 using Core.ViewModels.Dto.Common;
+using Core.ViewModels.Dto.Menu;
 using Core.ViewModels.Response;
 using Lead.UI.Interfaces;
 using Lead.UI.Settings;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.Options;
@@ -75,6 +78,7 @@ public class BaseController(IHttpService httpService, IOptions<ApiSettings> apiS
         if (sessionAuth == null || string.IsNullOrEmpty(sessionAuth.Token))
         {
             // Redirect to the login page if session is missing or token is empty
+            HttpContext.Session.Clear();
             HttpContext.Response.Redirect(Constants.RedirectToLogin);
             return;
         }
@@ -94,6 +98,7 @@ public class BaseController(IHttpService httpService, IOptions<ApiSettings> apiS
             // Check response status, if not success then redirect to login page
             if (response?.IsSuccess is not true)
             {
+                HttpContext.Session.Clear();
                 HttpContext.Response.Redirect(Constants.RedirectToLogin);
                 return;
             }
@@ -137,6 +142,31 @@ public class BaseController(IHttpService httpService, IOptions<ApiSettings> apiS
             UserInfo = userInfo;
         }
 
+        // User Rights Checking
+        var sessionMenu = HttpContext.Session.Get<IList<DynamicMenuItemDto>>(Constants.Menu);
+        if (sessionMenu != null)
+        {
+            var menu = (IEnumerable<DynamicMenuItemDto>)sessionMenu;
+            var executionPath = Request.Path.ToString();
+            if (!string.IsNullOrEmpty(executionPath))
+            {
+                if (UserInfo.UserRoles?.Contains(Constants.AdminAuthRoles) is false && IsRestricted(executionPath))
+                {
+                    var rights = menu.Where(h => h.MenuURL != "#").Where(p => p.MenuURL!.Split('/')[1] == executionPath.Split('/')[1]).ToList();
+                    if (rights.Count > 0)
+                    {
+                        //Do nothing
+                    }
+                    else
+                    {
+                        HttpContext.Session.Clear();
+                        HttpContext.Response.Redirect(Constants.RedirectToLogin);
+                        return;
+                    }
+
+                }
+            }
+        }
 
         // Redirect to business create page if no business found
         if (UserInfo.UserBusinessList?.Count <= 0 && UserInfo.UserRoles!.Contains(Constants.Client))
@@ -159,5 +189,20 @@ public class BaseController(IHttpService httpService, IOptions<ApiSettings> apiS
             _apiSettings.Endpoints.Auth.GetApiKey,
             GetParam);
         return apiKeyTask?.Data ?? string.Empty;
+    }
+
+    private static bool IsRestricted(string executionPath)
+    {
+        Span<string> permittedMethods = ["UserProfile", "UpdateProfile", "ChangePassword"];
+        string[] paths = executionPath.Split('/');
+        if (paths.Length > 2)
+            if (permittedMethods.Contains(paths[2])) 
+                return false;
+
+        Span<string> permittedContriollers = ["Home", "Dashboard"];
+        if (!executionPath.Equals("/") && !permittedContriollers.Contains(executionPath.Split('/')[1])) 
+            return true;
+        else 
+            return false;
     }
 }
