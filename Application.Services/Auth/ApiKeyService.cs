@@ -63,6 +63,7 @@ public class ApiKeyService(IApiKeyRepo apiKeyRepo, IHttpContextAccessor httpCont
     {
         try
         {
+            if (string.IsNullOrWhiteSpace(key) || string.Equals(key, "null", StringComparison.OrdinalIgnoreCase)) return false;
             return await _iRepo.ValidateKey(businessId, key ?? "");
         }
         catch (Exception ex)

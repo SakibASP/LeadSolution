@@ -1,13 +1,12 @@
 ﻿using Application.Interfaces.BgQueue;
-using Application.Interfaces.Common;
-using Application.Services.BgQueue;
-using Application.Services.Common;
 using Common.DI;
 using Core.Models.Auth;
 using Core.Models.Common;
 using Core.ViewModels.Dto.Auth.Auth;
-using DocumentFormat.OpenXml.Office2016.Drawing.ChartDrawing;
 using Infrastructure.Repositories.Data;
+using Lead.Api.Endpoints.v1.Common;
+using Lead.Api.Endpoints.v1.Lead;
+using Lead.Api.Endpoints.v1.Menu;
 using Lead.Api.Middlewares;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
@@ -18,7 +17,6 @@ using Microsoft.OpenApi.Models;
 using Serilog;
 using Serilog.Events;
 using Serilog.Sinks.MSSqlServer;
-using System.Configuration;
 using System.Text;
 using System.Text.Json;
 
@@ -178,7 +176,7 @@ try
     builder.Services.AddEndpointsApiExplorer();
     //builder.Services.AddOpenApi();
 
-    //Add lead services
+    //Add lead services 
     builder.Services.AddLeadTransientServices();
     builder.Services.AddLeadScopedServices();
     builder.Services.AddLeadSingletonServices();
@@ -232,9 +230,6 @@ try
         app.UseSwaggerUI();
     }
 
-    // Map controllers
-    app.MapControllers();
-
     // ------------------------------
     // Health check endpoints
     // ------------------------------
@@ -281,7 +276,7 @@ try
         AdditionalColumns =
         [
             new SqlColumn("UserName", System.Data.SqlDbType.NVarChar, dataLength: 256),
-        new SqlColumn("Path", System.Data.SqlDbType.NVarChar, dataLength: 256)
+            new SqlColumn("Path", System.Data.SqlDbType.NVarChar, dataLength: 256)
         ]
     };
 
@@ -317,8 +312,20 @@ try
         .CreateLogger();
     #endregion
 
+    // Map controllers
+    app.MapControllers();
+
     // Simple test endpoint
     app.MapGet("/", () => "API is running!");
+
+    //Map other endpoints
+    app.MapBusinessInfoEndpoints();
+    app.MapDataTypesEndpoints();
+    app.MapFormDetailsEndpoints();
+    app.MapFormValuesEndpoints();
+    app.MapAdminRightsEndpoints();
+    app.MapMenuEndpoints();
+    app.MapUtilityEndpoints();
 
     // Run the application
     app.Run();

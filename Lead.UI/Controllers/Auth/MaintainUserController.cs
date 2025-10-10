@@ -14,7 +14,7 @@ namespace Lead.UI.Controllers.Auth;
 
 public class MaintainUserController(IHttpService httpService, IOptions<ApiSettings> apiSetting) : BaseController(httpService, apiSetting)
 {
-    private string VersionedController => _apiSettings.Controllers.MaintainUser;
+    private string VersionedController => _apiSettings.Versions.MaintainUser;
     private void SetToken() => _httpService.SetBearerToken(UserInfo.AccessToken);
 
     public async Task<IActionResult> UserList()

@@ -18,7 +18,7 @@ public class AuthController(IHttpService httpService, IOptions<ApiSettings> apiS
 {
     private readonly IHttpService _httpService = httpService;
     private readonly ApiSettings _apiSettings = apiSetting.Value;
-    private string VersionedController => _apiSettings.Controllers.Auth;
+    private string VersionedController => _apiSettings.Versions.Auth;
 
     [HttpGet]
     public IActionResult Login() => View();

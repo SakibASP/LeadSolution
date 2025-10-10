@@ -13,9 +13,9 @@ public sealed class GenericRepo<T>(LeadContext context, IDapperContext dapper) :
     private readonly IDapperContext _dapper = dapper;
     private readonly DbSet<T> _dbSet = context.Set<T>();
 
-    public async Task<IList<T>> GetAllAsync(dynamic? parameter = null) => await _dbSet.AsNoTracking().ToListAsync();
+    public async Task<IList<T>> GetAllAsync() => await _dbSet.AsNoTracking().ToListAsync();
 
-    public async Task<IList<T>> GetAllWithTracingAsync(dynamic? parameter = null) => await _dbSet.ToListAsync();
+    public async Task<IList<T>> GetAllWithTracingAsync() => await _dbSet.ToListAsync();
 
     public async Task<T?> GetByIdAsync(int id) => await _dbSet.FindAsync(id);
 

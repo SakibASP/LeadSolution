@@ -72,7 +72,7 @@ public class UtilityService(IUtilityRepo repo, IHttpClientFactory factory, IHttp
         {
             bool IsAdmin = UserInfo().UserRoles?.Contains(Constants.Admin) is true || UserInfo().UserRoles?.Contains(Constants.SuperAdmin) is true;
             if (!IsAdmin)
-                request.Param1 = _httpContext.HttpContext?.User.FindFirstValue(ClaimTypes.NameIdentifier);
+                request.Param1 = request.Param1 ?? _httpContext.HttpContext?.User.FindFirstValue(ClaimTypes.NameIdentifier);
             var result = await _iUtilityRepo.GetDropdownListAsync<UserDropdownDto>(request);
             return ApiResponse<IList<UserDropdownDto>>.Success(result, string.Empty);
         }

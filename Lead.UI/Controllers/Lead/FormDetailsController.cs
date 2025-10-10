@@ -14,7 +14,7 @@ namespace Lead.UI.Controllers.Lead;
 
 public class FormDetailsController(IHttpService httpService, IOptions<ApiSettings> apiSetting) : BaseController(httpService, apiSetting)
 {
-    private string VersionedController => $"{_apiSettings.Controllers.FormDetails}";
+    private string VersionedController => $"{_apiSettings.Versions.FormDetails}";
 
     private void SetToken() => _httpService.SetBearerToken(UserInfo.AccessToken);
 

@@ -51,7 +51,7 @@ public class BaseController(IHttpService httpService, IOptions<ApiSettings> apiS
     /// <summary>
     /// Gets the utility controller endpoint from the API settings.
     /// </summary>
-    protected string UtilityVersion => _apiSettings.Controllers.Utility;
+    protected string UtilityVersion => _apiSettings.Versions.Utility;
 
 
     /// <summary>
@@ -93,7 +93,7 @@ public class BaseController(IHttpService httpService, IOptions<ApiSettings> apiS
             };
 
             // Call the API to refresh the token and get the response
-            var response = await _httpService.PostAsync<ApiResponse<AuthResponseDto>?>(_apiSettings.Controllers.Auth, _apiSettings.Endpoints.Auth.RefreshToken, tokenDto);
+            var response = await _httpService.PostAsync<ApiResponse<AuthResponseDto>?>(_apiSettings.Versions.Auth, _apiSettings.Endpoints.Auth.RefreshToken, tokenDto);
 
             // Check response status, if not success then redirect to login page
             if (response?.IsSuccess is not true)
@@ -185,7 +185,7 @@ public class BaseController(IHttpService httpService, IOptions<ApiSettings> apiS
         GetParam.Clear();
         GetParam.Add("businessId", businessId.ToString());
         var apiKeyTask = await _httpService.GetAsync<ApiResponse<string?>>(
-            _apiSettings.Controllers.Auth,
+            _apiSettings.Versions.Auth,
             _apiSettings.Endpoints.Auth.GetApiKey,
             GetParam);
         return apiKeyTask?.Data ?? string.Empty;

@@ -3,11 +3,11 @@
 public class ApiSettings
 {
     public string BaseUrl { get; set; } = default!;
-    public Controllers Controllers { get; set; } = default!;
+    public Versions Versions { get; set; } = default!;
     public Endpoints Endpoints { get; set; } = default!;
 }
 
-public class Controllers
+public class Versions
 {
     public string Auth { get; set; } = default!;
     public string Roles { get; set; } = default!;

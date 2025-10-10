@@ -11,7 +11,7 @@ namespace Lead.UI.Controllers.Lead;
 
 public class DataTypesController(IHttpService httpService, IOptions<ApiSettings> apiSetting) : BaseController(httpService, apiSetting)
 {
-    private string Version => _apiSettings.Controllers.DataTypes;
+    private string Version => _apiSettings.Versions.DataTypes;
 
     private void SetToken() => _httpService.SetBearerToken(UserInfo.AccessToken);
 

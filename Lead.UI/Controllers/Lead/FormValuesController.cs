@@ -16,7 +16,7 @@ namespace Lead.UI.Controllers.Lead;
 
 public class FormValuesController(IHttpService httpService, IOptions<ApiSettings> apiSetting) : BaseController(httpService, apiSetting)
 {
-    private string Version => _apiSettings.Controllers.FormValues;
+    private string Version => _apiSettings.Versions.FormValues;
     private FormValuesEndpoints Endpoints => _apiSettings.Endpoints.FormValues;
 
     private void SetToken() => _httpService.SetBearerToken(UserInfo.AccessToken);
@@ -165,7 +165,7 @@ public class FormValuesController(IHttpService httpService, IOptions<ApiSettings
     {
         SetToken();
         var response = await _httpService.PostAsync<ApiResponse<string>>(
-            _apiSettings.Controllers.Auth,
+            _apiSettings.Versions.Auth,
             _apiSettings.Endpoints.Auth.GenerateApiKey, businessId);
 
         return Json(response);

@@ -39,11 +39,11 @@ public class DataTypeService(IGenericRepo<DataTypes> repo, IHttpContextAccessor 
         }
     }
 
-    public async Task<ApiResponse<IList<DataTypes>>> GetAllAsync(dynamic? parameter)
+    public async Task<ApiResponse<IList<DataTypes>>> GetAllAsync()
     {
         try
         {
-            var result = await _iDataType.GetAllAsync(parameter);
+            var result = await _iDataType.GetAllAsync();
             return ApiResponse<IList<DataTypes>>.Success(result, "Data type retrieved successfully!");
         }
         catch (Exception ex)
@@ -51,7 +51,7 @@ public class DataTypeService(IGenericRepo<DataTypes> repo, IHttpContextAccessor 
             Log
                 .ForContext("UserName", CurrentUser)
                 .ForContext("Path", RequestPath)
-                .Error(ex, "Error retrieving DataTypes {parameter}", JsonSerializer.Serialize(parameter));
+                .Error(ex, "Error retrieving DataTypes");
             return ApiResponse<IList<DataTypes>>.Fail("Something went wrong!");
         }
     }

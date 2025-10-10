@@ -38,11 +38,11 @@ public class FormDetailService(IGenericRepo<FormDetails> repo, IFormDetailRepo d
         }
     }
 
-    public async Task<ApiResponse<IList<FormDetails>>> GetAllAsync(dynamic? parameter)
+    public async Task<ApiResponse<IList<FormDetails>>> GetAllAsync()
     {
         try
         {
-            var result = await _iGenericRepo.GetAllAsync(parameter);
+            var result = await _iGenericRepo.GetAllAsync();
             return ApiResponse<IList<FormDetails>>.Success(result, "Form details retrieved successfully!");
         }
         catch (Exception ex)
@@ -50,7 +50,7 @@ public class FormDetailService(IGenericRepo<FormDetails> repo, IFormDetailRepo d
             Log
                 .ForContext("UserName", CurrentUser)
                 .ForContext("Path", RequestPath)
-                .Error(ex, "Error retrieving all FormDetails with parameter: {@Parameter}", JsonSerializer.Serialize(parameter));
+                .Error(ex, "Error retrieving all FormDetails with parameter");
             return ApiResponse<IList<FormDetails>>.Fail("Something went wrong!");
         }
     }
