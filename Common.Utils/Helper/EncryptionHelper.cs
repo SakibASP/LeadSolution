@@ -6,7 +6,7 @@ namespace Common.Utils.Helper;
 public class EncryptionHelper
 {
     //Encryption Key
-    private static readonly string Key = "#SakibRealMadrid"; // Must be 16, 24, or 32 characters long
+    private static readonly string Key = "#YourPrivateKey"; // Must be 16, 24, or 32 characters long
 
     // Encrypt a string
     public static string Encrypt(string? plainText)
