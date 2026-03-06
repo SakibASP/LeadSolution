@@ -57,3 +57,13 @@
 /Lead.Api/Logs/FatalLogs
 /Lead.Mobile/bin/Debug
 /Lead.Mobile/obj
+/Application.Interfaces/bin/Debug/net10.0
+/Common.Utils/bin/Debug/net10.0
+/Core.Models/bin/Debug/net10.0
+/Core.ViewModels/bin/Debug/net10.0
+/Infrastructure.Interfaces/bin/Debug/net10.0
+/Infrastructure.Repositories/bin/Debug/net10.0
+/Application.Services/bin/Debug/net10.0
+/Common.DI/bin/Debug/net10.0
+/Lead.Api/bin/Debug/net10.0
+/Lead.UI/bin/Debug/net10.0
