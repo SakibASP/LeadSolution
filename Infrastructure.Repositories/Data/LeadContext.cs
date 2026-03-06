@@ -85,7 +85,7 @@ public class LeadContext : IdentityDbContext<ApplicationUser>
     public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {
         auditList.Clear();
-        auditFactory = new AuditTrailFactory(new HttpContextAccessor());
+        auditFactory = new AuditTrailFactory();
 
         var entityList = ChangeTracker.Entries().Where(p => p.State == EntityState.Deleted || p.State == EntityState.Modified);  //p.State == EntityState.Added || for insert statement
         foreach (var entity in entityList)
