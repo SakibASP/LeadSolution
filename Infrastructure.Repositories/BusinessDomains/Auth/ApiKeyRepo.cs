@@ -4,6 +4,7 @@ using Core.Models.Auth;
 using Infrastructure.Interfaces.Auth;
 using Infrastructure.Repositories.Data;
 using Microsoft.EntityFrameworkCore;
+using Encryptor = EncryptionHelper.EncryptionHelper;
 
 namespace Infrastructure.Repositories.BusinessDomains.Auth;
 
@@ -49,7 +50,7 @@ public sealed class ApiKeyRepo(LeadContext context) : IApiKeyRepo
 
     public async Task<bool> ValidateKey(int businessId, string key)
     {
-        var keyToCheck = EncryptionHelper.Decrypt(key);
+        var keyToCheck = Encryptor.Decrypt(key);
         return await _context.AspNetBusinessApiKeys
             .AnyAsync(x => x.BusinessId == businessId && x.ApiKey == keyToCheck && x.IsActive);
     }

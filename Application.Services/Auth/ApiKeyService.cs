@@ -1,12 +1,11 @@
 ﻿using Application.Interfaces.Auth;
 using Common.Utils.Extentions;
-using Common.Utils.Extentions;
-using Common.Utils.Helper;
 using Core.Models.Auth;
 using Core.ViewModels.Response;
 using Infrastructure.Interfaces.Auth;
 using Microsoft.AspNetCore.Http;
 using Serilog;
+using Encryptor = EncryptionHelper.EncryptionHelper;
 
 namespace Application.Services.Auth;
 
@@ -30,7 +29,7 @@ public class ApiKeyService(IApiKeyRepo apiKeyRepo, IHttpContextAccessor httpCont
                 CreatedBy = CurrentUser
             };
             await _iRepo.GenerateNewApiKeyAsync(businessApiKeys);
-            return ApiResponse<string?>.Success(EncryptionHelper.Encrypt(key), "Key generated successfully!");
+            return ApiResponse<string?>.Success(Encryptor.Encrypt(key), "Key generated successfully!");
         }
         catch (Exception ex)
         {
@@ -47,7 +46,7 @@ public class ApiKeyService(IApiKeyRepo apiKeyRepo, IHttpContextAccessor httpCont
         try
         {
             var apiKey = await _iRepo.GetActiveApiKeyAsync(businessId);
-            return ApiResponse<string?>.Success(EncryptionHelper.Encrypt(apiKey?.ApiKey), "Key got successfully!");
+            return ApiResponse<string?>.Success(Encryptor.Encrypt(apiKey?.ApiKey), "Key got successfully!");
         }
         catch (Exception ex)
         {

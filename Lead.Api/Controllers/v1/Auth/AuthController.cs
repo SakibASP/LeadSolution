@@ -2,7 +2,6 @@
 using Application.Interfaces.Common;
 using Application.Services.Common;
 using Common.Utils.Extentions;
-using Common.Utils.Extentions;
 using Common.Utils.Helper;
 using Core.Models.Auth;
 using Core.ViewModels.Dto.Auth.Auth;
@@ -15,6 +14,7 @@ using Microsoft.Extensions.Options;
 using Serilog;
 using System.Data;
 using System.Text.Json;
+using Encryptor = EncryptionHelper.EncryptionHelper;
 
 namespace Lead.Api.Controllers.v1.Auth;
 
@@ -97,7 +97,7 @@ public class AuthController(
                 Expires = _bdTime.AddDays(_jwtOptions.RefreshTokenValidityInDays)
             };
 
-            var encryptedRefreshToken = EncryptionHelper.Encrypt(JsonSerializer.Serialize(tokenDto));
+            var encryptedRefreshToken = Encryptor.Encrypt(JsonSerializer.Serialize(tokenDto));
             await _userManager.SetAuthenticationTokenAsync(user, "Default", "RefreshToken", encryptedRefreshToken);
 
             // Wrap auth response inside ApiResponse<AuthResponseDto>
@@ -108,7 +108,7 @@ public class AuthController(
                 Expiration = _bdTime.AddMinutes(_jwtOptions.TokenValidityInMinutes)
             };
 
-            await _userManager.SetAuthenticationTokenAsync(user, "Default", "AccessToken", EncryptionHelper.Encrypt(response.Token));
+            await _userManager.SetAuthenticationTokenAsync(user, "Default", "AccessToken", Encryptor.Encrypt(response.Token));
             return Ok(ApiResponse<AuthResponseDto>.Success(response, "Login successful!"));
         }
         catch (Exception ex)
@@ -146,7 +146,7 @@ public class AuthController(
             if (storedToken is null)
                 return Ok(ApiResponse<AuthResponseDto>.Fail("No refresh token found for this user!"));
 
-            var tokenData = JsonSerializer.Deserialize<TokenDto>(EncryptionHelper.Decrypt(storedToken));
+            var tokenData = JsonSerializer.Deserialize<TokenDto>(Encryptor.Decrypt(storedToken));
             if (tokenData is null)
                 return Ok(ApiResponse<AuthResponseDto>.Fail("Invalid refresh token data!"));
 
@@ -166,7 +166,7 @@ public class AuthController(
                 Expiration = _bdTime.AddMinutes(_jwtOptions.TokenValidityInMinutes)
             };
 
-            await _userManager.SetAuthenticationTokenAsync(user, "Default", "AccessToken", EncryptionHelper.Encrypt(response.Token));
+            await _userManager.SetAuthenticationTokenAsync(user, "Default", "AccessToken", Encryptor.Encrypt(response.Token));
             return Ok(ApiResponse<AuthResponseDto>.Success(response, "Token refreshed successful!"));
         }
         catch (Exception ex)

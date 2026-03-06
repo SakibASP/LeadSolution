@@ -9,6 +9,8 @@ using Microsoft.Extensions.Options;
 using MimeKit;
 using Serilog;
 
+using Encryptor = EncryptionHelper.EncryptionHelper;
+
 namespace Application.Services.Common;
 
 /// <summary>
@@ -159,7 +161,7 @@ public class EmailService(IOptions<SmtpSettings> options,
             // authenticate if username provided
             if (!string.IsNullOrEmpty(_settings.UserName))
             {
-                await client.AuthenticateAsync(_settings.UserName, EncryptionHelper.Decrypt(_settings.Password), cancellationToken).ConfigureAwait(false);
+                await client.AuthenticateAsync(_settings.UserName, Encryptor.Decrypt(_settings.Password), cancellationToken).ConfigureAwait(false);
             }
 
             await client.SendAsync(message, cancellationToken).ConfigureAwait(false);
